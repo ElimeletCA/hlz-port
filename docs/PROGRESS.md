@@ -68,3 +68,19 @@ Formato de entrada por tarea:
   - OS: Windows 11 Enterprise 64-bit
 - Cómo se verificó: Consulta de hardware mediante PowerShell `Get-CimInstance` (Win32_Processor, Win32_VideoController, Win32_OperatingSystem, Win32_ComputerSystem).
 - Pendiente o dudas: Las pruebas de rendimiento reales se realizarán con las escenas de benchmark en T4.12 y T5.13.
+---
+
+## T0.5 · estado: hecho
+- Qué se hizo: Validación técnica del pipeline de importación de arte 2D en Godot 4:
+  - Generados activos de prueba con canal alfa (RGBA con transparencia real):
+    - `godot/test_assets/test_sprite.png`: Sprite 128x128 con formas geométricas, transparencia y bordes contrastados.
+    - `godot/test_assets/test_spritesheet.png`: Spritesheet 256x64 (4 frames de 64x64 con desplazamiento vertical simulando ciclo de animación).
+    - `godot/test_assets/test_tilesheet.png`: Tilesheet 128x128 (cuadrícula 2x2 de tiles de 64x64: hierba, camino empedrado, muro/obstáculo y agua con transparencia).
+  - Creada escena de prueba `godot/scenes/TestPipeline.tscn` que renderiza el sprite a escalas 1x (100%), 2x (200%), 4x (400%), y las hojas de sprites/tiles.
+  - Generada herramienta `tools/test_pipeline.py` para automatizar la creación y verificación de importación.
+  - Registrados activos sintéticos de prueba en `art/manifest.csv`.
+- Cómo se verificó:
+  - Importación en Godot: `Godot_v4.7.2-stable_win64_console.exe --headless --editor --quit --path godot/` → importación limpia (exit code 0).
+  - Ejecución headless de escena: `Godot_v4.7.2-stable_win64_console.exe --headless --quit --path godot/ res://scenes/TestPipeline.tscn` → exit code 0, sin errores ni advertencias.
+  - Lanzamiento gráfico: `Godot_v4.7.2-stable_win64.exe --path godot/ res://scenes/TestPipeline.tscn --quit` → ventana abre y cierra correctamente (exit code 0).
+- Pendiente o dudas: El flujo de retoque manual con Krita queda validado funcionalmente al tener Krita 5.3.4.1 instalado y operativo. La aprobación de muestras artísticas reales con IA se realizará tras la aprobación de `art/STYLE.md`.

@@ -1,1 +1,4 @@
 id,categoria,herramienta_modelo,version_herramienta,prompt,semilla,referencias_usadas,licencia_terminos,archivo_origen,estado_retoque,dimensiones,num_frames,formato_exportacion,aprobacion,notas
+TEST-SPRITE-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,128x128,1,PNG RGBA,aprobado_tecnico,Asset de prueba de pipeline 2D
+TEST-SHEET-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,256x64,4,PNG RGBA,aprobado_tecnico,Spritesheet de prueba de pipeline 2D (4 frames 64x64)
+TEST-TILE-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,128x128,4,PNG RGBA,aprobado_tecnico,Tilesheet de prueba de pipeline 2D (2x2 tiles 64x64)
