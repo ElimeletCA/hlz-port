@@ -24,11 +24,12 @@ var interaction_count: int = 0
 
 func _ready() -> void:
 	prompt_label.visible = false
-	# Usar sprite del héroe con tinte dorado/antiguo como instructor
-	var tex := load("res://art_samples/hero_lucian_idle.png") as Texture2D
-	if tex:
-		sprite.texture = tex
-		sprite.modulate = Color(0.9, 0.85, 0.65) # Tinte veterano / maestro
+	var aldren_path := "res://art_samples/npc_aldren.png"
+	if ResourceLoader.exists(aldren_path):
+		var tex := load(aldren_path) as Texture2D
+		if tex:
+			sprite.texture = tex
+			sprite.modulate = Color.WHITE
 
 
 func interact(player: Node) -> void:

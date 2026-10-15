@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c8house001"]
+
+[ext_resource type="Texture2D" path="res://art_samples/prop_village_house.png" id="1_house"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_base"]
+size = Vector2(190, 60)
+
+[node name="PropVillageHouse" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(-110, -5, -60, -18, 0, -22, 60, -18, 110, -5, 110, 15, 60, 25, 0, 28, -60, 25, -110, 15)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_house")
+offset = Vector2(0, -128)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -30)
+shape = SubResource("RectangleShape2D_wall_base")

@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c8lantern01"]
+
+[ext_resource type="Texture2D" path="res://art_samples/prop_lantern.png" id="1_lantern"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_post"]
+radius = 8.0
+
+[node name="PropLantern" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.4)
+polygon = PackedVector2Array(-10, -2, 0, -5, 10, -2, 10, 4, 0, 6, -10, 4)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_lantern")
+offset = Vector2(0, -40)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -5)
+shape = SubResource("CircleShape2D_post")

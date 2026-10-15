@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c8cottage01"]
+
+[ext_resource type="Texture2D" path="res://art_samples/prop_cottage.png" id="1_cottage"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cottage_base"]
+size = Vector2(180, 50)
+
+[node name="PropCottage" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(-100, -5, -50, -16, 0, -20, 50, -16, 100, -5, 100, 15, 50, 22, 0, 25, -50, 22, -100, 15)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_cottage")
+offset = Vector2(0, -110)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -25)
+shape = SubResource("RectangleShape2D_cottage_base")

@@ -30,13 +30,19 @@ func _ready() -> void:
 	print("=== INICIANDO VERTICAL SLICE - 6 SLOTS ACTIVOS ===")
 	print("==================================================")
 	
-	# Cargar render de mapa 4x si existe
-	var out_dir := ProjectSettings.globalize_path("res://../out")
-	var map_path := out_dir + "/renders/m_m_00.png"
-	if FileAccess.file_exists(map_path):
-		var img := Image.new()
-		if img.load(map_path) == OK:
-			map_sprite.texture = ImageTexture.create_from_image(img)
+	# Cargar mapa ilustrado de la aldea
+	var village_map_res := "res://art_samples/map_silverleaf.png"
+	if ResourceLoader.exists(village_map_res):
+		var tex := load(village_map_res) as Texture2D
+		if tex:
+			map_sprite.texture = tex
+	else:
+		var out_dir := ProjectSettings.globalize_path("res://../out")
+		var map_path := out_dir + "/renders/m_m_00.png"
+		if FileAccess.file_exists(map_path):
+			var img := Image.new()
+			if img.load(map_path) == OK:
+				map_sprite.texture = ImageTexture.create_from_image(img)
 	
 	# Configurar cámara con Variante B oficial aprobada en T4.7
 	camera.zoom = Vector2(2.0, 2.0)

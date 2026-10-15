@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c8npc001"]
 
 [ext_resource type="Script" path="res://scripts/npc_trainer.gd" id="1_npc"]
-[ext_resource type="Texture2D" path="res://art_samples/hero_lucian_idle.png" id="2_lucian"]
+[ext_resource type="Texture2D" path="res://art_samples/npc_aldren.png" id="2_aldren"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_solid"]
 radius = 16.0
@@ -21,7 +21,7 @@ color = Color(0, 0, 0, 0.4)
 polygon = PackedVector2Array(-24, -4, -14, -8, 0, -10, 14, -8, 24, -4, 24, 4, 14, 8, 0, 10, -14, 8, -24, 4)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_lucian")
+texture = ExtResource("2_aldren")
 offset = Vector2(0, -64)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

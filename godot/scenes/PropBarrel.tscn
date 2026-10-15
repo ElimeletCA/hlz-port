@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c8barrel001"]
+
+[ext_resource type="Texture2D" path="res://art_samples/prop_barrel.png" id="1_barrel"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_barrel_base"]
+size = Vector2(50, 24)
+
+[node name="PropBarrel" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(-28, -3, -14, -8, 0, -10, 14, -8, 28, -3, 28, 5, 14, 9, 0, 10, -14, 9, -28, 5)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_barrel")
+offset = Vector2(0, -32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_barrel_base")
