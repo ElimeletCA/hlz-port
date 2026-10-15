@@ -1,0 +1,38 @@
+# ── Datos de origen y salida (nunca en git) ───────────────────────────────────
+input/
+out/
+reverse/decompiled/
+reverse/mapping.txt
+
+# ── Arte fuente privado ────────────────────────────────────────────────────────
+art/raw/
+art/work/
+art/concepts/
+
+# ── Godot ─────────────────────────────────────────────────────────────────────
+godot/.godot/
+godot/export_presets.cfg
+*.import
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# ── Editor y OS ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ── Logs temporales ───────────────────────────────────────────────────────────
+*.log

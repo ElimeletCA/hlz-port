@@ -1,0 +1,48 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes in []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Heroes Lore Zero"
+config/description="Port fan-made 2D de Heroes Lore: Zero — solo uso personal"
+config/version="0.0.1"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/initial_position_type=2
+window/size/mode=0
+window/size/resizable=true
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/vsync/vsync_mode=1
+window/per_pixel_transparency/allowed=false
+
+; Ventana inicial: 1280x720
+window/size/initial_width=1280
+window/size/initial_height=720
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=1
+
+[input]
+
+; InputMap vacío — se define en T4.9
+
+[editor]
+
+version_control/autoload_on_startup=false
