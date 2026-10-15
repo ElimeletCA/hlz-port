@@ -46,3 +46,13 @@ Formato de entrada por tarea:
   - `krita.exe` → versión `5.3.4.1 (git bd6e8d0)` en `C:\Program Files\Krita (x64)\bin\`
 - Pendiente o dudas: Ninguna herramienta nueva está en PATH del sistema; se usan rutas absolutas centralizadas en `tools/paths.py`. Krita no está en PATH (uso normal: doble clic o ruta absoluta).
 
+---
+
+## T0.3 · estado: hecho
+- Qué se hizo: Copiado el archivo `Heroes Lore Zero 360x640 Spanish.jar` a `input/` y calculado su hash criptográfico SHA-256. Registrado en `docs/spec/content_scope.md`.
+- Cómo se verificó:
+  - `Get-FileHash -Algorithm SHA256 "input\Heroes Lore Zero 360x640 Spanish.jar"`
+  - Hash: `F4F280AE14914867F5A2A5E4BFD30B139F8AB3F40E454A66D7433FCDB18A6331`
+  - Tamaño: 1.367.966 bytes
+  - Comprobado que `.gitignore` excluye el archivo del control de versiones.
+- Pendiente o dudas: Ninguna para esta tarea.

@@ -4,6 +4,12 @@ Documento vivo. Refleja el inventario de contenido confirmado del juego original
 
 Fuente primaria: inspección del `.jar` (v4.4.45, español modificado). Las hipótesis se verifican en T2.1–T2.4.
 
+### Archivo de referencia registrado (T0.3)
+- **Archivo:** `input/Heroes Lore Zero 360x640 Spanish.jar`
+- **Tamaño:** 1.367.966 bytes (1,30 MB)
+- **SHA-256:** `F4F280AE14914867F5A2A5E4BFD30B139F8AB3F40E454A66D7433FCDB18A6331`
+- **Estado de git:** Excluido por `.gitignore` (uso personal, no se versiona el binario)
+
 ---
 
 ## Matriz de contenido
