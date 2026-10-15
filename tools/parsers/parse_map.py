@@ -14,18 +14,20 @@ def parse_map(data: bytes, map_name: str = "") -> Dict[str, Any]:
     """
     off = 0
     map_flags = data[off]; off += 1
-    music_id = data[off]; off += 1
-    weather_id = data[off]; off += 1
+    tileset_0 = data[off]; off += 1
+    tileset_1 = data[off]; off += 1
 
-    # Referencias a tilesets
-    tileset_refs = []
+    # Nombres de localización y sub-área en español
+    names = []
     for _ in range(2):
-        tlen = data[off]; off += 1
-        if tlen > 0:
-            tileset_refs.append(list(data[off:off + tlen]))
-            off += tlen
+        nlen = data[off]; off += 1
+        if nlen > 0:
+            names.append(data[off:off + nlen].decode("iso-8859-1", errors="replace").strip())
+            off += nlen
         else:
-            tileset_refs.append([])
+            names.append("")
+    location_name = names[0] if len(names) > 0 else ""
+    sub_location = names[1] if len(names) > 1 else ""
 
     # Definiciones de tiles
     tile_def_count = data[off]; off += 1
@@ -89,14 +91,16 @@ def parse_map(data: bytes, map_name: str = "") -> Dict[str, Any]:
 
     return {
         "name": map_name,
+        "location_name": location_name,
+        "sub_location": sub_location,
+        "tileset_0": tileset_0,
+        "tileset_1": tileset_1,
         "width": width,
         "height": height,
         "pixel_width": width * 16,
         "pixel_height": height * 16,
         "tile_size": 16,
         "map_flags": map_flags,
-        "music_id": music_id,
-        "weather_id": weather_id,
         "tile_defs": tile_defs,
         "ground_layer": ground_layer,
         "overlay_layer": overlay_layer,

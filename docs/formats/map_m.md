@@ -23,13 +23,14 @@ Los mapas originales del juego se dividen en dos carpetas dentro del JAR:
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `map_flags` | `uint8` | Banderas de entorno del mapa (interior/exterior, iluminación). |
-| `music_id` | `uint8` | ID de música de fondo asociada (índice en `/snd/b/`). |
-| `weather_id`| `uint8` | Efecto atmosférico o clima. |
-| `tileset_refs` | `2 x (uint8 len + bytes)` | Referencias a los tilesets u objetos de escenario base. |
-| `tile_def_count` | `uint8` | Cantidad de definiciones de tiles de mapa (`/m/obX.mpm`). |
-| `tile_defs` | `bytes[tile_def_count]` | Mapeo de índices de tiles a gráficos en `/m/obX.mpm`. |
-| `width` | `uint8` | Ancho del mapa en número de casillas (tiles). |
-| `height` | `uint8` | Alto del mapa en número de casillas (tiles). |
+| `tileset_0` | `uint8` | Índice del tileset primario del mapa (carga `/m/tXX.mpm`, de 0 a 34). |
+| `tileset_1` | `uint8` | Índice del tileset secundario del mapa (carga `/m/tXX.mpm`). |
+| `location_name` | `uint8 len + bytes` | Nombre de la zona o mapa en español (ej. "Aldea Silverleaf", "Ciudad Humming"). |
+| `sub_location` | `uint8 len + bytes` | Nombre del sub-sector o piso (ej. "Orfanato", "Puerto", "Nivel 2 Cuarto B"). |
+| `tile_def_count` | `uint8` | Cantidad de definiciones de objetos / props de mapa (`/m/obX.mpm`). |
+| `tile_defs` | `bytes[tile_def_count]` | Mapeo de índices de objetos a gráficos en `/m/obX.mpm`. |
+| `width` | `uint8` | Ancho del mapa en número de casillas (tiles de 16×16 px). |
+| `height` | `uint8` | Alto del mapa en número de casillas (tiles de 16×16 px). |
 | `layer_ground` | `bytes[width * height]` | Índices de tile para la capa inferior de suelo (fondo). |
 | `layer_overlay` | `bytes[width * height]` | Índices de tile para la capa superior / colisión. |
 | `objects_count` | `uint8` | Cantidad de entidades interactivas (NPCs / cofres). |

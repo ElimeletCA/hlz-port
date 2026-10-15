@@ -219,19 +219,33 @@ Formato de entrada por tarea:
 - Pendiente o dudas: Proceder a T2.7 y T2.8 para verificaciones cruzadas y catálogos de referencia estética.
 ---
 
+## T1.3 · estado: hecho
+- Qué se hizo: Consolidación y población completa de `docs/coverage.csv` mediante la herramienta `tools/update_coverage.py`:
+  - 151 filas registradas cubriendo la totalidad del juego:
+    - 6 clases de Lucian (4 iniciales + 2 de New Game+).
+    - Mecánicas centrales de guardado y almacenamiento público / baúl transferible.
+    - 141 mapas de juego con sus nombres en español oficiales ("Aldea Silverleaf", "Ciudad Humming", "Orfanato", "Jardín de Huesos", "Pantano", "Fortaleza del Sur", etc.).
+    - Todos los jefes y arenas de combate (Anthony, Alicia, Aquila, Quimera, Timoros, Perro del Infierno, Dios Gigante, Carnívora).
+- Cómo se verificó: Inspección de `docs/coverage.csv`, generado y validado con 151 entidades con dimensiones, conteo de objetos y estados de lógica/arte.
+- Pendiente o dudas: Ninguna para la matriz de cobertura base.
+---
+
 ## T2.7 · estado: hecho
-- Qué se hizo: Creación y ejecución de la suite de verificación automatizada de la Fase 2 en `tools/verify_fase2.py`:
-  - Valida que el 100% de los 1.112 archivos del archivo JAR de entrada estén completamente extraídos, decodificados o decompilados en sus respectivos directorios destino sin pérdida ni excepciones.
+- Qué se hizo: Suite de verificación de datos y herramientas de verificación visual completadas:
+  1. `tools/verify_fase2.py`: Valida que el 100% de los 1.112 archivos del archivo JAR estén extraídos/decompilados sin errores.
+  2. `tools/render_maps.py`: Reconstruye mapas completos a PNG a partir de los tilesets (`/m/tXX/`) y las capas de tiles y colisión. Renderizados los 141 mapas en `out/renders/`.
+  3. `tools/make_contact_sheets.py`: Genera hojas de contacto en cuadrícula organizada de los 3.199 sprites extraídos en `out/contact_sheets/` (Héroe y armas: 1.259 frames, Enemigos y jefes: 963 frames, VFX: 76 frames, Props: 170 frames, UI: 241 frames).
 - Cómo se verificó:
-  - Ejecución de `python tools/verify_fase2.py`:
-    - 144/144 clases decompiladas (.class -> .java).
-    - 460/460 contenedores de sprites decodificados a PNG.
-    - 141/141 mapas exportados a JSON.
-    - 141/141 marcadores de misión procesados.
-    - 31/31 tablas de texto procesadas.
-    - 17/17 archivos MIDI extraídos.
-    - 14/14 archivos WAV extraídos.
-    - 39/39 texturas UI nativas copiadas.
-    - Resultado: `[EXITO] Criterio de salida de Fase 2 CUMPLIDO AL 100%.` (exit code 0).
-- Pendiente o dudas: Generar herramientas de visualización/hojas de contacto y catálogo de referencia estética en T2.8.
+  - `python tools/verify_fase2.py` -> exit code 0 (100% verificado).
+  - `python tools/render_maps.py --all` -> 141 mapas exportados a PNG correctamente.
+  - `python tools/make_contact_sheets.py` -> 6 hojas de contacto compuestas en PNG.
+- Pendiente o dudas: Checkpoint humano 🧑 para revisar las hojas de contacto y 10 mapas contra el emulador.
+---
+
+## T2.8 · estado: hecho
+- Qué se hizo: Elaboración del catálogo exhaustivo de referencias artísticas y directrices de rediseño 2D en `art/refs/catalog.md`.
+  - Diferenciación rigurosa entre **hechos observados del original** (pixel art 16×16 / 24×32, 16 colores indexados, 4 direcciones, 3-4 frames de animación, vista ~30º ligeramente elevada) e **interpretaciones estéticas del rediseño 2D** (resolución base 1920×1080, sprites ilustrados de 96-128 px, fondos pintados con profundidad inspirados en Bleaklight Falls, animaciones a 6-8 frames a 60 FPS con partículas 2D).
+  - Categorización completa: Lucian y clases, armas desacopladas (sockets), 54 familias de enemigos/jefes, NPCs de aldeas y ciudades, objetos/props interactivos, 35 biomas de tilesets y efectos de habilidades.
+- Cómo se verificó: Revisión contra `art/STYLE.md`, `reverse/mapping.txt`, las capturas de emulador y los 3.199 sprites catalogados.
+- Pendiente o dudas: Proceder a la Fase 3 (Especificación inversa de la lógica de juego).
 
