@@ -29,8 +29,9 @@ GODOT_PROJECT = os.path.join(os.path.dirname(__file__), '..', 'godot')
 ART_SAMPLES_DIR = os.path.join(GODOT_PROJECT, 'art_samples')
 IMPORTED_DIR = os.path.join(GODOT_PROJECT, '.godot', 'imported')
 
-# PNGs que necesitan importación (los que no tienen .import todavía)
+# PNGs que necesitan importación (o actualización si cambia el PNG)
 ASSETS_FALTANTES = [
+    'hero_lucian_idle.png',
     'map_silverleaf.png',
     'npc_aldren.png',
     'prop_barrel.png',
@@ -232,7 +233,7 @@ detect_3d/compress_to=1
 """
 
 
-def procesar_asset(nombre_png: str) -> bool:
+def procesar_asset(nombre_png: str, forzar: bool = False) -> bool:
     """Procesa un PNG: genera .ctex, .md5 y .import."""
     ruta_png = os.path.join(ART_SAMPLES_DIR, nombre_png)
 
@@ -241,11 +242,15 @@ def procesar_asset(nombre_png: str) -> bool:
         return False
 
     ruta_import = ruta_png + '.import'
-    if os.path.exists(ruta_import):
-        print(f"  [SKIP]  Ya importado: {nombre_png}")
+    hash_png = md5_archivo(ruta_png)
+    nombre_ctex = f"{nombre_png}-{hash_png}.ctex"
+    ruta_ctex = os.path.join(IMPORTED_DIR, nombre_ctex)
+
+    if not forzar and os.path.exists(ruta_import) and os.path.exists(ruta_ctex):
+        print(f"  [SKIP]  Ya importado y al día: {nombre_png}")
         return True
 
-    print(f"  [PROC]  Procesando: {nombre_png}")
+    print(f"  [PROC]  Procesando/Actualizando: {nombre_png}")
 
     # 1. Obtener dimensiones
     w, h = obtener_dimensiones_png(ruta_png)

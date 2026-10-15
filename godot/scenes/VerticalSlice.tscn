@@ -283,7 +283,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.5, 1)
 theme_override_font_sizes/font_size = 13
-text = "Lucian  ·  Nv. 1 Guerrero"
+text = "Lucian  ·  Nv. 1 Asesino"
 
 [node name="Bars" type="VBoxContainer" parent="HUD/CombatCard/VBox"]
 layout_mode = 2
@@ -355,7 +355,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
 theme_override_font_sizes/font_size = 10
-text = "Golpe Brutal"
+text = "Ataque Sorpresa"
 horizontal_alignment = 1
 
 [node name="Cost" type="Label" parent="HUD/CombatCard/VBox/Slots/Slot1/VBox"]
@@ -393,7 +393,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
 theme_override_font_sizes/font_size = 10
-text = "Embestida"
+text = "Danza Sombría"
 horizontal_alignment = 1
 
 [node name="Cost" type="Label" parent="HUD/CombatCard/VBox/Slots/Slot2/VBox"]
@@ -590,8 +590,7 @@ text = "Heroes Lore: Zero — Tarjeta de Combate"
 [node name="Controls" type="Label" parent="HUD/ControlsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.9)
-theme_override_font_sizes/font_size = 11
-text = "• Mover: WASD / Flechas / Stick Gamepad\n• Ataque Básico: [Espacio] / [J] / Botón X\n• [1] Golpe Brutal (12 SP Azul)\n• [2] Embestida (15 SP Azul)\n• [3] Onda Ígnea (10 EP Verde)\n• [4] Rayo 360° (14 EP Verde)\n• [5 / Q] Poción Vida (+50 HP)\n• [6 / R] Poción Maná (+25 SP)\n• Interactuar: [E] / [Enter] (Hablar / Abrir cofre)\n• Guardar: [F5]  |  Cargar: [F6]"
+text = "• Mover: WASD / Flechas / Stick Gamepad\n• Ataque Básico: [Espacio] / [J] / Botón X (Doble Daga)\n• [1] Ataque Sorpresa (12 SP Azul)\n• [2] Danza Sombría (15 SP Azul)\n• [3] Onda Ígnea (10 EP Verde)\n• [4] Rayo 360° (14 EP Verde)\n• [5 / Q] Poción Vida (+50 HP)\n• [6 / R] Poción Maná (+25 SP)\n• Interactuar: [E] / [Enter] (Hablar / Abrir cofre)\n• Guardar: [F5]  |  Cargar: [F6]"
 
 [node name="DialoguePanel" type="PanelContainer" parent="HUD"]
 visible = false

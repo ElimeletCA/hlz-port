@@ -36,17 +36,20 @@ enum Direction {
 	RIGHT = 3
 }
 
-# --- Atributos de Personaje (Clase Guerrero · Lucian) ---
+# --- Atributos de Personaje (Clase Asesino · Lucian) ---
 @export var character_name: String = "Lucian"
+@export var character_class: String = "Asesino"
 @export var level: int = 1
-@export var max_hp: int = 120
-@export var current_hp: int = 120
-@export var max_sp: int = 30     # Habilidades de Clase (Barra Azul)
-@export var current_sp: int = 30
+@export var max_hp: int = 110
+@export var current_hp: int = 110
+@export var max_sp: int = 35     # Habilidades de Clase (Barra Azul)
+@export var current_sp: int = 35
 @export var max_ep: int = 50     # Habilidades Elementales (Barra Verde)
 @export var current_ep: int = 50
-@export var base_atk: int = 18
-@export var base_def: int = 12
+@export var base_atk: int = 16
+@export var base_def: int = 8
+@export var crit_rate: float = 0.18   # 18% Crítico base de Asesino
+@export var evasion_rate: float = 0.20 # 20% Evasión base de Asesino
 @export var current_exp: int = 0
 @export var next_level_exp: int = 70
 
