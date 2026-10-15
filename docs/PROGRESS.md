@@ -248,4 +248,65 @@ Formato de entrada por tarea:
   - Categorización completa: Lucian y clases, armas desacopladas (sockets), 54 familias de enemigos/jefes, NPCs de aldeas y ciudades, objetos/props interactivos, 35 biomas de tilesets y efectos de habilidades.
 - Cómo se verificó: Revisión contra `art/STYLE.md`, `reverse/mapping.txt`, las capturas de emulador y los 3.199 sprites catalogados.
 - Pendiente o dudas: Proceder a la Fase 3 (Especificación inversa de la lógica de juego).
+---
+
+## T3.1 · estado: hecho
+- Qué se hizo: Documentación técnica del bucle principal, temporización de reloj y máquina de estados global en `docs/spec/engine.md`.
+  - Confirmada tasa nominal de lógica: `TICK_HZ = 14 Hz` (71.42 ms/tick) a partir del array estático en `rpg/e.java`. Modos secundarios: 10 Hz (ralentizado) y 20 Hz (transiciones).
+  - Definida arquitectura de doble reloj para Godot 4.7: simulación a 14 Hz desacoplada e interpolada en `_physics_process` y renderizado a 60+ FPS en `_process`.
+  - Mapeo de la máquina de estados: `Canvas` nativo (`de`), Título (`bc`), Mundo (`bf`), Estado global (`dq`) y Mapas (`e`).
+- Cómo se verificó: Decompilación e inspección de `rpg/e.java`, `cm.java` y `de.java`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T3.2 · estado: hecho
+- Qué se hizo: Documentación del sistema de movimiento, coordenadas y colisiones en `docs/spec/movement.md`.
+  - Coordenadas duales: continuas en píxeles `(h, i)` y discretas en casillas `(s, t)` donde `s = h >> 4` y `t = i >> 4` (tiles de 16×16 px).
+  - 8 direcciones de desplazamiento con vectores unitarios en `rpg.b.G` y `H`.
+  - Velocidad base de paso: 3 píxeles/tick (42 px/s a 14 Hz), reducida al 80% (4/5) bajo efecto slow.
+  - Reglas de colisión bitwise en capa overlay: máscara `0x80` (muro sólido), `0x40` (desnivel) y `0x3F` (tiles decorativos / barrera invisible).
+  - Adaptación para stick analógico con zona muerta de 0.20 y pivote en el pie `(X+8, Y+14)`.
+- Cómo se verificó: Inspección de `ee.java`, `dg.java`, `e.java` y `rpg/b.java`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T3.3 · estado: hecho
+- Qué se hizo: Especificación formal de combate en `docs/spec/combat.md`.
+  - Fórmulas de daño base: $\text{Daño} = \max(1, \text{ATK} - \text{DEF} + \text{Varianza})$ con fluctuación de $\pm 5\%$.
+  - Fórmula de crítico de `dg.java` (línea 2165): $\text{Prob\_Crit} = \max(10, 60 - \text{DEF})$ con daño multiplicado por $1.5\times$.
+  - Fórmula de evasión (Miss) de `dg.java` (línea 2172): tirada aleatoria sobre $100 - \text{EVA}$.
+  - Fórmulas pasivas de vampirismo: $10\%$ robo de vida (HP) y $5\%$ absorción de maná (MP).
+  - Catálogo de habilidades iniciales de las 6 clases (`t/s0.tdf` a `t/s5.tdf`) y estados alterados (Stun, Slow, Poison, Iron Skin).
+- Cómo se verificó: Rastreo de métodos de cálculo en `dg.java` y `ec.java`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T3.4 · estado: hecho
+- Qué se hizo: Especificación de la curva de progresión, crecimiento de stats y economía en `docs/spec/progression.md`.
+  - Curva de nivel exponencial hasta nivel 99: $\text{EXP}(L) = \lfloor 50 \times (L-1)^{2.2} + 20 \times (L-1) \rfloor$.
+  - Tabla de escalado de stats por nivel para las 6 clases (Guerrero, Caballero, Asesino, Pistolero, Elemental, Gunblader).
+  - Taxonomía completa de objetos (`/itm/` 0 a 19): armas, armaduras, accesorios, gemas, consumibles y objetos clave.
+  - Economía de tiendas y forja de refinación (`t/nb.tdf`).
+- Cómo se verificó: Análisis de `bn.java`, `ai.java`, `bx.java` y tablas de texto en `out/text/`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T3.5 · estado: hecho
+- Qué se hizo: Especificación de la inteligencia artificial de enemigos y jefes en `docs/spec/ai_enemies.md`.
+  - Máquina de estados de IA de 6 fases (Patrulla, Persecución, Anticipación, Ataque, Enfriamiento, Daño/Muerte).
+  - Parámetros espaciales y temporales: Radio de detección (4-6 tiles / 64-96 px), radio de abandono (9-12 tiles), cooldown de ataque (14-28 ticks).
+  - Desglose de mecánicas y fases de los 11 encuentros de jefes (Anthony, Alicia, Aquila, Quimera, Timoros, Perro del Infierno, Dios Gigante, etc.).
+- Cómo se verificó: Decodificación de atributos en `ec.java` y análisis de secuencias de combate.
+- Pendiente o dudas: Ninguna.
+---
+
+## T3.6 · estado: hecho
+- Qué se hizo: Especificación del sistema de eventos, banderas de historia y persistencia en `docs/spec/events_quests.md`.
+  - Arquitectura de bitset en `dq.java` (`get_flag`, `set_flag`, `clear_flag` en array `N`).
+  - Identificación de banderas especiales NG+ (Flag 250 y 251 para desbloquear Elemental y Gunblader).
+  - Triggers de mapa: portales de transición, zonas de spawn y colisión con NPCs/cofres.
+  - Formato de guardado para Godot (`user://save_X.dat` para 3 ranuras) y almacenamiento público compartido (`user://shared_trunk.dat`).
+- Cómo se verificó: Análisis de `dq.java`, `e.java` y formatos de texto `.tdf`.
+- Pendiente o dudas: Criterio de salida de Fase 3 cumplido. Listo para Fase 4.
+
 
