@@ -22,12 +22,24 @@ size = Vector2(64, 2624)
 size = Vector2(64, 2624)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_bg"]
-bg_color = Color(0.08, 0.1, 0.12, 0.85)
+bg_color = Color(0.08, 0.1, 0.12, 0.88)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3, 0.35, 0.45, 0.9)
+border_color = Color(0.35, 0.4, 0.5, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_bg"]
+bg_color = Color(0.1, 0.12, 0.16, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.45, 0.55, 0.85)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -54,8 +66,15 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_overlay"]
+bg_color = Color(0, 0, 0, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_diag_bg"]
-bg_color = Color(0.06, 0.08, 0.11, 0.92)
+bg_color = Color(0.06, 0.08, 0.11, 0.94)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
@@ -210,43 +229,258 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_exp_fill")
 max_value = 70.0
 show_percentage = false
 
-[node name="QuickSlots" type="HBoxContainer" parent="HUD"]
-offset_left = 24.0
-offset_top = 152.0
-offset_right = 140.0
-offset_bottom = 208.0
-
-[node name="PotionSlot" type="PanelContainer" parent="HUD/QuickSlots"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
+[node name="ActionBar" type="PanelContainer" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -340.0
+offset_top = -100.0
+offset_right = 340.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bg")
 
-[node name="Icon" type="TextureRect" parent="HUD/QuickSlots/PotionSlot"]
+[node name="Slots" type="HBoxContainer" parent="HUD/ActionBar"]
 layout_mode = 2
-texture = ExtResource("8_potion_icon")
-expand_mode = 1
-stretch_mode = 5
+theme_override_constants/separation = 12
+alignment = 1
 
-[node name="KeyBadge" type="Label" parent="HUD/QuickSlots/PotionSlot"]
+[node name="Slot1" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot1"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot1/VBox"]
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
-theme_override_font_sizes/font_size = 10
-text = "[Q]"
+theme_override_font_sizes/font_size = 12
+text = "[1] CLASE 1"
+horizontal_alignment = 1
 
-[node name="CountBadge" type="Label" parent="HUD/QuickSlots/PotionSlot"]
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot1/VBox"]
 layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 8
-theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Golpe Brutal"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="HUD/ActionBar/Slots/Slot1/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "12 MP"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot1"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
+
+[node name="Slot2" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot2"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "[2] CLASE 2"
+horizontal_alignment = 1
+
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Embestida"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="HUD/ActionBar/Slots/Slot2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "15 MP"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot2"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
+
+[node name="Slot3" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot3"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot3/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.1, 1)
+theme_override_font_sizes/font_size = 12
+text = "[3] ELEM 1"
+horizontal_alignment = 1
+
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot3/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Onda Ígnea"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="HUD/ActionBar/Slots/Slot3/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "10 MP"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot3"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
+
+[node name="Slot4" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot4"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot4/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "[4] ELEM 2"
+horizontal_alignment = 1
+
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot4/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Rayo 360°"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="HUD/ActionBar/Slots/Slot4/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "14 MP"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot4"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
+
+[node name="Slot5" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot5"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot5/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 12
+text = "[5 / Q] HP"
+horizontal_alignment = 1
+
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot5/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Poción Vida"
+horizontal_alignment = 1
+
+[node name="CountBadge" type="Label" parent="HUD/ActionBar/Slots/Slot5/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 9
 text = "x3"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot5"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
+
+[node name="Slot6" type="PanelContainer" parent="HUD/ActionBar/Slots"]
+custom_minimum_size = Vector2(96, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionBar/Slots/Slot6"]
+layout_mode = 2
+alignment = 1
+
+[node name="Key" type="Label" parent="HUD/ActionBar/Slots/Slot6/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.65, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "[6 / R] MP"
+horizontal_alignment = 1
+
+[node name="Name" type="Label" parent="HUD/ActionBar/Slots/Slot6/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 10
+text = "Poción Maná"
+horizontal_alignment = 1
+
+[node name="CountBadge" type="Label" parent="HUD/ActionBar/Slots/Slot6/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "x3"
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ProgressBar" parent="HUD/ActionBar/Slots/Slot6"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+fill_mode = 3
+show_percentage = false
 
 [node name="ControlsPanel" type="PanelContainer" parent="HUD"]
-offset_left = 1400.0
+offset_left = 1380.0
 offset_top = 24.0
 offset_right = 1896.0
-offset_bottom = 190.0
+offset_bottom = 230.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bg")
 
 [node name="Margin" type="MarginContainer" parent="HUD/ControlsPanel"]
@@ -264,13 +498,13 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 13
-text = "Heroes Lore: Zero — Vertical Slice (Fase 5)"
+text = "Heroes Lore: Zero — 6 Slots de Acción (Fase 5)"
 
 [node name="Controls" type="Label" parent="HUD/ControlsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.9)
 theme_override_font_sizes/font_size = 11
-text = "• Mover: WASD / Flechas / Stick Gamepad\n• Atacar: [Espacio] / [J] / Botón X (Mando)\n• Usar Poción: [Q] / Botón Y\n• Interactuar: [E] / Botón A (Hablar / Abrir cofre)\n• Guardar partida: [F5]  |  Cargar partida: [F6]"
+text = "• Mover: WASD / Flechas / Stick Gamepad\n• Ataque Básico: [Espacio] / [J] / Botón X\n• Slot 1 (Clase 1): [1] Golpe Brutal (12 MP)\n• Slot 2 (Clase 2): [2] Embestida (15 MP)\n• Slot 3 (Elem 1):  [3] Onda Ígnea (10 MP)\n• Slot 4 (Elem 2):  [4] Rayo 360° (14 MP)\n• Slot 5 (HP):      [5] o [Q] Poción Vida\n• Slot 6 (MP):      [6] o [R] Poción Maná\n• Interactuar: [E] / [Enter] (Hablar / Abrir cofre)\n• Guardar: [F5]  |  Cargar: [F6]"
 
 [node name="DialoguePanel" type="PanelContainer" parent="HUD"]
 visible = false
@@ -280,9 +514,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -480.0
-offset_top = -240.0
+offset_top = -320.0
 offset_right = 480.0
-offset_bottom = -40.0
+offset_bottom = -120.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_diag_bg")

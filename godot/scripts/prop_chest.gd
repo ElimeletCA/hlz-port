@@ -40,12 +40,16 @@ func interact(player: Node) -> void:
 		
 	prompt_label.visible = false
 	
-	# Entregar recompensa al jugador
-	if "inventory_potions" in player:
-		player.inventory_potions += item_reward_count
+	# Entregar recompensa al jugador (2 de HP y 2 de MP)
+	if "inventory_potions_hp" in player:
+		player.inventory_potions_hp += 2
+	if "inventory_potions_mp" in player:
+		player.inventory_potions_mp += 2
+	if player.has_signal("potions_updated"):
+		player.emit_signal("potions_updated", player.inventory_potions_hp, player.inventory_potions_mp)
 		
-	_spawn_floating_text("¡Obtenido: +%d %s!" % [item_reward_count, item_reward_name], Color(0.2, 1.0, 0.4))
-	emit_signal("chest_opened", item_reward_name, item_reward_count)
+	_spawn_floating_text("¡Obtenido: +2 Poción HP y +2 Poción MP!", Color(0.2, 1.0, 0.4))
+	emit_signal("chest_opened", "Pociones", 4)
 	
 	# Efecto visual de rebote
 	var tween := create_tween()

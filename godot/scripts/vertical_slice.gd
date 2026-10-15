@@ -6,9 +6,10 @@ extends Node2D
 #   - Movimiento a 14 Hz con reloj dual y paridad de velocidad
 #   - Colisiones sólidas de escenario y árboles con Y-Sort
 #   - Combate en tiempo real con hitboxes, fórmulas de daño y crítico
+#   - 6 SLOTS DE ACCIÓN (2 de Clase, 2 Elementales, 2 de Recuperación)
 #   - IA de lobos con máquina de estados (Patrulla / Carga / Enfriamiento / Drop)
 #   - Diálogo interactivo con el Maestro de Armas
-#   - Cofre interactivo con inventario de pociones
+#   - Cofre interactivo con inventario de pociones HP/MP
 #   - Cámara oficial aprobada: Variante B (zoom 2.0x, offset -80px)
 #   - Guardado y carga en slot 1 (F5 / F6)
 
@@ -26,7 +27,7 @@ const MAP_H_PX: int = 2560
 
 func _ready() -> void:
 	print("==================================================")
-	print("=== INICIANDO VERTICAL SLICE - HEROES LORE ZERO ===")
+	print("=== INICIANDO VERTICAL SLICE - 6 SLOTS ACTIVOS ===")
 	print("==================================================")
 	
 	# Cargar render de mapa 4x si existe
@@ -47,7 +48,7 @@ func _ready() -> void:
 	camera.limit_right = MAP_W_PX
 	camera.limit_bottom = MAP_H_PX
 	
-	# Posición inicial de Lucian: cerca del centro de la aldea / camino este
+	# Posición inicial de Lucian
 	player.global_position = Vector2(896, 1280)
 	
 	# Conectar señales del jugador al HUD
@@ -56,6 +57,8 @@ func _ready() -> void:
 	player.connect("exp_gained", Callable(self, "_on_player_exp_gained"))
 	player.connect("level_up", Callable(self, "_on_player_level_up"))
 	player.connect("died", Callable(self, "_on_player_died"))
+	player.connect("slot_cooldown_updated", Callable(self, "_on_slot_cooldown_updated"))
+	player.connect("potions_updated", Callable(self, "_on_potions_updated"))
 	
 	# Conectar señales del NPC al HUD
 	npc.connect("dialogue_started", Callable(self, "_on_npc_dialogue_started"))
@@ -68,12 +71,11 @@ func _ready() -> void:
 	hud.update_mp(player.current_mp, player.max_mp)
 	hud.update_exp(player.current_exp, player.next_level_exp)
 	hud.update_level(player.level, player.character_name)
-	hud.update_potion_count(player.inventory_potions)
+	hud.update_potions(player.inventory_potions_hp, player.inventory_potions_mp)
 	notification_label.visible = false
 
 
 func _process(_delta: float) -> void:
-	# Cámara sigue al jugador suavemente
 	if player != null and is_instance_valid(player):
 		camera.global_position = player.global_position
 
@@ -88,7 +90,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_player_hp_changed(cur: int, max_val: int) -> void:
 	hud.update_hp(cur, max_val)
-	hud.update_potion_count(player.inventory_potions)
 
 
 func _on_player_mp_changed(cur: int, max_val: int) -> void:
@@ -108,6 +109,14 @@ func _on_player_died() -> void:
 	_show_notification("HAS SIDO DERROTADO — Presiona F6 para cargar partida", Color(1.0, 0.2, 0.2))
 
 
+func _on_slot_cooldown_updated(slot_idx: int, cur_cd: float, max_cd: float) -> void:
+	hud.update_slot_cooldown(slot_idx, cur_cd, max_cd)
+
+
+func _on_potions_updated(hp_count: int, mp_count: int) -> void:
+	hud.update_potions(hp_count, mp_count)
+
+
 func _on_npc_dialogue_started(speaker: String, lines: Array) -> void:
 	var string_lines: Array[String] = []
 	for l in lines:
@@ -116,7 +125,7 @@ func _on_npc_dialogue_started(speaker: String, lines: Array) -> void:
 
 
 func _on_chest_opened(_item: String, _count: int) -> void:
-	hud.update_potion_count(player.inventory_potions)
+	hud.update_potions(player.inventory_potions_hp, player.inventory_potions_mp)
 
 
 func _save_vertical_slice() -> void:
@@ -130,7 +139,8 @@ func _save_vertical_slice() -> void:
 		"next_level_exp": player.next_level_exp,
 		"base_atk": player.base_atk,
 		"base_def": player.base_def,
-		"inventory_potions": player.inventory_potions,
+		"inventory_potions_hp": player.inventory_potions_hp,
+		"inventory_potions_mp": player.inventory_potions_mp,
 		"pos_x": player.global_position.x,
 		"pos_y": player.global_position.y,
 		"chest_opened": chest.is_opened
@@ -155,7 +165,8 @@ func _load_vertical_slice() -> void:
 	player.next_level_exp = int(save_data.get("next_level_exp", 70))
 	player.base_atk = int(save_data.get("base_atk", 18))
 	player.base_def = int(save_data.get("base_def", 12))
-	player.inventory_potions = int(save_data.get("inventory_potions", 3))
+	player.inventory_potions_hp = int(save_data.get("inventory_potions_hp", 3))
+	player.inventory_potions_mp = int(save_data.get("inventory_potions_mp", 3))
 	
 	var px: float = float(save_data.get("pos_x", 896.0))
 	var py: float = float(save_data.get("pos_y", 1280.0))
@@ -172,7 +183,7 @@ func _load_vertical_slice() -> void:
 	hud.update_mp(player.current_mp, player.max_mp)
 	hud.update_exp(player.current_exp, player.next_level_exp)
 	hud.update_level(player.level, player.character_name)
-	hud.update_potion_count(player.inventory_potions)
+	hud.update_potions(player.inventory_potions_hp, player.inventory_potions_mp)
 	
 	_show_notification("Partida cargada de Slot 1", Color(0.3, 0.8, 1.0))
 
