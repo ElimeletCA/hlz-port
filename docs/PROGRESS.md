@@ -84,3 +84,13 @@ Formato de entrada por tarea:
   - Ejecución headless de escena: `Godot_v4.7.2-stable_win64_console.exe --headless --quit --path godot/ res://scenes/TestPipeline.tscn` → exit code 0, sin errores ni advertencias.
   - Lanzamiento gráfico: `Godot_v4.7.2-stable_win64.exe --path godot/ res://scenes/TestPipeline.tscn --quit` → ventana abre y cierra correctamente (exit code 0).
 - Pendiente o dudas: El flujo de retoque manual con Krita queda validado funcionalmente al tener Krita 5.3.4.1 instalado y operativo. La aprobación de muestras artísticas reales con IA se realizará tras la aprobación de `art/STYLE.md`.
+---
+
+## T0.9 · estado: hecho
+- Qué se hizo: Preparada la escena de benchmark 2D sintética en `godot/scenes/Benchmark2D.tscn` y el script de medición `godot/scripts/benchmark.gd`.
+  - Incluye: Múltiples entidades (héroe, enemigos, spritesheet), capas de fondo con tilesheet, emisor de partículas 2D (`CPUParticles2D` con 32 partículas para máxima compatibilidad con renderer Compatibility) y HUD con medidor de FPS y tiempo de cuadro.
+  - La escena se utilizará en T4.10, T4.12 y T5.13 para comparar rendimiento entre renderizadores (Compatibility vs Mobile) y medir tasas de cuadro en resoluciones 1080p, 1440p y 4K en los perfiles Bajo, Medio y Alto.
+- Cómo se verificó:
+  - Ejecución headless: `Godot_v4.7.2-stable_win64_console.exe --headless --path godot/ res://scenes/Benchmark2D.tscn` → inicia, ejecuta el ciclo de proceso durante 1s y sale con exit code 0.
+  - Ejecución gráfica: `Godot_v4.7.2-stable_win64.exe --path godot/ res://scenes/Benchmark2D.tscn --quit-after 60` → ventana abre, renderiza fluidamente y cierra con exit code 0.
+- Pendiente o dudas: Las mediciones formales de benchmark en diferentes perfiles se registrarán en `docs/spec/performance.md` en la Fase 4.

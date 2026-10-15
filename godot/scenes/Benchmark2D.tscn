@@ -1,0 +1,67 @@
+[gd_scene load_steps=5 format=3 uid="uid://b0hlzbenchmark"]
+
+[ext_resource type="Script" path="res://scripts/benchmark.gd" id="1_bench"]
+[ext_resource type="Texture2D" uid="uid://ctk6qgn52qbdq" path="res://test_assets/test_sprite.png" id="2_sprite"]
+[ext_resource type="Texture2D" uid="uid://difdc7g3xj1m2" path="res://test_assets/test_spritesheet.png" id="3_sheet"]
+[ext_resource type="Texture2D" uid="uid://c4jdnqcnxnx63" path="res://test_assets/test_tilesheet.png" id="4_tiles"]
+
+[node name="Benchmark2D" type="Node2D"]
+script = ExtResource("1_bench")
+
+[node name="BackgroundTiles" type="Node2D" parent="."]
+
+[node name="Tile1" type="Sprite2D" parent="BackgroundTiles"]
+position = Vector2(200, 200)
+scale = Vector2(2, 2)
+texture = ExtResource("4_tiles")
+
+[node name="Tile2" type="Sprite2D" parent="BackgroundTiles"]
+position = Vector2(456, 200)
+scale = Vector2(2, 2)
+texture = ExtResource("4_tiles")
+
+[node name="Tile3" type="Sprite2D" parent="BackgroundTiles"]
+position = Vector2(712, 200)
+scale = Vector2(2, 2)
+texture = ExtResource("4_tiles")
+
+[node name="Entities" type="Node2D" parent="."]
+
+[node name="HeroSprite" type="Sprite2D" parent="Entities"]
+position = Vector2(300, 400)
+texture = ExtResource("2_sprite")
+
+[node name="EnemySprite1" type="Sprite2D" parent="Entities"]
+position = Vector2(500, 420)
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("2_sprite")
+
+[node name="EnemySprite2" type="Sprite2D" parent="Entities"]
+position = Vector2(650, 380)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("2_sprite")
+
+[node name="SheetEntity" type="Sprite2D" parent="Entities"]
+position = Vector2(400, 550)
+texture = ExtResource("3_sheet")
+
+[node name="ParticlesTest" type="CPUParticles2D" parent="."]
+position = Vector2(480, 360)
+amount = 32
+lifetime = 1.5
+emission_shape = 1
+emission_sphere_radius = 40.0
+spread = 180.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+color = Color(1, 0.8, 0.3, 0.8)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="LabelFPS" type="Label" parent="CanvasLayer"]
+offset_left = 30.0
+offset_top = 20.0
+offset_right = 400.0
+offset_bottom = 60.0
+text = "FPS: Medir..."
