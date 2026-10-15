@@ -134,3 +134,14 @@ Formato de entrada por tarea:
   - Audio confirmado en `snd/`: 17 pistas de música en `snd/b/` y 14 efectos de sonido en `snd/e/`.
 - Cómo se verificó: `python tools/inventory_jar.py` ejecutado con éxito, 1.112 archivos procesados y registrados en `docs/inventory.csv`.
 - Pendiente o dudas: Proceder a T2.2 (decompilación de las 144 clases con Vineflower).
+---
+
+## T2.2 · estado: hecho
+- Qué se hizo: Decompilación completa de las 144 clases Java contenidas en el .jar hacia `reverse/decompiled/` mediante `tools/vineflower-1.12.0.jar`.
+  - 144 archivos fuente `.java` generados y legibles.
+  - Verificada la legibilidad de la clase principal `rpg/RPGHeroEx.java` y el gestor del bucle principal `rpg/e.java`.
+  - Descubrimiento preliminar clave para Fase 3 (T3.1 / TICK_HZ): el bucle en `rpg/e.java` utiliza un array de velocidades `{6, 10, 14, 18}` Hz, inicializando por defecto con el índice 2 (14 Hz / ~71 ms por tick de lógica).
+- Cómo se verificó:
+  - Comando: `java -jar tools/vineflower-1.12.0.jar input/Heroes Lore Zero 360x640 Spanish.jar reverse/decompiled` → exit code 0.
+  - Conteo de archivos `.java`: 144 confirmados.
+- Pendiente o dudas: Las clases de lógica y recursos se encuentran en el paquete raíz y en el paquete `rpg/`. Proceder a T2.3 para crear `reverse/mapping.txt`.
