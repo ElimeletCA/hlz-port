@@ -36,3 +36,9 @@ Desktop.ini
 
 # ── Logs temporales ───────────────────────────────────────────────────────────
 *.log
+
+# ── Emulador J2ME (datos locales de ejecucion y guardado) ─────────────────────
+config/
+freej2me_system/
+rms/
+

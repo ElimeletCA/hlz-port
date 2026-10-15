@@ -115,3 +115,22 @@ Formato de entrada por tarea:
   - Creación de Canvas de renderizado: 240, 320 / resolución adaptada
   - Detección de mando/gamepad: `[Gamepad] Connected: Gamepad 0`
 - Pendiente o dudas: T1.2 requiere checkpoint humano (🧑) para la sesión de grabación y capturas en `docs/reference/`.
+---
+
+## T2.1 · estado: hecho
+- Qué se hizo: Inventario exhaustivo y catalogación completa del archivo `Heroes Lore Zero 360x640 Spanish.jar` mediante la herramienta `tools/inventory_jar.py`.
+  - Generado `docs/inventory.csv` con 1.112 registros incluyendo ruta relativa, extensión, tamaño en bytes, tamaño comprimido, CRC32 y hash SHA-256 por cada recurso.
+  - Distribución confirmada por extensiones:
+    - `.mpm`: 460 archivos
+    - Sin extensión: 285 archivos (incluye 141 archivos en `mmi/` de 70 bytes y 31 en `snd/`)
+    - `.class`: 144 clases Java
+    - `.m`: 141 mapas binarios
+    - `.png`: 39 texturas de UI
+    - `.tdf`: 31 archivos de texto y misiones
+    - `.bak`: 7 copias de seguridad internas
+    - `.p`: 1 paleta (`hero/h.p`)
+    - `.dat`: 1 fuente (`dotFontSmall.dat`)
+    - `.db`, `.txt`, `.mf`: 1 c/u
+  - Audio confirmado en `snd/`: 17 pistas de música en `snd/b/` y 14 efectos de sonido en `snd/e/`.
+- Cómo se verificó: `python tools/inventory_jar.py` ejecutado con éxito, 1.112 archivos procesados y registrados en `docs/inventory.csv`.
+- Pendiente o dudas: Proceder a T2.2 (decompilación de las 144 clases con Vineflower).
