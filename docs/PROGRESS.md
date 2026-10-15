@@ -94,3 +94,11 @@ Formato de entrada por tarea:
   - Ejecución headless: `Godot_v4.7.2-stable_win64_console.exe --headless --path godot/ res://scenes/Benchmark2D.tscn` → inicia, ejecuta el ciclo de proceso durante 1s y sale con exit code 0.
   - Ejecución gráfica: `Godot_v4.7.2-stable_win64.exe --path godot/ res://scenes/Benchmark2D.tscn --quit-after 60` → ventana abre, renderiza fluidamente y cierra con exit code 0.
 - Pendiente o dudas: Las mediciones formales de benchmark en diferentes perfiles se registrarán en `docs/spec/performance.md` en la Fase 4.
+---
+
+## T0.6 · estado: hecho
+- Qué se hizo: Creada y aprobada la guía de estilo visual 2D en `art/STYLE.md` y la plantilla de procedencia de arte en `art/manifest.csv`.
+  - Dirección aprobada: Arte 2D cenital ilustrado y estilizado, apariencia pintada a mano, profundidad por capas, sombras pintadas. Bleaklight Falls como referencia conceptual y de composición (sin copiar sus assets).
+  - Aprobación explícita del usuario recibida el 2026-10-14.
+- Cómo se verificó: Revisión y aprobación expresa del usuario. Archivo `art/STYLE.md` actualizado con estado vigente.
+- Pendiente o dudas: Las paletas detalladas por bioma y tamaños exactos de sprites se completarán durante la Fase 2 y Fase 4 conforme se extraigan los datos del original.

@@ -1,8 +1,8 @@
-# STYLE GUIDE — Heroes Lore: Zero Port (borrador inicial)
+# STYLE GUIDE — Heroes Lore: Zero Port
 
-**Estado: borrador · pendiente de aprobación humana (🧑)**
+**Estado: Aprobado formalmente por el usuario (🧑 2026-10-14)**
 
-Este documento es la biblia visual 2D del proyecto. Ningún recurso se produce en volumen hasta que este documento esté aprobado (T0.6 / T4.7).
+Este documento es la biblia visual 2D del proyecto. Define las directrices artísticas para la generación, retoque e integración de arte 2D cenital.
 
 ---
 
@@ -91,6 +91,7 @@ Ningún recurso entra al juego solo porque lo haya generado la IA.
 
 ---
 
-## Pendiente de aprobación
+## Aprobación y vigencia
 
-Este documento requiere revisión y aprobación explícita antes de producción de arte en volumen. Ver T0.6, T4.8 y Regla 13.
+Documento revisado y aprobado por el usuario el 2026-10-14. Sirve como base para el vertical slice (Fase 5) y la producción controlada por lotes.
+
