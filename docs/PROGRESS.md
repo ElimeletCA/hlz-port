@@ -159,3 +159,17 @@ Formato de entrada por tarea:
   - Creado archivo de documentación `reverse/mapping.txt` con la tabla de correspondencias.
 - Cómo se verificó: Inspección de código fuente decompilado en cada clase y verificación de cadenas de recursos y signaturas de métodos.
 - Pendiente o dudas: Proceder a T2.4 (redactar especificación de formatos en `docs/formats/tdf.md`, `mmi.md`, `mpm.md`).
+---
+
+## T2.4 · estado: hecho
+- Qué se hizo: Especificación formal campo por campo de los formatos binarios del juego a partir de la ingeniería inversa:
+  - `docs/formats/tdf.md`: Estructura de tablas de texto (31 archivos en `t/`). Cabecera de 1 byte de conteo y registros con longitud uint16_be y texto UTF-8/latin-1.
+  - `docs/formats/mmi.md`: Marcadores de objetivo de misión (141 archivos en `mmi/`). Estructura fija de 70 bytes conteniendo 35 pares de coordenadas (X, Y) en tiles.
+  - `docs/formats/mpm.md`: Contenedor modular de gráficos PNG (460 archivos). Bloque C con paleta compartida (`PLTE` + `tRNS`) y sub-bloques con geometría y datos (`IHDR` + `IDAT`).
+  - `docs/formats/map_m.md`: Formato de mapas binarios (141 archivos en `m/m/` y `m/m2/`). Capas de tiles de 16×16 píxeles, colisiones, objetos interactivos, decoraciones, enemigos y portales.
+- Cómo se verificó:
+  - Extracción y decodificación exitosa de texto en español desde `.tdf`.
+  - Parseo de coordenadas de `mmi/0`, `mmi/1`, `mmi/8`, `mmi/10`.
+  - Reconstrucción de PNG válido a partir de `en/0/01.mpm` comprobada nativamente con biblioteca Pillow (modo indexado P, 10×19 px).
+  - Actualizadas como resueltas OQ-001, OQ-002, OQ-003 y OQ-004 en `docs/OPEN_QUESTIONS.md`.
+- Pendiente o dudas: Proceder a T2.5 para implementar los parsers en `tools/`.
