@@ -1,3 +1,8 @@
 categoria,id,nombre_original,descripcion,estado_logica,estado_arte,fuente_referencia,notas
 info,MIDLET,Heroes Lore Zero,v4.4.45 360x640 Spanish,verificado_emulador,pendiente,input/Heroes Lore Zero 360x640 Spanish.jar,Clase principal: rpg.RPGHeroEx
 mapa,m01,m/m/01,Mapa de entrenamiento inicial,pendiente,pendiente,hipotesis,Verificar en F1/F2
+sistema,SISTEMA_SAVE,Sistema de guardado,3 ranuras de guardado independientes,confirmado,no_aplica,docs/reference/permitir-guardado-3-partidas.jpg,3 ranuras estandar
+sistema,SISTEMA_BAUL,Almacenamiento publico compartido,Permite transferir oro equipos y elementos entre ranuras de guardado,confirmado,no_aplica,docs/reference/permitir-transferir-cosas-entre-partidas-guardadas.jpg,Baul comun entre ranuras
+personaje,HERO_LUCIAN,Lucian,Protagonista del juego,confirmado,referencia_preparada,docs/reference/clase-guerrero.jpg,Pelo rojo vestimenta azulada
+clase,CLASE_GUERRERO,Guerrero,Estilo mandoble / armadura pesada cuerpo a cuerpo,confirmado,referencia_preparada,docs/reference/clase-guerrero.jpg,Recomendado principiantes
+clase,CLASE_ASESINO,Asesino,Estilo doble daga / armadura liviana esquiva,confirmado,referencia_preparada,docs/reference/clase-asesino.jpg,Recomendado expertos

@@ -173,3 +173,14 @@ Formato de entrada por tarea:
   - Reconstrucción de PNG válido a partir de `en/0/01.mpm` comprobada nativamente con biblioteca Pillow (modo indexado P, 10×19 px).
   - Actualizadas como resueltas OQ-001, OQ-002, OQ-003 y OQ-004 en `docs/OPEN_QUESTIONS.md`.
 - Pendiente o dudas: Proceder a T2.5 para implementar los parsers en `tools/`.
+---
+
+## T1.2 · estado: en curso
+- Qué se hizo: Recepción y análisis del primer lote de capturas de referencia directa del emulador en `docs/reference/`:
+  - `clase-guerrero.jpg`: Protagonista Lucian (pelo rojo, armadura azul/metálica) en clase Guerrero (mandoble a dos manos con filo azul y guarda dorada).
+  - `clase-asesino.jpg`: Protagonista Lucian en clase Asesino (doble empuñadura de dagas, armadura liviana y esquiva).
+  - `permitir-guardado-3-partidas.jpg`: Sistema original de 3 ranuras de guardado ("Cargar 1", "Cargar 2", "Cargar 3").
+  - `permitir-transferir-cosas-entre-partidas-guardadas.jpg`: Mecánica de "Almacenamiento público" que permite transferir oro, consumibles y equipamiento entre diferentes ranuras de guardado (vital para Fase 7 / T7.7).
+  - Catalogadas las entidades en `docs/coverage.csv`.
+- Cómo se verificó: Inspección visual de las 4 imágenes en `docs/reference/`, registro de atributos clave de diseño y actualización de la matriz de cobertura.
+- Pendiente o dudas: Continuar recibiendo capturas de mapas, combates y diálogos a medida que se juegue la sesión.
