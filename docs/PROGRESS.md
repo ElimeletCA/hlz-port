@@ -184,3 +184,9 @@ Formato de entrada por tarea:
   - Catalogadas las entidades en `docs/coverage.csv`.
 - Cómo se verificó: Inspección visual de las 4 imágenes en `docs/reference/`, registro de atributos clave de diseño y actualización de la matriz de cobertura.
 - Pendiente o dudas: Continuar recibiendo capturas de mapas, combates y diálogos a medida que se juegue la sesión.
+- Actualización T1.2: Confirmadas las 4 clases jugables de Lucian:
+  1. **Guerrero:** Mandoble / armadura pesada (principiantes).
+  2. **Caballero:** Espada y escudo / armadura pesada / alta defensa (principiantes).
+  3. **Asesino:** Doble daga / armadura ligera / esquiva (expertos).
+  4. **Pistolero:** Doble pistola / armadura ligera / ataque a distancia (expertos).
+  - Todas añadidas a `docs/coverage.csv`.

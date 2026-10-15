@@ -6,3 +6,5 @@ sistema,SISTEMA_BAUL,Almacenamiento publico compartido,Permite transferir oro eq
 personaje,HERO_LUCIAN,Lucian,Protagonista del juego,confirmado,referencia_preparada,docs/reference/clase-guerrero.jpg,Pelo rojo vestimenta azulada
 clase,CLASE_GUERRERO,Guerrero,Estilo mandoble / armadura pesada cuerpo a cuerpo,confirmado,referencia_preparada,docs/reference/clase-guerrero.jpg,Recomendado principiantes
 clase,CLASE_ASESINO,Asesino,Estilo doble daga / armadura liviana esquiva,confirmado,referencia_preparada,docs/reference/clase-asesino.jpg,Recomendado expertos
+clase,CLASE_CABALLERO,Caballero,Estilo espada y escudo / armadura pesada defensa alta,confirmado,referencia_preparada,docs/reference/clase-caballero.jpg,Recomendado principiantes
+clase,CLASE_PISTOLERO,Pistolero,Estilo dos pistolas / armadura liviana distancia,confirmado,referencia_preparada,docs/reference/clase-pistolero.jpg,Recomendado expertos
