@@ -102,3 +102,16 @@ Formato de entrada por tarea:
   - Aprobación explícita del usuario recibida el 2026-10-14.
 - Cómo se verificó: Revisión y aprobación expresa del usuario. Archivo `art/STYLE.md` actualizado con estado vigente.
 - Pendiente o dudas: Las paletas detalladas por bioma y tamaños exactos de sprites se completarán durante la Fase 2 y Fase 4 conforme se extraigan los datos del original.
+---
+
+## T1.1 · estado: hecho
+- Qué se hizo: Verificada la ejecución de `Heroes Lore Zero 360x640 Spanish.jar` en el emulador FreeJ2ME-Plus a resolución nativa 360×640.
+  - Identificado y resuelto requisito de codificación de la plataforma MIDP (`-Dfile.encoding=ISO_8859_1`).
+  - Creado script lanzador conveniente en `tools/run_emulator.bat`.
+  - Creada plantilla inicial de seguimiento de cobertura en `docs/coverage.csv`.
+- Cómo se verificó: Ejecución de subproceso en consola; salida confirma:
+  - Carga de MIDlet: `Heroes Lore Zero`
+  - Clase principal: `rpg.RPGHeroEx`
+  - Creación de Canvas de renderizado: 240, 320 / resolución adaptada
+  - Detección de mando/gamepad: `[Gamepad] Connected: Gamepad 0`
+- Pendiente o dudas: T1.2 requiere checkpoint humano (🧑) para la sesión de grabación y capturas en `docs/reference/`.

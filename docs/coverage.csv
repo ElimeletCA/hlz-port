@@ -1,0 +1,3 @@
+categoria,id,nombre_original,descripcion,estado_logica,estado_arte,fuente_referencia,notas
+info,MIDLET,Heroes Lore Zero,v4.4.45 360x640 Spanish,verificado_emulador,pendiente,input/Heroes Lore Zero 360x640 Spanish.jar,Clase principal: rpg.RPGHeroEx
+mapa,m01,m/m/01,Mapa de entrenamiento inicial,pendiente,pendiente,hipotesis,Verificar en F1/F2
