@@ -464,8 +464,8 @@ Formato de entrada por tarea:
 ## T5.9 · estado: hecho
 - Qué se hizo: Refinamiento del HUD y barra de 6 slots según el diseño original J2ME:
   - Tarjeta unificada inferior (`CombatCard`) con diseño puramente gráfico sin etiquetas de texto ni cifras numéricas que saturen la pantalla.
-  - Barra de Salud (HP) roja de ancho completo.
-  - Barras de Habilidad divididas 50%/50% en fila horizontal: SP (Azul, clase) a la izquierda y EP (Verde, elemental) a la derecha.
+  - Fila superior de Habilidades: SP (Azul, clase) a la izquierda y EP (Verde, elemental) a la derecha, divididas 50%/50%.
+  - Barra de Salud (HP) roja de ancho completo ubicada por debajo de las barras azul y verde.
   - Línea fina amarilla de Experiencia (EXP) abarcando todo el ancho inferior de los medidores.
   - 6 Slots de acción directamente debajo con bordes cromáticos distintivos:
     - [1] y [2]: Borde azul (Habilidades de Guerrero: Golpe Brutal, Embestida).
