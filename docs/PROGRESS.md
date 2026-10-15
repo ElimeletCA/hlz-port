@@ -486,4 +486,14 @@ Formato de entrada por tarea:
   - Sprite ilustrado distintivo del Maestro de Armas Aldren (`art_samples/npc_aldren.png`) con túnica verde, jubón de cuero y barba veterana, reemplazando el duplicado placeholder del héroe.
   - Registro de los nuevos activos en `art/manifest.csv`.
 - Cómo se verificó: Carga headless en Godot 4.7.2 con código de salida 0 y suite de pruebas de paridad 7/7 OK.
-- Pendiente o dudas: Revisión visual por parte del usuario mediante `JUGAR_VERTICAL_SLICE.bat` para confirmar la ambientación antes de pulir las animaciones multi-frame de Lucian y el Lobo (T5.11 / T5.12).
+- Integración de Lucian Asesino Canónico (Aprobado por el usuario):
+  - Basado fielmente en la hoja de expresiones oficial coreana de *Heroes Lore: Zero*.
+  - Chaleco de cuero rojizo/marrón sin mangas con cremallera frontal plateada.
+  - Pantalones morados intensos, brazos descubiertos y muñequeras azules en ambas muñecas.
+  - Cola de caballo baja con lazo azul, mechón ahoge superior y trenza lateral derecha naciendo antes de la oreja.
+  - Doble empuñadura de dagas de asesino con reflejos acerados cian.
+  - Procesado con canal alfa transparente y antialiasing limpio en `tools/process_lucian_sprite.py`.
+  - Integrado en `res://art_samples/hero_lucian_idle.png` (128x128 px, pivote en pies).
+  - HUD actualizado a "Lucian · Nv. 1 Asesino" con habilidades de clase *Ataque Sorpresa* y *Danza Sombría*.
+  - Stats calibrados en `player.gd`: CRIT 18%, EVA 20%, mayor agilidad y velocidad base.
+- Pendiente o dudas: Prueba visual interactiva por parte del usuario mediante `JUGAR_VERTICAL_SLICE.bat`.
