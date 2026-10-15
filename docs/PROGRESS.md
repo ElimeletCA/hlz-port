@@ -190,3 +190,7 @@ Formato de entrada por tarea:
   3. **Asesino:** Doble daga / armadura ligera / esquiva (expertos).
   4. **Pistolero:** Doble pistola / armadura ligera / ataque a distancia (expertos).
   - Todas añadidas a `docs/coverage.csv`.
+- Actualización T1.2 (Clases secretas / New Game+):
+  5. **Elemental:** Símbolo púrpura. Magia y habilidades elementales (bloqueada inicialmente, se desbloquea tras finalizar el juego).
+  6. **Gunblader:** Símbolo turquesa/cian. Híbrido espada-pistola (bloqueada inicialmente, se desbloquea tras finalizar el juego).
+  - Total de clases de Heroes Lore: Zero confirmadas: **6 clases** (4 iniciales + 2 desbloqueables).
