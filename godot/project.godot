@@ -25,6 +25,7 @@ GameClock="*res://scripts/game_clock.gd"
 DataLoader="*res://scripts/data_loader.gd"
 InputManager="*res://scripts/input_manager.gd"
 ProfileManager="*res://scripts/profile_manager.gd"
+SaveManager="*res://scripts/save_manager.gd"
 
 [display]
 

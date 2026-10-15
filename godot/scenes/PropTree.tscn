@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://c8tree001"]
+
+[ext_resource type="Texture2D" path="res://art_samples/prop_ancient_tree.png" id="1_tree"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_trunk"]
+radius = 20.0
+height = 54.0
+
+[node name="PropTree" type="StaticBody2D"]
+y_sort_enabled = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(-48, -4, -28, -14, 0, -18, 28, -14, 48, -4, 48, 8, 28, 16, 0, 18, -28, 16, -48, 8)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_tree")
+offset = Vector2(0, -75)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_trunk")

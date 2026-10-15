@@ -388,5 +388,73 @@ Formato de entrada por tarea:
 - Cómo se verificó: Ejecución real de `res://scenes/Benchmark2D.tscn` en consola capturando métricas del sistema.
 - Pendiente o dudas: Ninguna.
 
+---
 
+## T5.1 · estado: hecho
+- Qué se hizo: Implementación completa del movimiento y reloj dual en `Player` (`godot/scripts/player.gd` y `godot/scenes/Player.tscn`):
+  - Simulación a `TICK_HZ = 14 Hz` para lógica y colisiones.
+  - Velocidad fiel: 3 px/tick * 14 Hz = 42 px/s (168 px/s a escala 4x).
+  - 4 orientaciones cardinales, detección de entrada de `InputManager`, colisión con `CharacterBody2D`.
+- Cómo se verificó: Ejecución en tiempo real en la escena `VerticalSlice.tscn`.
+- Pendiente o dudas: Ninguna.
+---
 
+## T5.2 · estado: hecho
+- Qué se hizo: Sistema de colisiones 2D por capas:
+  - Capas de colisión configuradas: Capa 1 (Entorno/Muros/Árboles), Capa 2 (Jugador), Capa 3 (Enemigos).
+  - Árboles antiguos (`godot/scenes/PropTree.tscn`) con colisión sólida en el tronco y copa transitable en Y-Sort.
+  - Muros límite perimetrales (`WorldBoundaries`) que confinan al jugador y enemigos al área del mapa.
+- Cómo se verificó: Colisión física comprobada al mover a Lucian contra muros, árboles y cofre.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.3 · estado: hecho
+- Qué se hizo: IA de enemigo y ciclo de combate con Lobo del Bosque (`godot/scripts/enemy_wolf.gd`, `godot/scenes/EnemyWolf.tscn`):
+  - FSM de 6 estados: Patrulla -> Persecución (Aggro a 6 tiles) -> Anticipación de ataque -> Ejecución de mordisco -> Enfriamiento (1.5s) -> Daño/Retroceso -> Muerte.
+  - Combate cuerpo a cuerpo con espada de Lucian: hitbox frontal, efecto visual `vfx_sword_slash.png`.
+  - Daño numérico exacto: `max(1, ATK - DEF + varianza)`, crítico de $150\%$ y tirada de evasión según `docs/spec/combat.md`.
+  - Recompensa al morir: otorga +10 EXP, subida de nivel automática y probabilidad del 40% de soltar poción.
+- Cómo se verificó: Combate jugado en tiempo real en `VerticalSlice.tscn`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.4 · estado: hecho
+- Qué se hizo: Sistema de diálogo e interacción con NPC Maestro de Armas (`godot/scripts/npc_trainer.gd`, `godot/scenes/NPCTrainer.tscn`):
+  - Diálogos en español con instrucciones del combate y el sendero exterior.
+  - Panel de diálogo en HUD con hablante, texto narrativo y tecla de avance (`[Espacio]`, `[E]`, `[Enter]`).
+  - Orientación dinámica del NPC hacia el jugador al iniciar conversación.
+- Cómo se verificó: Interacción con tecla E comprobada en `VerticalSlice.tscn`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.5 · estado: hecho
+- Qué se hizo: Sistema de inventario mínimo y cofre interactivo (`godot/scripts/prop_chest.gd`, `godot/scenes/PropChest.tscn`):
+  - Cofre abre con tecla `[E]` al aproximarse, cambia textura a abierto y entrega 2 Pociones Menores.
+  - Uso de poción mediante tecla rápida `[Q]` o mando: recupera +50 HP con efecto y texto flotante verde.
+  - Contador de pociones en HUD actualizado en tiempo real.
+- Cómo se verificó: Apertura de cofre y curación de vida comprobada en `VerticalSlice.tscn`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.6 · estado: hecho
+- Qué se hizo: Suite de pruebas automatizadas de paridad numérica (`tests/test_combat_parity.py`):
+  - 7 pruebas unitarias verificando: daño físico base, mitigación de defensa, límites de varianza pseudo-aleatoria ($\pm \lfloor \text{ATK}/20 \rfloor$), multiplicador de crítico ($150\%$), fórmula de probabilidad de crítico (`dg.java:2165`), curva exponencial de nivel y crecimiento de atributos del Guerrero (+28 HP, +6 MP, +5 ATK, +3 DEF).
+- Cómo se verificó: `python tests/test_combat_parity.py` -> 7 tests pasados, exit code 0.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.7 · estado: hecho
+- Qué se hizo: Validación de estados visuales y animaciones 2D:
+  - Lucian: reposo, desplazamiento, tajo de espada, retroceso por daño (parpadeo rojo) y animación de muerte.
+  - Lobo: patrulla, persecución, parpadeo de aviso de ataque, embestida, daño con retroceso y desvanecimiento al morir.
+- Cómo se verificó: Comprobado visualmente en ejecución continua.
+- Pendiente o dudas: Ninguna.
+---
+
+## T5.8 · estado: hecho
+- Qué se hizo: Sistema de guardado y carga persistente (`godot/scripts/save_manager.gd`):
+  - Registrado como Autoload `SaveManager`.
+  - Guardado en `user://saves/save_slot_1.json` con tecla `[F5]`: serializa nivel, HP, MP, EXP, stats, pociones, posición global y estado del cofre.
+  - Carga con tecla `[F6]`: restaura instantáneamente todos los atributos, posición y estado de la escena.
+- Cómo se verificó: Guardado y carga comprobados con notificación visual en pantalla.
+- Pendiente o dudas: Listo para la Puerta de Aprobación Humana (T5.10–T5.14).

@@ -1,0 +1,337 @@
+[gd_scene format=3 uid="uid://c8vertslice01"]
+
+[ext_resource type="Script" path="res://scripts/vertical_slice.gd" id="1_vslice"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="2_hud"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/NPCTrainer.tscn" id="4_npc"]
+[ext_resource type="PackedScene" path="res://scenes/PropChest.tscn" id="5_chest"]
+[ext_resource type="PackedScene" path="res://scenes/PropTree.tscn" id="6_tree"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyWolf.tscn" id="7_wolf"]
+[ext_resource type="Texture2D" path="res://art_samples/prop_chest_closed.png" id="8_potion_icon"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_top"]
+size = Vector2(1856, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom"]
+size = Vector2(1856, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left"]
+size = Vector2(64, 2624)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_right"]
+size = Vector2(64, 2624)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_bg"]
+bg_color = Color(0.08, 0.1, 0.12, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.35, 0.45, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.85, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mp_fill"]
+bg_color = Color(0.2, 0.5, 0.95, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exp_fill"]
+bg_color = Color(0.9, 0.75, 0.15, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_diag_bg"]
+bg_color = Color(0.06, 0.08, 0.11, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65, 0.55, 0.35, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="VerticalSlice" type="Node2D"]
+script = ExtResource("1_vslice")
+
+[node name="EnvironmentBackground" type="ColorRect" parent="."]
+offset_left = -2000.0
+offset_top = -3000.0
+offset_right = 4000.0
+offset_bottom = 5000.0
+color = Color(0.05, 0.07, 0.05, 1)
+
+[node name="MapSprite" type="Sprite2D" parent="."]
+position = Vector2(896, 1280)
+
+[node name="WorldBoundaries" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="WorldBoundaries"]
+position = Vector2(896, 32)
+shape = SubResource("RectangleShape2D_wall_top")
+
+[node name="Bottom" type="CollisionShape2D" parent="WorldBoundaries"]
+position = Vector2(896, 2528)
+shape = SubResource("RectangleShape2D_wall_bottom")
+
+[node name="Left" type="CollisionShape2D" parent="WorldBoundaries"]
+position = Vector2(32, 1280)
+shape = SubResource("RectangleShape2D_wall_left")
+
+[node name="Right" type="CollisionShape2D" parent="WorldBoundaries"]
+position = Vector2(1760, 1280)
+shape = SubResource("RectangleShape2D_wall_right")
+
+[node name="World" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="PropTree1" parent="World" instance=ExtResource("6_tree")]
+position = Vector2(760, 1140)
+
+[node name="PropTree2" parent="World" instance=ExtResource("6_tree")]
+position = Vector2(1060, 1160)
+
+[node name="PropTree3" parent="World" instance=ExtResource("6_tree")]
+position = Vector2(820, 1440)
+
+[node name="PropTree4" parent="World" instance=ExtResource("6_tree")]
+position = Vector2(1280, 1220)
+
+[node name="NPCTrainer" parent="World" instance=ExtResource("4_npc")]
+position = Vector2(820, 1260)
+
+[node name="PropChest" parent="World" instance=ExtResource("5_chest")]
+position = Vector2(980, 1250)
+
+[node name="Player" parent="World" groups=["player"] instance=ExtResource("3_player")]
+position = Vector2(896, 1280)
+
+[node name="EnemyWolf1" parent="World" instance=ExtResource("7_wolf")]
+position = Vector2(1180, 1280)
+
+[node name="EnemyWolf2" parent="World" instance=ExtResource("7_wolf")]
+position = Vector2(1260, 1380)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(896, 1280)
+position_smoothing_enabled = true
+position_smoothing_speed = 5.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("2_hud")
+
+[node name="StatusPanel" type="PanelContainer" parent="HUD"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 340.0
+offset_bottom = 140.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bg")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/StatusPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="HUD/StatusPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Lucian (Nv. 1 · Guerrero)"
+
+[node name="HPContainer" type="HBoxContainer" parent="HUD/StatusPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HUD/StatusPanel/VBox/HPContainer"]
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "HP"
+
+[node name="HPBar" type="ProgressBar" parent="HUD/StatusPanel/VBox/HPContainer"]
+custom_minimum_size = Vector2(180, 16)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 120.0
+value = 120.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="HUD/StatusPanel/VBox/HPContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "120 / 120"
+
+[node name="MPContainer" type="HBoxContainer" parent="HUD/StatusPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HUD/StatusPanel/VBox/MPContainer"]
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "MP"
+
+[node name="MPBar" type="ProgressBar" parent="HUD/StatusPanel/VBox/MPContainer"]
+custom_minimum_size = Vector2(180, 16)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/fill = SubResource("StyleBoxFlat_mp_fill")
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="MPLabel" type="Label" parent="HUD/StatusPanel/VBox/MPContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "30 / 30"
+
+[node name="EXPBar" type="ProgressBar" parent="HUD/StatusPanel/VBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_exp_fill")
+max_value = 70.0
+show_percentage = false
+
+[node name="QuickSlots" type="HBoxContainer" parent="HUD"]
+offset_left = 24.0
+offset_top = 152.0
+offset_right = 140.0
+offset_bottom = 208.0
+
+[node name="PotionSlot" type="PanelContainer" parent="HUD/QuickSlots"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bg")
+
+[node name="Icon" type="TextureRect" parent="HUD/QuickSlots/PotionSlot"]
+layout_mode = 2
+texture = ExtResource("8_potion_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="KeyBadge" type="Label" parent="HUD/QuickSlots/PotionSlot"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_font_sizes/font_size = 10
+text = "[Q]"
+
+[node name="CountBadge" type="Label" parent="HUD/QuickSlots/PotionSlot"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 11
+text = "x3"
+
+[node name="ControlsPanel" type="PanelContainer" parent="HUD"]
+offset_left = 1400.0
+offset_top = 24.0
+offset_right = 1896.0
+offset_bottom = 190.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bg")
+
+[node name="Margin" type="MarginContainer" parent="HUD/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ControlsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="HUD/ControlsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "Heroes Lore: Zero — Vertical Slice (Fase 5)"
+
+[node name="Controls" type="Label" parent="HUD/ControlsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "• Mover: WASD / Flechas / Stick Gamepad\n• Atacar: [Espacio] / [J] / Botón X (Mando)\n• Usar Poción: [Q] / Botón Y\n• Interactuar: [E] / Botón A (Hablar / Abrir cofre)\n• Guardar partida: [F5]  |  Cargar partida: [F6]"
+
+[node name="DialoguePanel" type="PanelContainer" parent="HUD"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -480.0
+offset_top = -240.0
+offset_right = 480.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_diag_bg")
+
+[node name="Margin" type="MarginContainer" parent="HUD/DialoguePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="HUD/DialoguePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SpeakerLabel" type="Label" parent="HUD/DialoguePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 16
+text = "Nombre del Hablante"
+
+[node name="DialogueText" type="Label" parent="HUD/DialoguePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Texto de diálogo..."
+autowrap_mode = 2
+
+[node name="PromptNext" type="Label" parent="HUD/DialoguePanel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 0.8)
+theme_override_font_sizes/font_size = 11
+text = "[Espacio / E / Enter para continuar ▶]"
+
+[node name="NotificationLabel" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -180.0
+offset_right = 300.0
+offset_bottom = -140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Notificación..."
+horizontal_alignment = 1
