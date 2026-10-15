@@ -474,3 +474,16 @@ Formato de entrada por tarea:
     - [6]: Borde azul (Poción SP).
 - Cómo se verificó: Ejecución en Godot Engine v4.7.2 headless con código de salida 0 y suite de paridad 7/7 tests OK.
 - Pendiente o dudas: Ninguna. Listo para la revisión del usuario y el reemplazo de arte real (T5.10 / T5.11).
+
+---
+
+## T5.10 · estado: en curso
+- Qué se hizo: Montaje de la primera capa visual con arte ilustrado en la escena integrada del Vertical Slice (`VerticalSlice.tscn`):
+  - Terreno ilustrado de Aldea Silverleaf (`art_samples/map_silverleaf.png`, 1792×2560 px) que sustituye el fondo plano por senderos de adoquines, hierba orgánica y plaza central con luz dorada matutina según `art/STYLE.md`.
+  - Casas de aldea (`PropVillageHouse.tscn`) con muros de piedra, vigas de roble y tejados de tejas rojas integradas en `World` con ordenación dinámica **Y-Sort** y colisión física sólida en sus cimientos.
+  - Taller y cabaña de entrenamiento (`PropCottage.tscn`) con toldo, diana y maniquí, ubicado junto al puesto del instructor.
+  - Mobiliario y props de aldea: farolas de hierro forjado (`PropLantern.tscn`), barriles y cajas de suministros (`PropBarrel.tscn`) y árboles antiguos (`PropTree.tscn`).
+  - Sprite ilustrado distintivo del Maestro de Armas Aldren (`art_samples/npc_aldren.png`) con túnica verde, jubón de cuero y barba veterana, reemplazando el duplicado placeholder del héroe.
+  - Registro de los nuevos activos en `art/manifest.csv`.
+- Cómo se verificó: Carga headless en Godot 4.7.2 con código de salida 0 y suite de pruebas de paridad 7/7 OK.
+- Pendiente o dudas: Revisión visual por parte del usuario mediante `JUGAR_VERTICAL_SLICE.bat` para confirmar la ambientación antes de pulir las animaciones multi-frame de Lucian y el Lobo (T5.11 / T5.12).
