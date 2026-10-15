@@ -145,3 +145,17 @@ Formato de entrada por tarea:
   - Comando: `java -jar tools/vineflower-1.12.0.jar input/Heroes Lore Zero 360x640 Spanish.jar reverse/decompiled` → exit code 0.
   - Conteo de archivos `.java`: 144 confirmados.
 - Pendiente o dudas: Las clases de lógica y recursos se encuentran en el paquete raíz y en el paquete `rpg/`. Proceder a T2.3 para crear `reverse/mapping.txt`.
+---
+
+## T2.3 · estado: hecho
+- Qué se hizo: Rastreo de clases y métodos ofuscados a partir de `rpg/RPGHeroEx` y generación de `reverse/mapping.txt`.
+  - Identificados los 6 subsistemas principales y sus clases responsables:
+    1. **Entrada y Ciclo de vida:** `rpg.RPGHeroEx` (MIDlet), `rpg.e` (bucle principal y control de tiempo), `rpg.a` (mapeo de teclas).
+    2. **Carga de binarios y utilidades:** `rpg.c` (cargador de recursos), `rpg.f` (utilidades de lectura binaria big/little endian).
+    3. **Gráficos y Spritesheets:** `ba.java` (decodificador de `.mpm` con chunks PNG embebidos).
+    4. **Textos y Diálogos:** `cx.java` (decodificador de `.tdf`).
+    5. **Audio:** `bm.java` (reproducción de MIDI en `/snd/b/` y WAV en `/snd/e/`).
+    6. **Datos de juego:** `e.java` (coordenadas de objetivos en `/mmi/`), `ai.java` (objetos en `/itm/`), `ag.java` (fuente raster).
+  - Creado archivo de documentación `reverse/mapping.txt` con la tabla de correspondencias.
+- Cómo se verificó: Inspección de código fuente decompilado en cada clase y verificación de cadenas de recursos y signaturas de métodos.
+- Pendiente o dudas: Proceder a T2.4 (redactar especificación de formatos en `docs/formats/tdf.md`, `mmi.md`, `mpm.md`).

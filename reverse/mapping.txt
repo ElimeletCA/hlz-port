@@ -1,0 +1,27 @@
+# mapping.txt — Mapeo de desofuscación de Heroes Lore: Zero (T2.3)
+# Formato: <clase_ofuscada> -> <nombre_identificado> : <responsabilidad>
+
+# ── Núcleo y Punto de Entrada ────────────────────────────────────────────────
+rpg.RPGHeroEx -> MainMIDlet : Punto de entrada MIDlet, ciclo de vida J2ME (startApp, pauseApp, destroyApp)
+rpg.e -> GameEngine / GameLoop : Bucle principal Runnable (Thread), control de TICK_HZ (array {6,10,14,18}), maquina de estados
+rpg.c -> ResourceManager / DataLoader : Cargador central de recursos del JAR (getResourceAsStream), cache binaria
+rpg.f -> BinaryUtils / EndianUtils : Lectura y conversion de enteros y shorts big-endian y little-endian
+rpg.a -> InputManager / KeyConstants : Mapeo de teclas de entrada (D-pad, softkeys, teclado numerico)
+rpg.b -> GameConstants : Interfaz con constantes globales del juego
+
+# ── Gestores de Recursos Específicos ─────────────────────────────────────────
+ba -> MpmSpriteLoader : Decodificador de archivos .mpm (spritesheets, chunks PNG, animaciones, hitboxes)
+cx -> TdfTextLoader : Decodificador de archivos .tdf (cadenas de texto, dialogos y misiones)
+bm -> AudioManager : Gestor y reproductor de musica MIDI (/snd/b/) y efectos WAV (/snd/e/)
+ag -> FontRenderer : Cargador y dibujador de fuente raster (dotFontSmall.dat, ftd/table)
+ai -> ItemDatabase : Gestor de tablas de objetos, consumibles y equipo (/itm/)
+e  -> MapMarkerManager : Lector de coordenadas y objetivos de mision por mapa (/mmi/<map_id>)
+
+# ── Entidades y Combate (en análisis) ─────────────────────────────────────────
+dg -> HeroDataManager : Datos de estado, estadisticas y equipo del heroe (/hero/)
+ah -> EnemyManager : Definiciones y stats de enemigos (/en/)
+ec -> BossManager : Logica de jefes y patrones avanzados
+l  -> HeroEntity : Instancia activa del heroe en el mapa
+dq -> GameStateFlags : Banderas globales de progreso, misiones y guardado
+dt -> MapLogic / CollisionEngine : Control de colisiones y transiciones de mapa
+cm -> CanvasRenderer : Canvas LCDUI que maneja el pintado de pantalla y buffers
