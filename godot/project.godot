@@ -16,6 +16,15 @@ config/version="0.0.1"
 run/main_scene="res://scenes/Main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+run/max_fps=60
+
+[autoload]
+
+DisplayManager="*res://scripts/display_manager.gd"
+GameClock="*res://scripts/game_clock.gd"
+DataLoader="*res://scripts/data_loader.gd"
+InputManager="*res://scripts/input_manager.gd"
+ProfileManager="*res://scripts/profile_manager.gd"
 
 [display]
 

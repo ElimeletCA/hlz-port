@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://c8comparison01"]
+
+[ext_resource type="Script" path="res://scripts/camera_comparison.gd" id="1_cam"]
+
+[node name="CameraComparison" type="Node2D"]
+script = ExtResource("1_cam")
+
+[node name="EnvironmentBackground" type="ColorRect" parent="."]
+offset_left = -1000.0
+offset_top = -1000.0
+offset_right = 2000.0
+offset_bottom = 2000.0
+color = Color(0.0784314, 0.0901961, 0.109804, 1)
+
+[node name="MapContainer" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="MapSprite" type="Sprite2D" parent="MapContainer"]
+centered = false
+
+[node name="Player" type="Node2D" parent="MapContainer"]
+y_sort_enabled = true
+position = Vector2(224, 320)
+
+[node name="Shadow" type="Polygon2D" parent="MapContainer/Player"]
+color = Color(0, 0, 0, 0.35)
+polygon = PackedVector2Array(-8, -2, -5, -4, 0, -5, 5, -4, 8, -2, 8, 2, 5, 4, 0, 5, -5, 4, -8, 2)
+
+[node name="Sprite2D" type="Sprite2D" parent="MapContainer/Player"]
+offset = Vector2(0, -14)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(224, 320)
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="CanvasLayer"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 680.0
+offset_bottom = 200.0
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LabelTitle" type="Label" parent="CanvasLayer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Heroes Lore: Zero — Comparación de Perspectiva 2D (T4.6 / T4.7)"
+
+[node name="LabelInfo" type="Label" parent="CanvasLayer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Variante activa..."
+
+[node name="LabelDesc" type="Label" parent="CanvasLayer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "Descripción de la variante..."
+autowrap_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnVarA" type="Button" parent="CanvasLayer/Panel/Margin/VBox/HBox"]
+layout_mode = 2
+text = "1: Variante A (Directa)"
+
+[node name="BtnVarB" type="Button" parent="CanvasLayer/Panel/Margin/VBox/HBox"]
+layout_mode = 2
+text = "2: Variante B (Elevada - Recomendada)"
+
+[node name="LabelControls" type="Label" parent="CanvasLayer/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.8, 0.7)
+theme_override_font_sizes/font_size = 11
+text = "Controles: Flechas / WASD / Stick Gamepad para mover a Lucian | Teclas 1 y 2 o Espacio para alternar cámara"
+
+[connection signal="pressed" from="CanvasLayer/Panel/Margin/VBox/HBox/BtnVarA" to="." method="_on_btn_var_a_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/Margin/VBox/HBox/BtnVarB" to="." method="_on_btn_var_b_pressed"]

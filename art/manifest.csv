@@ -2,3 +2,11 @@ id,categoria,herramienta_modelo,version_herramienta,prompt,semilla,referencias_u
 TEST-SPRITE-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,128x128,1,PNG RGBA,aprobado_tecnico,Asset de prueba de pipeline 2D
 TEST-SHEET-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,256x64,4,PNG RGBA,aprobado_tecnico,Spritesheet de prueba de pipeline 2D (4 frames 64x64)
 TEST-TILE-001,test_asset,Pillow,12.1.0,no aplica (sintetico),no aplica,ninguna,interno,tools/test_pipeline.py,no requiere,128x128,4,PNG RGBA,aprobado_tecnico,Tilesheet de prueba de pipeline 2D (2x2 tiles 64x64)
+HERO-LUCIAN-001,personaje,Pillow,12.1.0,Lucian protagonista pelo rojo armadura azul y dorada,101,art/refs/catalog.md,interno,tools/generate_first_art_batch.py,retocado,96x128,1,PNG RGBA,pendiente_usuario,Muestra inicial 2D de Lucian para prueba de escala 1080p
+ENEMY-WOLF-001,enemigo,Pillow,12.1.0,Lobo de bosque pelaje gris-azulado ojos ambar,102,art/refs/catalog.md,interno,tools/generate_first_art_batch.py,retocado,80x64,1,PNG RGBA,pendiente_usuario,Muestra inicial 2D de enemigo menor para escala y combate
+TILE-GRASS-001,escenario,Pillow,12.1.0,Hierba y sendero verde musgo estilo Bleaklight Falls,103,art/STYLE.md,interno,tools/generate_first_art_batch.py,retocado,64x64,1,PNG RGBA,pendiente_usuario,Muestra inicial de tile de suelo con paleta natural
+PROP-TREE-001,escenario,Pillow,12.1.0,Arbol ancestral follaje por capas para Y-Sort,104,art/STYLE.md,interno,tools/generate_first_art_batch.py,retocado,128x160,1,PNG RGBA,pendiente_usuario,Obstáculo de entorno para prueba de profundidad y solape
+PROP-CHEST-001,objeto,Pillow,12.1.0,Cofre cerrado madera y refuerzos bronce,105,art/refs/catalog.md,interno,tools/generate_first_art_batch.py,retocado,48x48,1,PNG RGBA,pendiente_usuario,Prop interactivo cerrado
+PROP-CHEST-002,objeto,Pillow,12.1.0,Cofre abierto con resplandor dorado,106,art/refs/catalog.md,interno,tools/generate_first_art_batch.py,retocado,48x48,1,PNG RGBA,pendiente_usuario,Prop interactivo abierto con botín
+VFX-SLASH-001,efecto,Pillow,12.1.0,Tajo de espada arco de energia cian y blanco,107,art/STYLE.md,interno,tools/generate_first_art_batch.py,retocado,96x64,1,PNG RGBA,pendiente_usuario,Efecto visual de ataque cuerpo a cuerpo
+

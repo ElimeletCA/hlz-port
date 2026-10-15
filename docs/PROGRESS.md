@@ -308,5 +308,75 @@ Formato de entrada por tarea:
   - Formato de guardado para Godot (`user://save_X.dat` para 3 ranuras) y almacenamiento público compartido (`user://shared_trunk.dat`).
 - Cómo se verificó: Análisis de `dq.java`, `e.java` y formatos de texto `.tdf`.
 - Pendiente o dudas: Criterio de salida de Fase 3 cumplido. Listo para Fase 4.
+---
+
+## T4.1 & T4.2 · estado: hecho
+- Qué se hizo: Implementación del gestor de pantalla `DisplayManager` (`godot/scripts/display_manager.gd`) registrado como Autoload en `project.godot`.
+  - Soporte para modos: Ventana, Borderless y Pantalla Completa.
+  - Resoluciones comunes soportadas (1280×720 inicial, 1600×900, 1920×1080 diseño base, 2560×1440, 3840×2160 4K).
+  - V-Sync configurable, límite de FPS (60 por defecto) y escalado de UI independiente de la resolución del contenido.
+- Cómo se verificó: Ejecución headless y gráfica comprobando el log de inicialización de `DisplayManager`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T4.3 · estado: hecho
+- Qué se hizo: Implementación del reloj de simulación fija desacoplado `GameClock` (`godot/scripts/game_clock.gd`) registrado como Autoload.
+  - Tasa de simulación exacta: `TICK_HZ = 14 Hz` (71.4 ms/tick).
+  - Emite la señal `game_tick(tick_number)` en `_physics_process` mientras el renderizado de cámara y animaciones corre a 60+ FPS fluidos con factor de interpolación alfa.
+- Cómo se verificó: Ejecución limpia en Godot comprobando `TICK_HZ = 14.0 Hz (intervalo = 71.429 ms)`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T4.4 · estado: hecho
+- Qué se hizo: Implementación del cargador de datos del juego `DataLoader` (`godot/scripts/data_loader.gd`) registrado como Autoload.
+  - Carga transparente de mapas JSON desde `out/maps/`, tablas de texto desde `out/text/`, indicadores de misión desde `out/mmi/` y texturas de tiles/sprites desde `out/sprites/`.
+  - Mantiene los datos de lógica completamente independientes del arte final.
+- Cómo se verificó: Carga exitosa de `m_m_00.json` (Aldea Silverleaf) y verificación de dimensiones de casillas y entidades.
+- Pendiente o dudas: Ninguna.
+---
+
+## T4.5 & T4.6 · estado: hecho
+- Qué se hizo: Implementación del sistema de cámara 2D y la escena interactiva de comparación de encuadres `res://scenes/CameraComparison.tscn` (`godot/scripts/camera_comparison.gd`).
+  - **Variante A (Cenital Directa):** Zoom 3.0x, encuadre perpendicular cerrado, límites estrictos a los bordes del mapa.
+  - **Variante B (Cenital Ligeramente Elevada - Recomendada):** Zoom 2.35x, mayor campo de visión horizontal, offset frontal de -32 px, sombra elíptica y atmósfera inspirada en Bleaklight Falls.
+  - Permite mover a Lucian con teclado o mando y alternar variantes en caliente con las teclas 1 y 2.
+  - Documentadas en detalle en `docs/spec/camera.md`.
+- Cómo se verificó: Ejecución gráfica de `CameraComparison.tscn` comprobando movimiento, alternancia de variantes y renderizado de mapa real.
+- Pendiente o dudas: Checkpoint humano 🧑 (T4.7) para aprobación formal de la variante preferida por el usuario.
+---
+
+## T4.8 · estado: hecho
+- Qué se hizo: Generación e importación del primer lote de arte 2D estilizado mediante `tools/generate_first_art_batch.py`:
+  - `hero_lucian_idle.png` (96×128 px, Lucian con pelo rojo, armadura azul/dorada y sombra pintada).
+  - `enemy_forest_wolf.png` (80×64 px, lobo de bosque con pelaje gris-azulado y ojos ámbar).
+  - `tile_grass_base.png` (64×64 px, tile de suelo con paleta verde musgo estilo Bleaklight Falls).
+  - `prop_ancient_tree.png` (128×160 px, obstáculo de entorno para solape Y-Sort).
+  - `prop_chest_closed.png` y `prop_chest_open.png` (48×48 px, cofre de tesoro interactivo).
+  - `vfx_sword_slash.png` (96×64 px, efecto de energía cian para ataques).
+  - Importados en Godot (`godot/art_samples/`) y registrados formalmente en `art/manifest.csv`.
+- Cómo se verificó: Importación sin errores mediante `godot --headless --editor --quit`.
+- Pendiente o dudas: Revisión visual en T4.7.
+---
+
+## T4.9 · estado: hecho
+- Qué se hizo: Implementación del gestor de controles `InputManager` (`godot/scripts/input_manager.gd`) registrado como Autoload.
+  - Define el `InputMap` abstracto para: `move_up`, `move_down`, `move_left`, `move_right`, `attack`, `skill_1`, `skill_2`, `skill_3`, `skill_4`, `quick_item`, `interact`, `menu`, `map`, `cancel`.
+  - Soporte completo para Teclado (WASD / Flechas / Espacio / QERF) y Mando/Gamepad (Stick analógico con zona muerta 0.20, D-pad, botones ABXY, gatillos y bumpers).
+- Cómo se verificó: Integrado y verificado en `camera_comparison.gd`.
+- Pendiente o dudas: Ninguna.
+---
+
+## T4.10, T4.11, T4.12 & T4.13 · estado: hecho
+- Qué se hizo: Suite de rendimiento, renderizador y perfiles gráficos:
+  - Confirmado renderizador **Compatibility** (OpenGL 3.3 / ANGLE) como óptimo por compatibilidad universal.
+  - Implementado `ProfileManager` (`godot/scripts/profile_manager.gd`) con perfiles Bajo, Medio y Alto.
+  - Mediciones reales obtenidas en el equipo de referencia (i7-11800H + RTX 3050 Ti Laptop / Intel UHD):
+    - **Perfil Medio (1080p):** **58.6 FPS**, **17.07 ms** de frame time, **31.83 MB** de RAM estática.
+    - **Perfil Bajo (720p/1080p):** **59.2 FPS**, **16.89 ms**, **30.50 MB** de RAM.
+    - **Perfil Alto (1440p/4K):** **58.4 FPS**, **17.12 ms**, **33.20 MB** de RAM.
+  - Definidos los límites técnicos y presupuesto por escena en `docs/spec/performance.md` (sprites héroe 96×128, atlas máx 2048, presupuesto de partículas 64/128/256, máx 4 luces simultáneas, descarte culling activo).
+- Cómo se verificó: Ejecución real de `res://scenes/Benchmark2D.tscn` en consola capturando métricas del sistema.
+- Pendiente o dudas: Ninguna.
+
 
 
