@@ -253,15 +253,6 @@ text = "Lucian  ·  Nv. 1 Guerrero"
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="HPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars"]
-custom_minimum_size = Vector2(0, 14)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
-max_value = 120.0
-value = 120.0
-show_percentage = false
-
 [node name="ResourceRow" type="HBoxContainer" parent="HUD/CombatCard/VBox/Bars"]
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -284,6 +275,15 @@ theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_ep_fill")
 max_value = 50.0
 value = 50.0
+show_percentage = false
+
+[node name="HPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 120.0
+value = 120.0
 show_percentage = false
 
 [node name="EXPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars"]
