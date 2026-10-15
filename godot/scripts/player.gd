@@ -11,7 +11,8 @@ extends CharacterBody2D
 #   Slot 6: Consumible Recuperación MP (Poción · +25 MP) [Tecla 6 o R / D-Pad Abajo]
 
 signal hp_changed(current: int, max_hp: int)
-signal mp_changed(current: int, max_mp: int)
+signal sp_changed(current: int, max_sp: int)
+signal ep_changed(current: int, max_ep: int)
 signal exp_gained(amount: int, current_exp: int, next_exp: int)
 signal level_up(new_level: int)
 signal died()
@@ -40,30 +41,40 @@ enum Direction {
 @export var level: int = 1
 @export var max_hp: int = 120
 @export var current_hp: int = 120
-@export var max_mp: int = 30
-@export var current_mp: int = 30
+@export var max_sp: int = 30     # Habilidades de Clase (Barra Azul)
+@export var current_sp: int = 30
+@export var max_ep: int = 50     # Habilidades Elementales (Barra Verde)
+@export var current_ep: int = 50
 @export var base_atk: int = 18
 @export var base_def: int = 12
 @export var current_exp: int = 0
 @export var next_level_exp: int = 70
+
+# Compatibilidad con código anterior
+var current_mp: int:
+	get: return current_sp
+	set(v): current_sp = v
+var max_mp: int:
+	get: return max_sp
+	set(v): max_sp = v
 
 # --- Inventario de Consumibles ---
 @export var inventory_potions_hp: int = 3
 @export var inventory_potions_mp: int = 3
 
 # --- Tiempos de Enfriamiento Máximos (Cooldowns en segundos) ---
-const CD_MAX_SLOT_1: float = 2.0  # Golpe Brutal
-const CD_MAX_SLOT_2: float = 3.5  # Embestida
-const CD_MAX_SLOT_3: float = 2.5  # Onda Ígnea
-const CD_MAX_SLOT_4: float = 4.0  # Rayo 360°
+const CD_MAX_SLOT_1: float = 2.0  # Golpe Brutal (Clase)
+const CD_MAX_SLOT_2: float = 3.5  # Embestida (Clase)
+const CD_MAX_SLOT_3: float = 2.5  # Onda Ígnea (Elemental)
+const CD_MAX_SLOT_4: float = 4.0  # Rayo 360° (Elemental)
 const CD_MAX_SLOT_5: float = 1.0  # Poción HP
-const CD_MAX_SLOT_6: float = 1.0  # Poción MP
+const CD_MAX_SLOT_6: float = 1.0  # Poción SP
 
-# --- Costes de Maná/EP ---
-const MP_COST_SLOT_1: int = 12
-const MP_COST_SLOT_2: int = 15
-const MP_COST_SLOT_3: int = 10
-const MP_COST_SLOT_4: int = 14
+# --- Costes de SP (Clase) y EP (Elemental) ---
+const SP_COST_SLOT_1: int = 12
+const SP_COST_SLOT_2: int = 15
+const EP_COST_SLOT_3: int = 10
+const EP_COST_SLOT_4: int = 14
 
 # Tiempos de enfriamiento actuales
 var cd_timer_1: float = 0.0
@@ -111,9 +122,22 @@ func _ready() -> void:
 	GameClock.game_tick.connect(_on_game_tick)
 	
 	emit_signal("hp_changed", current_hp, max_hp)
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("sp_changed", current_sp, max_sp)
+	emit_signal("ep_changed", current_ep, max_ep)
 	emit_signal("potions_updated", inventory_potions_hp, inventory_potions_mp)
 
+
+func _on_game_tick(tick_count: int) -> void:
+	if current_state == State.DEAD:
+		return
+	# Regeneración natural de EP (Verde) durante la batalla: +2 EP cada segundo (14 ticks)
+	if tick_count % 14 == 0 and current_ep < max_ep:
+		current_ep = mini(max_ep, current_ep + 2)
+		emit_signal("ep_changed", current_ep, max_ep)
+		
+	# Regeneración leve de SP (Azul): +1 SP cada 2 segundos (28 ticks)
+	if tick_count % 28 == 0 and current_sp < max_sp:
+		current_sp = mini(max_sp, current_sp + 1)
 
 func _process(delta: float) -> void:
 	# Actualizar enfriamientos de los 6 slots
@@ -148,7 +172,7 @@ func _physics_process(_delta: float) -> void:
 	if current_state == State.DEAD:
 		return
 		
-	# 1. Movimiento básico
+	# Movimiento direccional
 	move_dir = InputManager.get_movement_vector()
 	
 	if current_state != State.ATTACK and current_state != State.SKILL_CAST and current_state != State.HURT:
@@ -163,11 +187,11 @@ func _physics_process(_delta: float) -> void:
 	elif current_state != State.SKILL_CAST and current_state != State.HURT:
 		velocity = Vector2.ZERO
 		
-	# 2. Entrada de Ataque Básico Melee
+	# Ataque Básico Melee
 	if Input.is_action_just_pressed("attack") and _can_act():
 		perform_attack()
 		
-	# 3. Entrada de los 6 Slots de Acción
+	# Los 6 Slots de Acción
 	if Input.is_action_just_pressed("slot_1_skill") and _can_act():
 		use_slot_1_skill()
 	elif Input.is_action_just_pressed("slot_2_skill") and _can_act():
@@ -188,14 +212,6 @@ func _can_act() -> bool:
 	return current_state != State.ATTACK and current_state != State.SKILL_CAST and current_state != State.HURT and current_state != State.DEAD
 
 
-func _on_game_tick(tick_count: int) -> void:
-	if current_state == State.DEAD:
-		return
-	if tick_count % 28 == 0 and current_mp < max_mp:
-		current_mp = mini(max_mp, current_mp + 1)
-		emit_signal("mp_changed", current_mp, max_mp)
-
-
 func _update_facing_direction(input: Vector2) -> void:
 	if absf(input.x) > absf(input.y):
 		current_dir = Direction.RIGHT if input.x > 0 else Direction.LEFT
@@ -214,22 +230,18 @@ func _get_dir_vector() -> Vector2:
 	return Vector2.DOWN
 
 
-# ==============================================================================
-# SISTEMA DE LOS 6 SLOTS DE ACCIÓN (CANÓNICO HEROES LORE: ZERO)
-# ==============================================================================
-
-## SLOT 1: Habilidad de Clase 1 — Golpe Brutal (Guerrero)
+## SLOT 1: Habilidad de Clase 1 — Golpe Brutal (Guerrero · Consume SP Azul)
 func use_slot_1_skill() -> void:
 	if cd_timer_1 > 0.0:
 		_spawn_floating_text("¡En recarga!", Color(0.8, 0.8, 0.8))
 		return
-	if current_mp < MP_COST_SLOT_1:
-		_spawn_floating_text("¡Sin MP suficiente!", Color(0.3, 0.6, 1.0))
+	if current_sp < SP_COST_SLOT_1:
+		_spawn_floating_text("¡Sin SP suficiente!", Color(0.3, 0.6, 1.0))
 		return
 		
-	current_mp -= MP_COST_SLOT_1
+	current_sp -= SP_COST_SLOT_1
 	cd_timer_1 = CD_MAX_SLOT_1
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("sp_changed", current_sp, max_sp)
 	current_state = State.ATTACK
 	
 	_spawn_floating_text("¡GOLPE BRUTAL!", Color(1.0, 0.85, 0.2))
@@ -239,7 +251,7 @@ func use_slot_1_skill() -> void:
 	attack_area.position = dir_vec * 56
 	slash_vfx.position = dir_vec * 56
 	slash_vfx.rotation = dir_vec.angle()
-	slash_vfx.modulate = Color(1.5, 1.2, 0.3, 1.0) # Tinte dorado pesado
+	slash_vfx.modulate = Color(1.5, 1.2, 0.3, 1.0)
 	slash_vfx.scale = Vector2(1.5, 1.5)
 	slash_vfx.visible = true
 	
@@ -259,18 +271,18 @@ func use_slot_1_skill() -> void:
 			body.take_damage(heavy_dmg, true, global_position)
 
 
-## SLOT 2: Habilidad de Clase 2 — Embestida (Guerrero)
+## SLOT 2: Habilidad de Clase 2 — Embestida (Guerrero · Consume SP Azul)
 func use_slot_2_skill() -> void:
 	if cd_timer_2 > 0.0:
 		_spawn_floating_text("¡En recarga!", Color(0.8, 0.8, 0.8))
 		return
-	if current_mp < MP_COST_SLOT_2:
-		_spawn_floating_text("¡Sin MP suficiente!", Color(0.3, 0.6, 1.0))
+	if current_sp < SP_COST_SLOT_2:
+		_spawn_floating_text("¡Sin SP suficiente!", Color(0.3, 0.6, 1.0))
 		return
 		
-	current_mp -= MP_COST_SLOT_2
+	current_sp -= SP_COST_SLOT_2
 	cd_timer_2 = CD_MAX_SLOT_2
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("sp_changed", current_sp, max_sp)
 	current_state = State.SKILL_CAST
 	
 	_spawn_floating_text("¡EMBESTIDA!", Color(1.0, 0.5, 0.2))
@@ -287,7 +299,6 @@ func use_slot_2_skill() -> void:
 		if current_state == State.SKILL_CAST: current_state = State.IDLE
 	)
 	
-	# Daño a todos los enemigos atravesados
 	var check_time := 0.20
 	var timer := get_tree().create_timer(check_time)
 	timer.timeout.connect(func():
@@ -307,18 +318,18 @@ func use_slot_2_skill() -> void:
 	)
 
 
-## SLOT 3: Habilidad Elemental 1 — Onda Ígnea (Común)
+## SLOT 3: Habilidad Elemental 1 — Onda Ígnea (Consume EP Verde)
 func use_slot_3_elem() -> void:
 	if cd_timer_3 > 0.0:
 		_spawn_floating_text("¡En recarga!", Color(0.8, 0.8, 0.8))
 		return
-	if current_mp < MP_COST_SLOT_3:
-		_spawn_floating_text("¡Sin MP suficiente!", Color(0.3, 0.6, 1.0))
+	if current_ep < EP_COST_SLOT_3:
+		_spawn_floating_text("¡Sin EP suficiente!", Color(0.2, 0.9, 0.4))
 		return
 		
-	current_mp -= MP_COST_SLOT_3
+	current_ep -= EP_COST_SLOT_3
 	cd_timer_3 = CD_MAX_SLOT_3
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("ep_changed", current_ep, max_ep)
 	
 	_spawn_floating_text("¡ONDA ÍGNEA!", Color(1.0, 0.4, 0.1))
 	
@@ -331,18 +342,18 @@ func use_slot_3_elem() -> void:
 		get_parent().add_child(fb)
 
 
-## SLOT 4: Habilidad Elemental 2 — Rayo de Choque 360° (Común)
+## SLOT 4: Habilidad Elemental 2 — Rayo de Choque 360° (Consume EP Verde)
 func use_slot_4_elem() -> void:
 	if cd_timer_4 > 0.0:
 		_spawn_floating_text("¡En recarga!", Color(0.8, 0.8, 0.8))
 		return
-	if current_mp < MP_COST_SLOT_4:
-		_spawn_floating_text("¡Sin MP suficiente!", Color(0.3, 0.6, 1.0))
+	if current_ep < EP_COST_SLOT_4:
+		_spawn_floating_text("¡Sin EP suficiente!", Color(0.2, 0.9, 0.4))
 		return
 		
-	current_mp -= MP_COST_SLOT_4
+	current_ep -= EP_COST_SLOT_4
 	cd_timer_4 = CD_MAX_SLOT_4
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("ep_changed", current_ep, max_ep)
 	
 	_spawn_floating_text("¡DESCARGA ELÉCTRICA!", Color(0.4, 0.9, 1.0))
 	
@@ -401,23 +412,23 @@ func use_slot_5_item_hp() -> void:
 	_spawn_floating_text("+%d HP" % heal, Color(0.2, 1.0, 0.4))
 
 
-## SLOT 6: Objeto de Recuperación SP / MP (Poción de Maná)
+## SLOT 6: Objeto de Recuperación SP (Poción de Maná/SP)
 func use_slot_6_item_mp() -> void:
 	if cd_timer_6 > 0.0: return
 	if inventory_potions_mp <= 0:
-		_spawn_floating_text("¡Sin pociones de MP!", Color(0.4, 0.6, 1.0))
+		_spawn_floating_text("¡Sin pociones de SP!", Color(0.4, 0.6, 1.0))
 		return
-	if current_mp >= max_mp:
-		_spawn_floating_text("¡MP al máximo!", Color(0.6, 0.8, 1.0))
+	if current_sp >= max_sp:
+		_spawn_floating_text("¡SP al máximo!", Color(0.6, 0.8, 1.0))
 		return
 		
 	cd_timer_6 = CD_MAX_SLOT_6
 	inventory_potions_mp -= 1
-	var mana_heal: int = 25
-	current_mp = mini(max_mp, current_mp + mana_heal)
-	emit_signal("mp_changed", current_mp, max_mp)
+	var sp_heal: int = 25
+	current_sp = mini(max_sp, current_sp + sp_heal)
+	emit_signal("sp_changed", current_sp, max_sp)
 	emit_signal("potions_updated", inventory_potions_hp, inventory_potions_mp)
-	_spawn_floating_text("+%d MP" % mana_heal, Color(0.3, 0.7, 1.0))
+	_spawn_floating_text("+%d SP" % sp_heal, Color(0.3, 0.7, 1.0))
 
 
 # ==============================================================================
@@ -510,13 +521,16 @@ func _level_up() -> void:
 	next_level_exp = int(50.0 * pow(level, 2.2) + 20.0 * level)
 	max_hp += 28
 	current_hp = max_hp
-	max_mp += 6
-	current_mp = max_mp
+	max_sp += 6
+	current_sp = max_sp
+	max_ep += 5
+	current_ep = max_ep
 	base_atk += 5
 	base_def += 3
 	emit_signal("level_up", level)
 	emit_signal("hp_changed", current_hp, max_hp)
-	emit_signal("mp_changed", current_mp, max_mp)
+	emit_signal("sp_changed", current_sp, max_sp)
+	emit_signal("ep_changed", current_ep, max_ep)
 	_spawn_floating_text("¡SUBE DE NIVEL! (Nv. %d)" % level, Color(1.0, 0.85, 0.1))
 
 

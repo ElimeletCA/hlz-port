@@ -1,39 +1,46 @@
 class_name GameHUD
 extends CanvasLayer
 
-# hud.gd — Interfaz de usuario (HUD) para el Vertical Slice de Heroes Lore: Zero
-# Muestra:
-#   - Barras de HP, MP y EXP con valores numéricos
-#   - Barra de 6 SLOTS DE ACCIÓN con keybindings, iconos, costes de MP y cooldowns en tiempo real:
-#       Slot 1: [1] Golpe Brutal (12 MP)
-#       Slot 2: [2] Embestida (15 MP)
-#       Slot 3: [3] Onda Ígnea (10 MP)
-#       Slot 4: [4] Rayo 360° (14 MP)
-#       Slot 5: [5/Q] Poción HP (+50 HP)
-#       Slot 6: [6/R] Poción MP (+25 MP)
-#   - Panel de diálogos narrativo
+# hud.gd — Interfaz de usuario unificada (HUD) inspirada fielmente en Heroes Lore: Zero
+# Integra en UNA SOLA TARJETA INFERIOR:
+#   - Barra de Salud (HP - Rojo)
+#   - Barra de Habilidades de Clase (SP - Azul)
+#   - Barra de Habilidades Elementales (EP - Verde)
+#   - Línea fina de Experiencia (EXP - Amarillo)
+#   - Los 6 Slots de Acción organizados debajo:
+#       [1] Clase 1 (Azul)  |  [2] Clase 2 (Azul)
+#       [3] Elem 1 (Verde)  |  [4] Elem 2 (Verde)
+#       [5] Poción HP       |  [6] Poción SP
 
 signal dialogue_advanced()
 signal dialogue_closed()
 
-@onready var hp_bar: ProgressBar = $StatusPanel/VBox/HPContainer/HPBar
-@onready var hp_label: Label = $StatusPanel/VBox/HPContainer/HPLabel
-@onready var mp_bar: ProgressBar = $StatusPanel/VBox/MPContainer/MPBar
-@onready var mp_label: Label = $StatusPanel/VBox/MPContainer/MPLabel
-@onready var exp_bar: ProgressBar = $StatusPanel/VBox/EXPBar
-@onready var name_label: Label = $StatusPanel/VBox/NameLabel
+# Referencias a la tarjeta unificada inferior
+@onready var name_label: Label = $CombatCard/VBox/Header/NameLabel
+
+@onready var hp_bar: ProgressBar = $CombatCard/VBox/Bars/HPContainer/HPBar
+@onready var hp_label: Label = $CombatCard/VBox/Bars/HPContainer/HPLabel
+
+@onready var sp_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/SPContainer/SPBar
+@onready var sp_label: Label = $CombatCard/VBox/Bars/ResourceRow/SPContainer/SPLabel
+
+@onready var ep_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/EPContainer/EPBar
+@onready var ep_label: Label = $CombatCard/VBox/Bars/ResourceRow/EPContainer/EPLabel
+
+@onready var exp_bar: ProgressBar = $CombatCard/VBox/Bars/EXPBar
 
 # Las 6 barras de cooldown de los slots
-@onready var cd_bar_1: ProgressBar = $ActionBar/Slots/Slot1/CooldownOverlay
-@onready var cd_bar_2: ProgressBar = $ActionBar/Slots/Slot2/CooldownOverlay
-@onready var cd_bar_3: ProgressBar = $ActionBar/Slots/Slot3/CooldownOverlay
-@onready var cd_bar_4: ProgressBar = $ActionBar/Slots/Slot4/CooldownOverlay
-@onready var cd_bar_5: ProgressBar = $ActionBar/Slots/Slot5/CooldownOverlay
-@onready var cd_bar_6: ProgressBar = $ActionBar/Slots/Slot6/CooldownOverlay
+@onready var cd_bar_1: ProgressBar = $CombatCard/VBox/Slots/Slot1/CooldownOverlay
+@onready var cd_bar_2: ProgressBar = $CombatCard/VBox/Slots/Slot2/CooldownOverlay
+@onready var cd_bar_3: ProgressBar = $CombatCard/VBox/Slots/Slot3/CooldownOverlay
+@onready var cd_bar_4: ProgressBar = $CombatCard/VBox/Slots/Slot4/CooldownOverlay
+@onready var cd_bar_5: ProgressBar = $CombatCard/VBox/Slots/Slot5/CooldownOverlay
+@onready var cd_bar_6: ProgressBar = $CombatCard/VBox/Slots/Slot6/CooldownOverlay
 
-@onready var badge_hp: Label = $ActionBar/Slots/Slot5/VBox/CountBadge
-@onready var badge_mp: Label = $ActionBar/Slots/Slot6/VBox/CountBadge
+@onready var badge_hp: Label = $CombatCard/VBox/Slots/Slot5/VBox/CountBadge
+@onready var badge_mp: Label = $CombatCard/VBox/Slots/Slot6/VBox/CountBadge
 
+# Diálogos
 @onready var dialogue_panel: PanelContainer = $DialoguePanel
 @onready var speaker_label: Label = $DialoguePanel/Margin/VBox/SpeakerLabel
 @onready var dialogue_text: Label = $DialoguePanel/Margin/VBox/DialogueText
@@ -48,7 +55,6 @@ func _ready() -> void:
 	dialogue_panel.visible = false
 	prompt_next.visible = true
 	
-	# Inicializar overlays de cooldown a 0
 	for bar in [cd_bar_1, cd_bar_2, cd_bar_3, cd_bar_4, cd_bar_5, cd_bar_6]:
 		if bar:
 			bar.max_value = 1.0
@@ -69,10 +75,21 @@ func update_hp(current: int, max_hp: int) -> void:
 	hp_label.text = "%d / %d" % [current, max_hp]
 
 
+func update_sp(current: int, max_sp: int) -> void:
+	sp_bar.max_value = max_sp
+	sp_bar.value = current
+	sp_label.text = "%d / %d" % [current, max_sp]
+
+
+func update_ep(current: int, max_ep: int) -> void:
+	ep_bar.max_value = max_ep
+	ep_bar.value = current
+	ep_label.text = "%d / %d" % [current, max_ep]
+
+
+# Compatibilidad
 func update_mp(current: int, max_mp: int) -> void:
-	mp_bar.max_value = max_mp
-	mp_bar.value = current
-	mp_label.text = "%d / %d" % [current, max_mp]
+	update_sp(current, max_mp)
 
 
 func update_exp(current: int, next: int) -> void:
@@ -81,7 +98,7 @@ func update_exp(current: int, next: int) -> void:
 
 
 func update_level(lvl: int, character_name: String = "Lucian") -> void:
-	name_label.text = "%s (Nv. %d · Guerrero)" % [character_name, lvl]
+	name_label.text = "%s  ·  Nv. %d Guerrero" % [character_name, lvl]
 
 
 func update_potions(hp_count: int, mp_count: int) -> void:

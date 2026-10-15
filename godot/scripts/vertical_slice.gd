@@ -53,7 +53,8 @@ func _ready() -> void:
 	
 	# Conectar señales del jugador al HUD
 	player.connect("hp_changed", Callable(self, "_on_player_hp_changed"))
-	player.connect("mp_changed", Callable(self, "_on_player_mp_changed"))
+	player.connect("sp_changed", Callable(self, "_on_player_sp_changed"))
+	player.connect("ep_changed", Callable(self, "_on_player_ep_changed"))
 	player.connect("exp_gained", Callable(self, "_on_player_exp_gained"))
 	player.connect("level_up", Callable(self, "_on_player_level_up"))
 	player.connect("died", Callable(self, "_on_player_died"))
@@ -68,7 +69,8 @@ func _ready() -> void:
 	
 	# Inicializar HUD
 	hud.update_hp(player.current_hp, player.max_hp)
-	hud.update_mp(player.current_mp, player.max_mp)
+	hud.update_sp(player.current_sp, player.max_sp)
+	hud.update_ep(player.current_ep, player.max_ep)
 	hud.update_exp(player.current_exp, player.next_level_exp)
 	hud.update_level(player.level, player.character_name)
 	hud.update_potions(player.inventory_potions_hp, player.inventory_potions_mp)
@@ -92,8 +94,12 @@ func _on_player_hp_changed(cur: int, max_val: int) -> void:
 	hud.update_hp(cur, max_val)
 
 
-func _on_player_mp_changed(cur: int, max_val: int) -> void:
-	hud.update_mp(cur, max_val)
+func _on_player_sp_changed(cur: int, max_val: int) -> void:
+	hud.update_sp(cur, max_val)
+
+
+func _on_player_ep_changed(cur: int, max_val: int) -> void:
+	hud.update_ep(cur, max_val)
 
 
 func _on_player_exp_gained(_amount: int, cur: int, next_val: int) -> void:
@@ -133,8 +139,10 @@ func _save_vertical_slice() -> void:
 		"level": player.level,
 		"current_hp": player.current_hp,
 		"max_hp": player.max_hp,
-		"current_mp": player.current_mp,
-		"max_mp": player.max_mp,
+		"current_sp": player.current_sp,
+		"max_sp": player.max_sp,
+		"current_ep": player.current_ep,
+		"max_ep": player.max_ep,
 		"current_exp": player.current_exp,
 		"next_level_exp": player.next_level_exp,
 		"base_atk": player.base_atk,
@@ -159,8 +167,10 @@ func _load_vertical_slice() -> void:
 	player.level = int(save_data.get("level", 1))
 	player.current_hp = int(save_data.get("current_hp", 120))
 	player.max_hp = int(save_data.get("max_hp", 120))
-	player.current_mp = int(save_data.get("current_mp", 30))
-	player.max_mp = int(save_data.get("max_mp", 30))
+	player.current_sp = int(save_data.get("current_sp", 30))
+	player.max_sp = int(save_data.get("max_sp", 30))
+	player.current_ep = int(save_data.get("current_ep", 50))
+	player.max_ep = int(save_data.get("max_ep", 50))
 	player.current_exp = int(save_data.get("current_exp", 0))
 	player.next_level_exp = int(save_data.get("next_level_exp", 70))
 	player.base_atk = int(save_data.get("base_atk", 18))
@@ -180,7 +190,8 @@ func _load_vertical_slice() -> void:
 		chest.sprite.texture = chest.tex_open
 		
 	hud.update_hp(player.current_hp, player.max_hp)
-	hud.update_mp(player.current_mp, player.max_mp)
+	hud.update_sp(player.current_sp, player.max_sp)
+	hud.update_ep(player.current_ep, player.max_ep)
 	hud.update_exp(player.current_exp, player.next_level_exp)
 	hud.update_level(player.level, player.character_name)
 	hud.update_potions(player.inventory_potions_hp, player.inventory_potions_mp)
