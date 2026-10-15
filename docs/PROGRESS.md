@@ -458,3 +458,19 @@ Formato de entrada por tarea:
   - Carga con tecla `[F6]`: restaura instantáneamente todos los atributos, posición y estado de la escena.
 - Cómo se verificó: Guardado y carga comprobados con notificación visual en pantalla.
 - Pendiente o dudas: Listo para la Puerta de Aprobación Humana (T5.10–T5.14).
+
+---
+
+## T5.9 · estado: hecho
+- Qué se hizo: Refinamiento del HUD y barra de 6 slots según el diseño original J2ME:
+  - Tarjeta unificada inferior (`CombatCard`) con diseño puramente gráfico sin etiquetas de texto ni cifras numéricas que saturen la pantalla.
+  - Barra de Salud (HP) roja de ancho completo.
+  - Barras de Habilidad divididas 50%/50% en fila horizontal: SP (Azul, clase) a la izquierda y EP (Verde, elemental) a la derecha.
+  - Línea fina amarilla de Experiencia (EXP) abarcando todo el ancho inferior de los medidores.
+  - 6 Slots de acción directamente debajo con bordes cromáticos distintivos:
+    - [1] y [2]: Borde azul (Habilidades de Guerrero: Golpe Brutal, Embestida).
+    - [3] y [4]: Borde verde (Habilidades elementales: Onda Ígnea, Rayo 360°).
+    - [5]: Borde rojo (Poción HP).
+    - [6]: Borde azul (Poción SP).
+- Cómo se verificó: Ejecución en Godot Engine v4.7.2 headless con código de salida 0 y suite de paridad 7/7 tests OK.
+- Pendiente o dudas: Ninguna. Listo para la revisión del usuario y el reemplazo de arte real (T5.10 / T5.11).
