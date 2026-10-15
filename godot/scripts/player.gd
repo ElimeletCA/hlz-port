@@ -96,6 +96,16 @@ var is_invulnerable: bool = false
 var invulnerable_timer: float = 0.0
 var move_dir: Vector2 = Vector2.ZERO
 
+# Texturas direccionales ilustradas de Lucian
+var tex_down: Texture2D
+var tex_up: Texture2D
+var tex_side: Texture2D
+
+# Variables para animación de paso, balanceo y respiración
+var walk_anim_timer: float = 0.0
+var idle_anim_timer: float = 0.0
+var step_dust_cooldown: float = 0.0
+
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var shadow: Polygon2D = $Shadow
 @onready var slash_vfx: Sprite2D = $SlashVFX
@@ -108,12 +118,23 @@ var fireball_scene: PackedScene
 func _ready() -> void:
 	fireball_scene = load("res://scenes/Fireball.tscn")
 	
-	# Cargar sprite ilustrado si existe
-	var lucian_path := "res://art_samples/hero_lucian_idle.png"
-	if ResourceLoader.exists(lucian_path):
-		var tex := load(lucian_path) as Texture2D
-		if tex:
-			sprite.texture = tex
+	# Cargar sprites direccionales ilustrados
+	var down_path := "res://art_samples/hero_lucian_down.png"
+	if ResourceLoader.exists(down_path):
+		tex_down = load(down_path) as Texture2D
+	elif ResourceLoader.exists("res://art_samples/hero_lucian_idle.png"):
+		tex_down = load("res://art_samples/hero_lucian_idle.png") as Texture2D
+		
+	var up_path := "res://art_samples/hero_lucian_up.png"
+	if ResourceLoader.exists(up_path):
+		tex_up = load(up_path) as Texture2D
+		
+	var side_path := "res://art_samples/hero_lucian_side.png"
+	if ResourceLoader.exists(side_path):
+		tex_side = load(side_path) as Texture2D
+		
+	if tex_down:
+		sprite.texture = tex_down
 	
 	var slash_path := "res://art_samples/vfx_sword_slash.png"
 	if ResourceLoader.exists(slash_path):
@@ -171,7 +192,7 @@ func _process(delta: float) -> void:
 			sprite.modulate.a = 1.0
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if current_state == State.DEAD:
 		return
 		
@@ -184,9 +205,45 @@ func _physics_process(_delta: float) -> void:
 			_update_facing_direction(move_dir)
 			velocity = move_dir.normalized() * BASE_SPEED_4X
 			move_and_slide()
+			
+			# Ciclo de animación de caminata / trote dinámico (Walking Bob & Sway)
+			walk_anim_timer += delta * 14.0
+			var bob := absf(sin(walk_anim_timer)) * 4.5
+			sprite.offset.y = -64.0 - bob
+			
+			# Balanceo corporal rítmico (inclinación de peso entre pies)
+			if current_dir == Direction.LEFT or current_dir == Direction.RIGHT:
+				var lean_dir := 1.0 if current_dir == Direction.RIGHT else -1.0
+				sprite.rotation = lean_dir * (0.04 + sin(walk_anim_timer) * 0.035)
+			else:
+				sprite.rotation = sin(walk_anim_timer * 0.5) * 0.045
+				
+			# Compresión y estiramiento dinámico (Squash & Stretch de impacto)
+			var squash := sin(walk_anim_timer * 2.0) * 0.03
+			sprite.scale = Vector2(1.0 + squash, 1.0 - squash)
+			
+			# Sombra adaptativa al elevar los pies
+			shadow.scale = Vector2.ONE * (1.0 - (bob / 4.5) * 0.15)
+			
+			# Emisión de polvo ligero en las pisadas
+			step_dust_cooldown -= delta
+			if sin(walk_anim_timer) < -0.85 and step_dust_cooldown <= 0.0:
+				_spawn_step_dust()
+				step_dust_cooldown = 0.22
 		else:
 			current_state = State.IDLE
 			velocity = Vector2.ZERO
+			
+			# Animación de respiración / guardia (Idle Breathing)
+			idle_anim_timer += delta * 2.5
+			walk_anim_timer = 0.0
+			
+			sprite.offset.y = lerpf(sprite.offset.y, -64.0, delta * 12.0)
+			sprite.rotation = lerpf(sprite.rotation, 0.0, delta * 12.0)
+			
+			var breath := sin(idle_anim_timer) * 0.015
+			sprite.scale = Vector2(1.0 - breath * 0.5, 1.0 + breath)
+			shadow.scale = Vector2.ONE
 	elif current_state != State.SKILL_CAST and current_state != State.HURT:
 		velocity = Vector2.ZERO
 		
@@ -216,12 +273,22 @@ func _can_act() -> bool:
 
 
 func _update_facing_direction(input: Vector2) -> void:
-	if absf(input.x) > absf(input.y):
+	if absf(input.x) > absf(input.y) * 0.8:
 		current_dir = Direction.RIGHT if input.x > 0 else Direction.LEFT
+		if tex_side:
+			sprite.texture = tex_side
 		sprite.flip_h = (current_dir == Direction.LEFT)
 	else:
-		current_dir = Direction.DOWN if input.y > 0 else Direction.UP
-		sprite.flip_h = false
+		if input.y > 0:
+			current_dir = Direction.DOWN
+			if tex_down:
+				sprite.texture = tex_down
+			sprite.flip_h = false
+		else:
+			current_dir = Direction.UP
+			if tex_up:
+				sprite.texture = tex_up
+			sprite.flip_h = false
 
 
 func _get_dir_vector() -> Vector2:
@@ -247,21 +314,24 @@ func use_slot_1_skill() -> void:
 	emit_signal("sp_changed", current_sp, max_sp)
 	current_state = State.ATTACK
 	
-	_spawn_floating_text("¡GOLPE BRUTAL!", Color(1.0, 0.85, 0.2))
+	_spawn_floating_text("¡ATAQUE SORPRESA!", Color(0.85, 0.4, 1.0))
+	_spawn_afterimage()
 	
-	# Efecto visual ampliado dorado y 180% de daño
+	# Efecto visual sombrío ampliado y 180% de daño
 	var dir_vec := _get_dir_vector()
 	attack_area.position = dir_vec * 56
 	slash_vfx.position = dir_vec * 56
 	slash_vfx.rotation = dir_vec.angle()
-	slash_vfx.modulate = Color(1.5, 1.2, 0.3, 1.0)
-	slash_vfx.scale = Vector2(1.5, 1.5)
+	slash_vfx.modulate = Color(1.6, 0.5, 1.8, 1.0)
+	slash_vfx.scale = Vector2(1.6, 1.6)
 	slash_vfx.visible = true
 	
 	var tween := create_tween()
-	tween.tween_property(sprite, "scale", Vector2(1.25, 0.85), 0.1)
+	tween.tween_property(sprite, "offset", Vector2(0, -64) + dir_vec * 24.0, 0.08)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.25, 0.85), 0.08)
 	tween.parallel().tween_property(slash_vfx, "modulate:a", 0.0, 0.25)
-	tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.12)
+	tween.tween_property(sprite, "offset", Vector2(0, -64), 0.12)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.12)
 	tween.tween_callback(func():
 		slash_vfx.visible = false
 		slash_vfx.scale = Vector2(1.0, 1.0)
@@ -274,7 +344,7 @@ func use_slot_1_skill() -> void:
 			body.take_damage(heavy_dmg, true, global_position)
 
 
-## SLOT 2: Habilidad de Clase 2 — Embestida (Guerrero · Consume SP Azul)
+## SLOT 2: Habilidad de Clase 2 — Danza Sombría (Asesino · Consume SP Azul)
 func use_slot_2_skill() -> void:
 	if cd_timer_2 > 0.0:
 		_spawn_floating_text("¡En recarga!", Color(0.8, 0.8, 0.8))
@@ -288,14 +358,17 @@ func use_slot_2_skill() -> void:
 	emit_signal("sp_changed", current_sp, max_sp)
 	current_state = State.SKILL_CAST
 	
-	_spawn_floating_text("¡EMBESTIDA!", Color(1.0, 0.5, 0.2))
+	_spawn_floating_text("¡DANZA SOMBRÍA!", Color(0.5, 0.9, 1.0))
+	_spawn_afterimage()
 	
 	var dir_vec := _get_dir_vector()
 	velocity = dir_vec * 550.0 # Embestida supersónica
 	
 	var dash_tween := create_tween()
-	dash_tween.tween_property(sprite, "modulate", Color(1.5, 1.0, 0.4), 0.05)
-	dash_tween.tween_interval(0.20)
+	dash_tween.tween_property(sprite, "modulate", Color(1.2, 0.8, 1.8), 0.05)
+	dash_tween.tween_interval(0.10)
+	dash_tween.tween_callback(_spawn_afterimage)
+	dash_tween.tween_interval(0.10)
 	dash_tween.tween_property(sprite, "modulate", Color.WHITE, 0.08)
 	dash_tween.tween_callback(func():
 		velocity = Vector2.ZERO
@@ -442,17 +515,22 @@ func perform_attack() -> void:
 	current_state = State.ATTACK
 	var dir_vec := _get_dir_vector()
 	attack_area.position = dir_vec * 48
-	slash_vfx.position = dir_vec * 48
+	slash_vfx.position = dir_vec * 44
 	slash_vfx.rotation = dir_vec.angle()
-	slash_vfx.modulate = Color.WHITE
+	slash_vfx.modulate = Color(1.3, 1.3, 1.4, 1.0)
 	slash_vfx.visible = true
 	
+	# Estocada ágil con dagas (avance rápido en la dirección y retorno)
+	var lunge_offset := dir_vec * 16.0
 	var tween := create_tween()
-	tween.tween_property(sprite, "scale", Vector2(1.15, 0.9), 0.08)
-	tween.parallel().tween_property(slash_vfx, "modulate:a", 0.0, 0.22)
-	tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.12)
+	tween.tween_property(sprite, "offset", Vector2(0, -64) + lunge_offset, 0.07).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.15, 0.88), 0.07)
+	tween.parallel().tween_property(slash_vfx, "modulate:a", 0.0, 0.20)
+	tween.tween_property(sprite, "offset", Vector2(0, -64), 0.10).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.10)
 	tween.tween_callback(func():
 		slash_vfx.visible = false
+		slash_vfx.modulate.a = 1.0
 		if current_state == State.ATTACK: current_state = State.IDLE
 	)
 	
@@ -574,3 +652,40 @@ func _spawn_floating_text(text: String, color: Color) -> void:
 	tween.tween_property(label, "position:y", label.position.y - 40, 0.8)
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.8)
 	tween.tween_callback(label.queue_free)
+
+
+func _spawn_step_dust() -> void:
+	var dust := Polygon2D.new()
+	var pts := PackedVector2Array()
+	var segs := 6
+	var rad := randf_range(3.5, 6.0)
+	for i in range(segs):
+		var ang := (i / float(segs)) * TAU
+		pts.append(Vector2(cos(ang) * rad, sin(ang) * (rad * 0.6)))
+	dust.polygon = pts
+	dust.color = Color(0.85, 0.80, 0.70, 0.45)
+	
+	var foot_offset := -_get_dir_vector() * randf_range(6.0, 10.0) + Vector2(randf_range(-4, 4), randf_range(-2, 2))
+	dust.global_position = global_position + foot_offset
+	get_parent().add_child(dust)
+	
+	var dtween := create_tween()
+	dtween.tween_property(dust, "scale", Vector2(1.8, 1.8), 0.22)
+	dtween.parallel().tween_property(dust, "modulate:a", 0.0, 0.22)
+	dtween.tween_callback(dust.queue_free)
+
+
+func _spawn_afterimage() -> void:
+	var ghost := Sprite2D.new()
+	ghost.texture = sprite.texture
+	ghost.offset = sprite.offset
+	ghost.flip_h = sprite.flip_h
+	ghost.scale = sprite.scale
+	ghost.rotation = sprite.rotation
+	ghost.modulate = Color(0.4, 0.2, 0.7, 0.55) # Sombra púrpura de Asesino
+	ghost.global_position = global_position
+	get_parent().add_child(ghost)
+	
+	var gt := create_tween()
+	gt.tween_property(ghost, "modulate:a", 0.0, 0.25)
+	gt.tween_callback(ghost.queue_free)

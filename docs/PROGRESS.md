@@ -493,7 +493,27 @@ Formato de entrada por tarea:
   - Cola de caballo baja con lazo azul, mechón ahoge superior y trenza lateral derecha naciendo antes de la oreja.
   - Doble empuñadura de dagas de asesino con reflejos acerados cian.
   - Procesado con canal alfa transparente y antialiasing limpio en `tools/process_lucian_sprite.py`.
-  - Integrado en `res://art_samples/hero_lucian_idle.png` (128x128 px, pivote en pies).
+  - Integrado en `res://art_samples/hero_lucian_idle.png` y `hero_lucian_down.png` (128x128 px, pivote en pies).
   - HUD actualizado a "Lucian · Nv. 1 Asesino" con habilidades de clase *Ataque Sorpresa* y *Danza Sombría*.
   - Stats calibrados en `player.gd`: CRIT 18%, EVA 20%, mayor agilidad y velocidad base.
-- Pendiente o dudas: Prueba visual interactiva por parte del usuario mediante `JUGAR_VERTICAL_SLICE.bat`.
+- Sistema Direccional Completo (4 Direcciones) y Ciclo de Marcha Dinámico:
+  - Texturas direccionales generadas y configuradas:
+    - Sur (Frente): `hero_lucian_down.png`
+    - Norte (Espaldas): `hero_lucian_up.png` (muestra la pequeña coleta trasera con lazo azul y espalda del chaleco rojizo)
+    - Este / Oeste (Perfil / Zancada lateral): `hero_lucian_side.png` (con reflejo horizontal `flip_h` para izquierda)
+  - Animación de Marcha Procedural (Walking Bob & Sway):
+    - Rebote vertical orgánico de zancada (`offset.y = -64.0 - bob`).
+    - Balanceo corporal y transferencia de peso entre pies (`rotation`).
+    - Compresión y extensión al pisar el suelo (Squash & Stretch).
+    - Escala de sombra dinámica según la altura del paso.
+    - Partículas ligeras de polvo en cada pisada (`_spawn_step_dust()`).
+  - Animación de Guardia / Respiración en Reposo (Idle Breathing):
+    - Respiración rítmica sutil en el pecho al detenerse.
+    - Retención de la última dirección orientada (no vuelve a mirar al frente abruptamente).
+  - Animación de Combate Asesino:
+    - Ataque básico con estocada de dagas dobles hacia adelante (`lunge_offset`) y retorno ágil.
+    - Slot 1 *Ataque Sorpresa* con desplazamiento y estela de sombra morada (`_spawn_afterimage()`).
+    - Slot 2 *Danza Sombría* con ráfaga de estelas espectrales durante el avance supersónico.
+- Cómo se verificó: Ejecución en Godot 4.7.2 headless exit code 0 (`VerticalSlice.tscn`).
+- Pendiente o dudas: Prueba interactiva del usuario con `JUGAR_VERTICAL_SLICE.bat` para confirmar la fluidez de movimiento y combate.
+
