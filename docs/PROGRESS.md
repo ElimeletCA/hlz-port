@@ -194,3 +194,44 @@ Formato de entrada por tarea:
   5. **Elemental:** Símbolo púrpura. Magia y habilidades elementales (bloqueada inicialmente, se desbloquea tras finalizar el juego).
   6. **Gunblader:** Símbolo turquesa/cian. Híbrido espada-pistola (bloqueada inicialmente, se desbloquea tras finalizar el juego).
   - Total de clases de Heroes Lore: Zero confirmadas: **6 clases** (4 iniciales + 2 desbloqueables).
+---
+
+## T2.5 · estado: hecho
+- Qué se hizo: Implementación de los módulos de parseo binario en `tools/parsers/`:
+  - `parse_tdf.py`: Decodificación de tablas de texto `.tdf` a UTF-8/Latin-1 y exportación a JSON.
+  - `parse_mmi.py`: Decodificación de marcadores de objetivo `mmi/` (70 bytes = 35 pares de coordenadas X,Y).
+  - `parse_mpm.py`: Reensamblador de contenedores `.mpm` a imágenes PNG estándar mediante inyección de chunks `PLTE`, `tRNS`, `IHDR` e `IDAT`.
+  - `parse_map.py`: Decodificador de mapas binarios `.m` (dimensiones, capas ground/collision en tiles de 16×16, objetos, decoraciones, spawns y portales).
+- Cómo se verificó: Pruebas unitarias de decodificación ejecutadas directamente sobre muestras de cada formato (`t/m/0.tdf`, `mmi/0`, `en/0/01.mpm`, `m/m/00.m`). Todas parsearon con integridad estructural y tipos esperados.
+- Pendiente o dudas: Ninguna. Parsers integrados en el pipeline de extracción.
+---
+
+## T2.6 · estado: hecho
+- Qué se hizo: Implementación del extractor general `tools/extract.py` que procesa íntegramente el `.jar` hacia el directorio de trabajo local `out/`:
+  - 31 archivos `.tdf` convertidos a JSON (751 cadenas de texto en español en `out/text/`, más consolidado maestro `_all_text_master.json`).
+  - 141 archivos `mmi/` convertidos a JSON (2.911 marcadores de misión activos en `out/mmi/`).
+  - 141 mapas `.m` exportados a JSON (con capas de tiles, colisiones, objetos y entidades en `out/maps/`).
+  - 460 archivos `.mpm` reconstruidos en **3.199 sprites y frames individuales en formato PNG estándar** con canal alfa en `out/sprites/`.
+  - 17 pistas de audio MIDI organizadas en `out/audio/midi/`.
+  - 14 efectos de sonido WAV organizados en `out/audio/wav/`.
+  - 39 texturas nativas de interfaz copiadas a `out/ui/`.
+- Cómo se verificó: Ejecución de `python tools/extract.py input/Heroes Lore Zero 360x640 Spanish.jar out` (exit code 0, 0 errores, tiempo de ejecución ~3.2s).
+- Pendiente o dudas: Proceder a T2.7 y T2.8 para verificaciones cruzadas y catálogos de referencia estética.
+---
+
+## T2.7 · estado: hecho
+- Qué se hizo: Creación y ejecución de la suite de verificación automatizada de la Fase 2 en `tools/verify_fase2.py`:
+  - Valida que el 100% de los 1.112 archivos del archivo JAR de entrada estén completamente extraídos, decodificados o decompilados en sus respectivos directorios destino sin pérdida ni excepciones.
+- Cómo se verificó:
+  - Ejecución de `python tools/verify_fase2.py`:
+    - 144/144 clases decompiladas (.class -> .java).
+    - 460/460 contenedores de sprites decodificados a PNG.
+    - 141/141 mapas exportados a JSON.
+    - 141/141 marcadores de misión procesados.
+    - 31/31 tablas de texto procesadas.
+    - 17/17 archivos MIDI extraídos.
+    - 14/14 archivos WAV extraídos.
+    - 39/39 texturas UI nativas copiadas.
+    - Resultado: `[EXITO] Criterio de salida de Fase 2 CUMPLIDO AL 100%.` (exit code 0).
+- Pendiente o dudas: Generar herramientas de visualización/hojas de contacto y catálogo de referencia estética en T2.8.
+
