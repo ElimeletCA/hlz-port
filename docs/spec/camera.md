@@ -35,13 +35,17 @@ Se han implementado dos variantes totalmente funcionales y alternables en tiempo
 
 ---
 
-## 3. Decisión y Recomendación Técnica (🧑 T4.7)
+## 3. Decisión y Aprobación Formal (🧑 T4.7 · Aprobado)
 
-> [!TIP]
-> **Recomendación:** Se recomienda formalmente la **Variante B (Cenital Ligeramente Elevada)** por las siguientes razones:
-> 1. Cumple al $100\%$ con la dirección artística aprobada en `art/STYLE.md` (atmósfera y profundidad inspirada en *Bleaklight Falls*).
-> 2. Permite ver con anticipación la aproximación de enemigos en combates a tiempo real a 14 Hz.
-> 3. El zoom de $2.35\times$ aprovecha de manera natural la resolución horizontal nativa de $1920 \times 1080$ de PC sin provocar claustrofobia visual.
+> [!IMPORTANT]
+> **Decisión del Usuario (Checkpoint T4.7 - Aprobado):**
+> Se adopta formal y exclusivamente la **Variante B (Cenital Amplia · Estilo Bleaklight Falls)**:
+> 1. **Zoom:** $2.0\times$ (sobre lienzo base de 1920×1080 con escala 4x en tilesets).
+> 2. **Offset:** $(0, -80\text{ px})$ vertical, otorgando anticipación frontal del camino y combate.
+> 3. **Límites:** Márgenes suaves con degradado periférico en bioma.
+> 4. **Estilo:** Cenital amplia con composición de profundidad atmosférica aprobada en `art/STYLE.md`.
+>
+> La Variante A queda descartada. Todas las escenas a partir de la Fase 5 utilizarán esta configuración de cámara.
 
 ---
 

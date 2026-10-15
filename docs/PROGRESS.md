@@ -337,12 +337,22 @@ Formato de entrada por tarea:
 
 ## T4.5 & T4.6 · estado: hecho
 - Qué se hizo: Implementación del sistema de cámara 2D y la escena interactiva de comparación de encuadres `res://scenes/CameraComparison.tscn` (`godot/scripts/camera_comparison.gd`).
-  - **Variante A (Cenital Directa):** Zoom 3.0x, encuadre perpendicular cerrado, límites estrictos a los bordes del mapa.
-  - **Variante B (Cenital Ligeramente Elevada - Recomendada):** Zoom 2.35x, mayor campo de visión horizontal, offset frontal de -32 px, sombra elíptica y atmósfera inspirada en Bleaklight Falls.
+  - **Variante A (Cenital Directa):** Zoom 5.0x, encuadre perpendicular muy cerrado (~6 tiles visibles), límites estrictos a los bordes del mapa, viñeta azul.
+  - **Variante B (Cenital Amplia - Bleaklight Falls):** Zoom 2.0x, campo de visión amplio (~15 tiles visibles), offset frontal de -80 px, viñeta ámbar, atmósfera inspirada en Bleaklight Falls.
   - Permite mover a Lucian con teclado o mando y alternar variantes en caliente con las teclas 1 y 2.
   - Documentadas en detalle en `docs/spec/camera.md`.
-- Cómo se verificó: Ejecución gráfica de `CameraComparison.tscn` comprobando movimiento, alternancia de variantes y renderizado de mapa real.
-- Pendiente o dudas: Checkpoint humano 🧑 (T4.7) para aprobación formal de la variante preferida por el usuario.
+- Cómo se verificó: Ejecución gráfica de `CameraComparison.tscn` comprobando movimiento, alternancia de variantes y renderizado de mapa real a escala 4x.
+- Pendiente o dudas: Ninguna.
+
+---
+
+## T4.7 · estado: hecho (🧑 Checkpoint Humano)
+- Qué se hizo: Evaluación interactiva y aprobación por el usuario de la perspectiva y encuadre 2D.
+  - El usuario probó ambas variantes en tiempo real y aprobó formalmente la **Variante B (Cenital Amplia · Estilo Bleaklight Falls)**.
+  - Parámetros fijados: Zoom $2.0\times$, offset vertical $-80\text{ px}$, límites con margen de amortiguación.
+  - Registrado en `docs/spec/camera.md`. La Variante A queda descartada.
+- Cómo se verificó: Decisión explícita del usuario recibida y documentada.
+- Pendiente o dudas: Fase 4 concluida al 100%. Listo para comenzar la Fase 5 (Vertical Slice).
 ---
 
 ## T4.8 · estado: hecho
