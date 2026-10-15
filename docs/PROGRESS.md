@@ -24,3 +24,25 @@ Formato de entrada por tarea:
   - **Gráfico:** `Godot_v4.7.2-stable_win64.exe --path godot/ --quit` → exit code 0 (ventana abre y cierra sin errores)
 - Pendiente o dudas: Las carpetas `godot/.godot/` (caché de importación) se generan al abrir el editor completo; están excluidas por .gitignore. El campo `window/size/initial_width/height` puede necesitar ajuste si Godot 4.7 lo lee desde otra clave; verificar al abrir el editor.
 
+
+---
+
+## T0.1 · estado: hecho
+- Qué se hizo: Instalación de todas las herramientas del proyecto.
+  - **Git 2.49.0** — preexistente ✅
+  - **Python 3.11.9** — preexistente ✅
+  - **Java JDK 17.0.15** (OpenJDK Temurin) — preexistente ✅
+  - **FFmpeg 2026-08-27-git** — preexistente ✅
+  - **Godot 4.7.2** — preexistente ✅
+  - **Vineflower 1.12.0** — descargado a `tools/vineflower-1.12.0.jar` ✅
+  - **FluidSynth 2.6.1** — descargado y extraído a `tools/fluidsynth/` ✅
+  - **FreeJ2ME-Plus nightly** — descargado y extraído a `tools/freej2me-plus/` ✅
+  - **Krita 5.3.4.1** — instalado manualmente por el usuario en `C:\Program Files\Krita (x64)\` ✅
+- Cómo se verificó:
+  - `python tools/paths.py` → todas las rutas [OK], exit code 0
+  - `java -jar vineflower-1.12.0.jar --help` → `Vineflower Decompiler 1.12.0`
+  - `fluidsynth.exe --version` → `FluidSynth runtime version 2.6.1`
+  - `java -jar freej2me_plus.jar` → responde con error esperado (sin JAR de juego)
+  - `krita.exe` → versión `5.3.4.1 (git bd6e8d0)` en `C:\Program Files\Krita (x64)\bin\`
+- Pendiente o dudas: Ninguna herramienta nueva está en PATH del sistema; se usan rutas absolutas centralizadas en `tools/paths.py`. Krita no está en PATH (uso normal: doble clic o ruta absoluta).
+
