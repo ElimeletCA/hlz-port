@@ -32,6 +32,9 @@ IMPORTED_DIR = os.path.join(GODOT_PROJECT, '.godot', 'imported')
 # PNGs que necesitan importación (o actualización si cambia el PNG)
 ASSETS_FALTANTES = [
     'hero_lucian_idle.png',
+    'hero_lucian_down.png',
+    'hero_lucian_up.png',
+    'hero_lucian_side.png',
     'map_silverleaf.png',
     'npc_aldren.png',
     'prop_barrel.png',
@@ -312,7 +315,8 @@ def main():
     exitosos = 0
     fallidos = 0
 
-    for nombre_png in ASSETS_FALTANTES:
+    archivos = sorted([f for f in os.listdir(ART_SAMPLES_DIR) if f.endswith('.png')])
+    for nombre_png in archivos:
         try:
             if procesar_asset(nombre_png):
                 exitosos += 1

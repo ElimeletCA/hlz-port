@@ -101,7 +101,12 @@ var tex_down: Texture2D
 var tex_up: Texture2D
 var tex_side: Texture2D
 
-# Variables para animación de paso, balanceo y respiración
+# Fotogramas del ciclo de marcha canónico (8 frames por dirección)
+var walk_frames_down: Array[Texture2D] = []
+var walk_frames_up: Array[Texture2D] = []
+var walk_frames_side: Array[Texture2D] = []
+
+# Variables para animación de paso y polvo
 var walk_anim_timer: float = 0.0
 var idle_anim_timer: float = 0.0
 var step_dust_cooldown: float = 0.0
@@ -118,7 +123,7 @@ var fireball_scene: PackedScene
 func _ready() -> void:
 	fireball_scene = load("res://scenes/Fireball.tscn")
 	
-	# Cargar sprites direccionales ilustrados
+	# Cargar sprites direccionales canónicos
 	var down_path := "res://art_samples/hero_lucian_down.png"
 	if ResourceLoader.exists(down_path):
 		tex_down = load(down_path) as Texture2D
@@ -135,6 +140,20 @@ func _ready() -> void:
 		
 	if tex_down:
 		sprite.texture = tex_down
+
+	# Cargar ciclo de marcha canónico (8 fotogramas por dirección)
+	for i in range(8):
+		var p_down := "res://art_samples/hero_lucian_walk_down_%d.png" % i
+		if ResourceLoader.exists(p_down):
+			walk_frames_down.append(load(p_down) as Texture2D)
+			
+		var p_up := "res://art_samples/hero_lucian_walk_up_%d.png" % i
+		if ResourceLoader.exists(p_up):
+			walk_frames_up.append(load(p_up) as Texture2D)
+			
+		var p_side := "res://art_samples/hero_lucian_walk_side_%d.png" % i
+		if ResourceLoader.exists(p_side):
+			walk_frames_side.append(load(p_side) as Texture2D)
 	
 	var slash_path := "res://art_samples/vfx_sword_slash.png"
 	if ResourceLoader.exists(slash_path):
@@ -206,43 +225,60 @@ func _physics_process(delta: float) -> void:
 			velocity = move_dir.normalized() * BASE_SPEED_4X
 			move_and_slide()
 			
-			# Ciclo de animación de caminata / trote dinámico (Walking Bob & Sway)
-			walk_anim_timer += delta * 14.0
-			var bob := absf(sin(walk_anim_timer)) * 4.5
-			sprite.offset.y = -64.0 - bob
+			# Ciclo de animación canónico frame-by-frame (8 fotogramas a 12 FPS)
+			walk_anim_timer += delta * 12.0
+			var frame_idx := int(fposmod(walk_anim_timer, 8.0))
 			
-			# Balanceo corporal rítmico (inclinación de peso entre pies)
-			if current_dir == Direction.LEFT or current_dir == Direction.RIGHT:
-				var lean_dir := 1.0 if current_dir == Direction.RIGHT else -1.0
-				sprite.rotation = lean_dir * (0.04 + sin(walk_anim_timer) * 0.035)
-			else:
-				sprite.rotation = sin(walk_anim_timer * 0.5) * 0.045
-				
-			# Compresión y estiramiento dinámico (Squash & Stretch de impacto)
-			var squash := sin(walk_anim_timer * 2.0) * 0.03
-			sprite.scale = Vector2(1.0 + squash, 1.0 - squash)
+			match current_dir:
+				Direction.DOWN:
+					if frame_idx < walk_frames_down.size():
+						sprite.texture = walk_frames_down[frame_idx]
+					sprite.flip_h = false
+				Direction.UP:
+					if frame_idx < walk_frames_up.size():
+						sprite.texture = walk_frames_up[frame_idx]
+					sprite.flip_h = false
+				Direction.RIGHT:
+					if frame_idx < walk_frames_side.size():
+						sprite.texture = walk_frames_side[frame_idx]
+					sprite.flip_h = false
+				Direction.LEFT:
+					if frame_idx < walk_frames_side.size():
+						sprite.texture = walk_frames_side[frame_idx]
+					sprite.flip_h = true
+					
+			sprite.offset = Vector2(0, -64)
+			sprite.rotation = 0.0
+			sprite.scale = Vector2.ONE
+			shadow.scale = Vector2.ONE
 			
-			# Sombra adaptativa al elevar los pies
-			shadow.scale = Vector2.ONE * (1.0 - (bob / 4.5) * 0.15)
-			
-			# Emisión de polvo ligero en las pisadas
+			# Emisión de polvo ligero en pisadas (frames de apoyo del paso)
 			step_dust_cooldown -= delta
-			if sin(walk_anim_timer) < -0.85 and step_dust_cooldown <= 0.0:
+			if (frame_idx == 1 or frame_idx == 5) and step_dust_cooldown <= 0.0:
 				_spawn_step_dust()
-				step_dust_cooldown = 0.22
+				step_dust_cooldown = 0.18
 		else:
 			current_state = State.IDLE
 			velocity = Vector2.ZERO
-			
-			# Animación de respiración / guardia (Idle Breathing)
-			idle_anim_timer += delta * 2.5
 			walk_anim_timer = 0.0
 			
-			sprite.offset.y = lerpf(sprite.offset.y, -64.0, delta * 12.0)
-			sprite.rotation = lerpf(sprite.rotation, 0.0, delta * 12.0)
-			
-			var breath := sin(idle_anim_timer) * 0.015
-			sprite.scale = Vector2(1.0 - breath * 0.5, 1.0 + breath)
+			match current_dir:
+				Direction.DOWN:
+					if tex_down: sprite.texture = tex_down
+					sprite.flip_h = false
+				Direction.UP:
+					if tex_up: sprite.texture = tex_up
+					sprite.flip_h = false
+				Direction.RIGHT:
+					if tex_side: sprite.texture = tex_side
+					sprite.flip_h = false
+				Direction.LEFT:
+					if tex_side: sprite.texture = tex_side
+					sprite.flip_h = true
+					
+			sprite.offset = Vector2(0, -64)
+			sprite.rotation = 0.0
+			sprite.scale = Vector2.ONE
 			shadow.scale = Vector2.ONE
 	elif current_state != State.SKILL_CAST and current_state != State.HURT:
 		velocity = Vector2.ZERO

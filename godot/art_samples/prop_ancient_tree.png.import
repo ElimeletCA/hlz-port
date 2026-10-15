@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brrlwmgqe0w6r"
-path="res://.godot/imported/prop_ancient_tree.png-7442a38d1334a75d7585ea5fd52fd5a6.ctex"
+uid="uid://0046IWWwAK6UD"
+path="res://.godot/imported/prop_ancient_tree.png-649e432aa8bcf24e95241da1347653be.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/prop_ancient_tree.png"
-dest_files=["res://.godot/imported/prop_ancient_tree.png-7442a38d1334a75d7585ea5fd52fd5a6.ctex"]
+dest_files=["res://.godot/imported/prop_ancient_tree.png-649e432aa8bcf24e95241da1347653be.ctex"]
 
 [params]
 

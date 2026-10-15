@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://0027iSKRlyF2P"
-path="res://.godot/imported/hero_lucian_idle.png-bda4f26666c8db94cf997659fad510f0.ctex"
+uid="uid://003UaKzIfrx8R"
+path="res://.godot/imported/hero_lucian_idle.png-813c0369d7ffb916dfcd12484cedd0ed.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/hero_lucian_idle.png"
-dest_files=["res://.godot/imported/hero_lucian_idle.png-bda4f26666c8db94cf997659fad510f0.ctex"]
+dest_files=["res://.godot/imported/hero_lucian_idle.png-813c0369d7ffb916dfcd12484cedd0ed.ctex"]
 
 [params]
 

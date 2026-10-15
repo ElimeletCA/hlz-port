@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://001uVTJX7nL4v"
-path="res://.godot/imported/map_silverleaf.png-9879def8658e4bca8e39a79a62075133.ctex"
+uid="uid://001FoGkrxEfyu"
+path="res://.godot/imported/map_silverleaf.png-c304e43b1426508510ca7798abc91029.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/map_silverleaf.png"
-dest_files=["res://.godot/imported/map_silverleaf.png-9879def8658e4bca8e39a79a62075133.ctex"]
+dest_files=["res://.godot/imported/map_silverleaf.png-c304e43b1426508510ca7798abc91029.ctex"]
 
 [params]
 

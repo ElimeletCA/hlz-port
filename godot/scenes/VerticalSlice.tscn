@@ -192,48 +192,6 @@ shape = SubResource("RectangleShape2D_wall_right")
 [node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
-[node name="HouseWest" parent="World" instance=ExtResource("9_house")]
-position = Vector2(560, 1100)
-
-[node name="HouseEast" parent="World" instance=ExtResource("9_house")]
-position = Vector2(1240, 1080)
-
-[node name="HouseSouth" parent="World" instance=ExtResource("9_house")]
-position = Vector2(540, 1520)
-
-[node name="TrainerCottage" parent="World" instance=ExtResource("10_cottage")]
-position = Vector2(700, 1230)
-
-[node name="PropLantern1" parent="World" instance=ExtResource("11_lantern")]
-position = Vector2(760, 1160)
-
-[node name="PropLantern2" parent="World" instance=ExtResource("11_lantern")]
-position = Vector2(1040, 1160)
-
-[node name="PropLantern3" parent="World" instance=ExtResource("11_lantern")]
-position = Vector2(760, 1380)
-
-[node name="PropLantern4" parent="World" instance=ExtResource("11_lantern")]
-position = Vector2(1040, 1380)
-
-[node name="PropBarrel1" parent="World" instance=ExtResource("12_barrel")]
-position = Vector2(620, 1240)
-
-[node name="PropBarrel2" parent="World" instance=ExtResource("12_barrel")]
-position = Vector2(1160, 1140)
-
-[node name="PropTree1" parent="World" instance=ExtResource("6_tree")]
-position = Vector2(420, 960)
-
-[node name="PropTree2" parent="World" instance=ExtResource("6_tree")]
-position = Vector2(1380, 960)
-
-[node name="PropTree3" parent="World" instance=ExtResource("6_tree")]
-position = Vector2(440, 1380)
-
-[node name="PropTree4" parent="World" instance=ExtResource("6_tree")]
-position = Vector2(1360, 1420)
-
 [node name="NPCTrainer" parent="World" instance=ExtResource("4_npc")]
 position = Vector2(820, 1260)
 

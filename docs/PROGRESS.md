@@ -507,13 +507,15 @@ Formato de entrada por tarea:
     - Compresión y extensión al pisar el suelo (Squash & Stretch).
     - Escala de sombra dinámica según la altura del paso.
     - Partículas ligeras de polvo en cada pisada (`_spawn_step_dust()`).
-  - Animación de Guardia / Respiración en Reposo (Idle Breathing):
-    - Respiración rítmica sutil en el pecho al detenerse.
-    - Retención de la última dirección orientada (no vuelve a mirar al frente abruptamente).
-  - Animación de Combate Asesino:
-    - Ataque básico con estocada de dagas dobles hacia adelante (`lunge_offset`) y retorno ágil.
-    - Slot 1 *Ataque Sorpresa* con desplazamiento y estela de sombra morada (`_spawn_afterimage()`).
-    - Slot 2 *Danza Sombría* con ráfaga de estelas espectrales durante el avance supersónico.
-- Cómo se verificó: Ejecución en Godot 4.7.2 headless exit code 0 (`VerticalSlice.tscn`).
-- Pendiente o dudas: Prueba interactiva del usuario con `JUGAR_VERTICAL_SLICE.bat` para confirmar la fluidez de movimiento y combate.
+- Transición a Arte Original Canónico Reescalado 4x (Pixel-Perfect HD):
+  - A petición del usuario ("reutilizar exactamente los mismos mapas originales, sprites y animaciones con reescalado"), se abandonó el enfoque de ilustraciones IA para volver a la pureza del arte original de 2008 de *Heroes Lore: Zero* (JAR 360×640).
+  - Aldea Silverleaf original completa (`map_silverleaf.png`): renderizada a partir de los tilesets originales (`t00` y `t26`) a escala entera 4x (1792×2560 px), mostrando la plaza, calles empedradas, fuentes y arquitectura original auténtica sin props artificiales.
+  - Lucian Asesino original compuesto mediante `tools/build_authentic_pixel_assets.py` a partir de `hero/h2` (Class 2), cuerpo base (`0/t`), armadura (`2/00`), trenza/cabello (`eh`) y dagas dobles (`w/200`).
+  - Ciclo de marcha canónico de 8 fotogramas auténticos implementado en `player.gd` para las 4 direcciones (Abajo, Arriba, Perfil/Lados) a 12 FPS, eliminando cualquier deformación artificial.
+  - Re-importación masiva con `tools/generar_import_godot.py` para todos los 41 activos y fotogramas a `.ctex`.
+- Cómo se verificó:
+  - Godot 4.7.2 headless exit code 0 (`VerticalSlice.tscn`).
+  - Suite de paridad de combate 7/7 OK (`test_combat_parity.py`).
+- Pendiente o dudas: Revisión visual por parte del usuario ejecutando `JUGAR_VERTICAL_SLICE.bat`.
+
 
