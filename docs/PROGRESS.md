@@ -56,3 +56,15 @@ Formato de entrada por tarea:
   - Tamaño: 1.367.966 bytes
   - Comprobado que `.gitignore` excluye el archivo del control de versiones.
 - Pendiente o dudas: Ninguna para esta tarea.
+---
+
+## T0.8 · estado: hecho
+- Qué se hizo: Consultadas y registradas las especificaciones reales del equipo de desarrollo en `docs/spec/performance.md`.
+  - CPU: Intel Core i7-11800H (8 núcleos, 16 hilos, 2.30 GHz base)
+  - GPU Integrada: Intel UHD Graphics (para pruebas de perfil modesto/bajo)
+  - GPU Dedicada: NVIDIA GeForce RTX 3050 Ti Laptop GPU (4 GB VRAM)
+  - RAM: 32 GB (31.77 GB disponibles)
+  - Pantallas: 1920×1080 @ 144 Hz (integrada) y 3840×2160 @ 60 Hz (4K externa conectada)
+  - OS: Windows 11 Enterprise 64-bit
+- Cómo se verificó: Consulta de hardware mediante PowerShell `Get-CimInstance` (Win32_Processor, Win32_VideoController, Win32_OperatingSystem, Win32_ComputerSystem).
+- Pendiente o dudas: Las pruebas de rendimiento reales se realizarán con las escenas de benchmark en T4.12 y T5.13.
