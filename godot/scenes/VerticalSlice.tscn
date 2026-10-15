@@ -33,6 +33,10 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_bg"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
 bg_color = Color(0.06, 0.08, 0.11, 0.95)
 border_width_left = 3
 border_width_top = 3
@@ -43,6 +47,13 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.08, 0.1, 0.13, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.85, 0.2, 0.2, 1)
@@ -96,13 +107,25 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_item"]
-bg_color = Color(0.13, 0.1, 0.09, 0.92)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_item_hp"]
+bg_color = Color(0.13, 0.08, 0.08, 0.92)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.8, 0.55, 0.25, 0.9)
+border_color = Color(0.85, 0.25, 0.25, 0.9)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_item_sp"]
+bg_color = Color(0.08, 0.11, 0.17, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.5, 0.85, 0.9)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -205,16 +228,16 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -370.0
-offset_top = -175.0
+offset_top = -148.0
 offset_right = 370.0
-offset_bottom = -15.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_card_bg")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/CombatCard"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 5
 
 [node name="Header" type="HBoxContainer" parent="HUD/CombatCard/VBox"]
 layout_mode = 2
@@ -228,98 +251,45 @@ text = "Lucian  ·  Nv. 1 Guerrero"
 
 [node name="Bars" type="VBoxContainer" parent="HUD/CombatCard/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 4
 
-[node name="HPContainer" type="HBoxContainer" parent="HUD/CombatCard/VBox/Bars"]
+[node name="HPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars"]
+custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Label" type="Label" parent="HUD/CombatCard/VBox/Bars/HPContainer"]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 11
-text = "HP"
-
-[node name="HPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars/HPContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 max_value = 120.0
 value = 120.0
 show_percentage = false
 
-[node name="HPLabel" type="Label" parent="HUD/CombatCard/VBox/Bars/HPContainer"]
-custom_minimum_size = Vector2(65, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 10
-text = "120 / 120"
-horizontal_alignment = 2
-
 [node name="ResourceRow" type="HBoxContainer" parent="HUD/CombatCard/VBox/Bars"]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="SPContainer" type="HBoxContainer" parent="HUD/CombatCard/VBox/Bars/ResourceRow"]
-layout_mode = 2
-size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="HUD/CombatCard/VBox/Bars/ResourceRow/SPContainer"]
-custom_minimum_size = Vector2(22, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.65, 1, 1)
-theme_override_font_sizes/font_size = 10
-text = "SP"
-
-[node name="SPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars/ResourceRow/SPContainer"]
+[node name="SPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars/ResourceRow"]
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_sp_fill")
 max_value = 30.0
 value = 30.0
 show_percentage = false
 
-[node name="SPLabel" type="Label" parent="HUD/CombatCard/VBox/Bars/ResourceRow/SPContainer"]
-custom_minimum_size = Vector2(45, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 9
-text = "30 / 30"
-horizontal_alignment = 2
-
-[node name="EPContainer" type="HBoxContainer" parent="HUD/CombatCard/VBox/Bars/ResourceRow"]
+[node name="EPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars/ResourceRow"]
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="Label" type="Label" parent="HUD/CombatCard/VBox/Bars/ResourceRow/EPContainer"]
-custom_minimum_size = Vector2(22, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.9, 0.45, 1)
-theme_override_font_sizes/font_size = 10
-text = "EP"
-
-[node name="EPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars/ResourceRow/EPContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_ep_fill")
 max_value = 50.0
 value = 50.0
 show_percentage = false
 
-[node name="EPLabel" type="Label" parent="HUD/CombatCard/VBox/Bars/ResourceRow/EPContainer"]
-custom_minimum_size = Vector2(45, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 9
-text = "50 / 50"
-horizontal_alignment = 2
-
 [node name="EXPBar" type="ProgressBar" parent="HUD/CombatCard/VBox/Bars"]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_exp_line")
 max_value = 70.0
 show_percentage = false
@@ -484,7 +454,7 @@ show_percentage = false
 [node name="Slot5" type="PanelContainer" parent="HUD/CombatCard/VBox/Slots"]
 custom_minimum_size = Vector2(110, 60)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_slot_item")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_item_hp")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/CombatCard/VBox/Slots/Slot5"]
 layout_mode = 2
@@ -522,7 +492,7 @@ show_percentage = false
 [node name="Slot6" type="PanelContainer" parent="HUD/CombatCard/VBox/Slots"]
 custom_minimum_size = Vector2(110, 60)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_slot_item")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_item_sp")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/CombatCard/VBox/Slots/Slot6"]
 layout_mode = 2

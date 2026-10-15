@@ -17,16 +17,9 @@ signal dialogue_closed()
 
 # Referencias a la tarjeta unificada inferior
 @onready var name_label: Label = $CombatCard/VBox/Header/NameLabel
-
-@onready var hp_bar: ProgressBar = $CombatCard/VBox/Bars/HPContainer/HPBar
-@onready var hp_label: Label = $CombatCard/VBox/Bars/HPContainer/HPLabel
-
-@onready var sp_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/SPContainer/SPBar
-@onready var sp_label: Label = $CombatCard/VBox/Bars/ResourceRow/SPContainer/SPLabel
-
-@onready var ep_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/EPContainer/EPBar
-@onready var ep_label: Label = $CombatCard/VBox/Bars/ResourceRow/EPContainer/EPLabel
-
+@onready var hp_bar: ProgressBar = $CombatCard/VBox/Bars/HPBar
+@onready var sp_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/SPBar
+@onready var ep_bar: ProgressBar = $CombatCard/VBox/Bars/ResourceRow/EPBar
 @onready var exp_bar: ProgressBar = $CombatCard/VBox/Bars/EXPBar
 
 # Las 6 barras de cooldown de los slots
@@ -72,19 +65,16 @@ func _unhandled_input(event: InputEvent) -> void:
 func update_hp(current: int, max_hp: int) -> void:
 	hp_bar.max_value = max_hp
 	hp_bar.value = current
-	hp_label.text = "%d / %d" % [current, max_hp]
 
 
 func update_sp(current: int, max_sp: int) -> void:
 	sp_bar.max_value = max_sp
 	sp_bar.value = current
-	sp_label.text = "%d / %d" % [current, max_sp]
 
 
 func update_ep(current: int, max_ep: int) -> void:
 	ep_bar.max_value = max_ep
 	ep_bar.value = current
-	ep_label.text = "%d / %d" % [current, max_ep]
 
 
 # Compatibilidad
