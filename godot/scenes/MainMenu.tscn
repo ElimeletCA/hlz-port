@@ -1,0 +1,311 @@
+[gd_scene load_steps=5 format=3 uid="uid://hlzmainmenu01"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu_script"]
+[ext_resource type="Texture2D" uid="uid://fcj1cfedk4ag" path="res://art_samples/ui_title.png" id="2_title_tex"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+bg_color = Color(0.18, 0.24, 0.35, 0.85)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.78, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.1, 0.14, 0.2, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.35, 0.5, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0431373, 0.054902, 0.0784314, 1)
+
+[node name="VignetteOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0196078, 0.027451, 0.0392157, 0.45)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(600, 700)
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="TitleContainer" type="VBoxContainer" parent="CenterContainer/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TitleTexture" type="TextureRect" parent="CenterContainer/MainVBox/TitleContainer"]
+custom_minimum_size = Vector2(480, 250)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_title_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SubTitle" type="Label" parent="CenterContainer/MainVBox/TitleContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.72, 0.35, 1)
+theme_override_font_sizes/font_size = 22
+text = "HEROES LORE: ZERO — PC REMASTER"
+horizontal_alignment = 1
+
+[node name="MenuButtons" type="VBoxContainer" parent="CenterContainer/MainVBox"]
+custom_minimum_size = Vector2(440, 260)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="BtnNewGame" type="Button" parent="CenterContainer/MainVBox/MenuButtons"]
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "NUEVA PARTIDA"
+
+[node name="BtnContinue" type="Button" parent="CenterContainer/MainVBox/MenuButtons"]
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "CONTINUAR"
+
+[node name="BtnOptions" type="Button" parent="CenterContainer/MainVBox/MenuButtons"]
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "OPCIONES"
+
+[node name="BtnQuit" type="Button" parent="CenterContainer/MainVBox/MenuButtons"]
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "SALIR"
+
+[node name="OptionsModal" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(700, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -250.0
+offset_right = 350.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="OptionsModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 30
+
+[node name="OptionsVBox" type="VBoxContainer" parent="OptionsModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="OptionsTitle" type="Label" parent="OptionsModal/Margin/OptionsVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.3, 1)
+theme_override_font_sizes/font_size = 24
+text = "CONFIGURACIÓN Y OPCIONES"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="OptionsModal/Margin/OptionsVBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="OptionsModal/Margin/OptionsVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="LblWindowMode" type="Label" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Modo de Pantalla:"
+
+[node name="WindowModeOption" type="OptionButton" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+custom_minimum_size = Vector2(280, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="LblResolution" type="Label" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Resolución de Ventana:"
+
+[node name="ResolutionOption" type="OptionButton" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+custom_minimum_size = Vector2(280, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="LblVsync" type="Label" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Sincronización Vertical (V-Sync):"
+
+[node name="VsyncCheck" type="CheckButton" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+layout_mode = 2
+text = "Activado"
+
+[node name="LblProfile" type="Label" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Perfil de Rendimiento:"
+
+[node name="ProfileOption" type="OptionButton" parent="OptionsModal/Margin/OptionsVBox/Grid"]
+custom_minimum_size = Vector2(280, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="Spacer" type="Control" parent="OptionsModal/Margin/OptionsVBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="BtnOptionsBack" type="Button" parent="OptionsModal/Margin/OptionsVBox"]
+custom_minimum_size = Vector2(240, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "GUARDAR Y VOLVER"
+
+[node name="StubModal" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(650, 350)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="StubModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="StubVBox" type="VBoxContainer" parent="StubModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="StubLabel" type="Label" parent="StubModal/Margin/StubVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Notificación de Estado"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BtnStubClose" type="Button" parent="StubModal/Margin/StubVBox"]
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_focus")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "ACEPTAR"
+
+[node name="Footer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Margin" type="MarginContainer" parent="Footer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_right = 30
+
+[node name="FooterHBox" type="HBoxContainer" parent="Footer/Margin"]
+layout_mode = 2
+alignment = 1
+
+[node name="LblVersion" type="Label" parent="Footer/Margin/FooterHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "Heroes Lore: Zero — Remaster PC v0.1.0"
+
+[node name="LblStatus" type="Label" parent="Footer/Margin/FooterHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.7, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "[Mando / Teclado Soportados]"
+horizontal_alignment = 2

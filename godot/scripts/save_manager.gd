@@ -60,3 +60,18 @@ static func load_game(slot: int) -> Dictionary:
 
 static func has_save(slot: int) -> bool:
 	return FileAccess.file_exists(get_save_path(slot))
+
+
+static func has_any_save() -> bool:
+	for slot in [1, 2, 3]:
+		if has_save(slot):
+			return true
+	return false
+
+
+static func get_latest_save_slot() -> int:
+	for slot in [1, 2, 3]:
+		if has_save(slot):
+			return slot
+	return 0
+

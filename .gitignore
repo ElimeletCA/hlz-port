@@ -9,17 +9,12 @@ art/work/
 art/concepts/
 
 # ── Godot ─────────────────────────────────────────────────────────────────────
-# Ignorar la caché interna del editor (generada automáticamente)
-godot/.godot/uid_cache.bin
-godot/.godot/global_script_class_cache.cfg
-godot/.godot/editor/
-godot/.godot/mono/
-# Excepción: importados de art_samples (necesarios para correr sin el editor)
-!godot/.godot/imported/
+godot/.godot/
 godot/export_presets.cfg
 *.import
-# Excepción: .import de art_samples (generados por tools/generar_import_godot.py)
+# Excepción: .import de art_samples
 !godot/art_samples/*.import
+*.uid
 
 # ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/

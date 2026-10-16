@@ -1,0 +1,157 @@
+{
+	"assertions": [
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "main_menu_valid",
+			"result": "PASS",
+			"test": "NodesExistence"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "btn_new_game_valid",
+			"result": "PASS",
+			"test": "NodesExistence"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "btn_continue_valid",
+			"result": "PASS",
+			"test": "NodesExistence"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "btn_options_valid",
+			"result": "PASS",
+			"test": "NodesExistence"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "btn_quit_valid",
+			"result": "PASS",
+			"test": "NodesExistence"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "new_game_enabled",
+			"result": "PASS",
+			"test": "NewGameButton"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "new_game_visible",
+			"result": "PASS",
+			"test": "NewGameButton"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "continue_enabled_when_save_exists",
+			"result": "PASS",
+			"test": "ContinueButton_HasSave"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "continue_enabled_with_save",
+			"result": "PASS",
+			"test": "ContinueButton_Reactive"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "continue_shows_slot",
+			"result": "PASS",
+			"test": "ContinueButton_Reactive"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "options_modal_initially_hidden",
+			"result": "PASS",
+			"test": "OptionsFlow"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "options_modal_opens",
+			"result": "PASS",
+			"test": "OptionsFlow"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "menu_buttons_hidden_in_options",
+			"result": "PASS",
+			"test": "OptionsFlow"
+		},
+		{
+			"actual": "3",
+			"expected": "3",
+			"property": "window_modes_count",
+			"result": "PASS",
+			"test": "OptionsControls"
+		},
+		{
+			"actual": "5",
+			"expected": "5",
+			"property": "resolutions_count",
+			"result": "PASS",
+			"test": "OptionsControls"
+		},
+		{
+			"actual": "3",
+			"expected": "3",
+			"property": "profiles_count",
+			"result": "PASS",
+			"test": "OptionsControls"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "options_modal_closes",
+			"result": "PASS",
+			"test": "OptionsFlow"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "menu_buttons_restored",
+			"result": "PASS",
+			"test": "OptionsFlow"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "stub_modal_opens",
+			"result": "PASS",
+			"test": "NewGameTransition"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "stub_contains_t5b",
+			"result": "PASS",
+			"test": "NewGameTransition"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "stub_modal_closes",
+			"result": "PASS",
+			"test": "NewGameTransition"
+		}
+	],
+	"fail": 0,
+	"pass": 21,
+	"suite": "T5.A MainMenu Acceptance Test",
+	"timestamp": "2026-10-16T12:05:11",
+	"total_assertions": 21,
+	"verdict": "PASS"
+}

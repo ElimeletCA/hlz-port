@@ -88,14 +88,24 @@ Formato estándar de entrada:
 ### Desglose de Tareas de la Fase 5
 
 #### T5.A · Menú Principal y Navegación
-- **Estado:** `pendiente` (Próxima tarea a ejecutar)
-- **Qué se hará:** Crear la escena `godot/scenes/MainMenu.tscn` y el script `godot/scripts/main_menu.gd` con opciones: "Nueva Partida", "Continuar" (activa solo con partida guardada válida), "Opciones" y "Salir". Navegación completa por mando y teclado.
-- **Dependencias:** T4.1, T4.8.
-- **Pruebas:** Navegación por foco visual, transición a T5.B al seleccionar Nueva Partida.
-- **Criterio:** La escena arranca desde `Main.tscn` y responde limpiamente sin errores.
+- **Estado:** `hecho`
+- **Qué se hizo:** 
+  - Creada la escena canónica `godot/scenes/MainMenu.tscn` y el script `godot/scripts/main_menu.gd`.
+  - Configurado `run/main_scene="res://scenes/MainMenu.tscn"` en `project.godot` y actualizado `Main.tscn` para redirigir transparentemente al menú.
+  - Opciones implementadas: "NUEVA PARTIDA", "CONTINUAR" (reactivo, desactivado sin partida guardada, habilitado con número de slot si existe partida), "OPCIONES" y "SALIR".
+  - Panel modal de Opciones completo: Modo de Pantalla (Ventana, Pantalla Completa, Borderless), Resolución (1280x720 a 4K), V-Sync y Perfil Gráfico (Bajo, Medio, Alto) conectado con `DisplayManager` y `ProfileManager`.
+  - Soporte completo para navegación por foco con Teclado (Enter, Espacio, Flechas, Escape) y Mando/Gamepad (D-pad, Stick, Botón A interactuar, Botón B cancelar/volver).
+  - Integrada la textura original de título `ui_title.png` extraída del JAR.
+  - Ampliado `SaveManager` con `has_any_save()` y `get_latest_save_slot()`.
+- **Cómo se verificó:**
+  - Batería de pruebas automatizadas `godot/scenes/TestMainMenu.tscn` (`scripts/test_main_menu.gd`): **21/21 aserciones aprobadas (100% PASS, 0 FAIL)** en modo headless y ventana.
+  - Reporte de telemetría exportado en `godot/anim_captures/main_menu_test_results.json`.
+  - Captura real en ventana generada en `godot/anim_captures/main_menu_preview.png`.
+  - Cero regresiones en `test_combat_parity.py` (7/7 OK) y `AnimReview.tscn` (1,548 PASS, 0 FAIL, 4 NOT TESTED).
+- **Pendiente o dudas:** La opción "Nueva Partida" muestra el punto de integración limpio hacia T5.B. La pantalla de selección de personaje se implementará en la siguiente tarea (T5.B).
 
 #### T5.B · Selección de Personaje y Persistencia de Clase
-- **Estado:** `pendiente`
+- **Estado:** `pendiente` (Próxima tarea a ejecutar)
 - **Qué se hará:** Crear `godot/scenes/CharacterSelect.tscn` y script `character_select.gd` permitiendo elegir entre las 4 clases iniciales (Asesino, Guerrero, Caballero, Pistolero), mostrando retrato, descripción y atributos.
 - **Dependencias:** T5.A, T3.4.
 - **Pruebas:** Confirmar que la clase elegida persiste en sesión y configura correctamente los sprites y stats del jugador.
