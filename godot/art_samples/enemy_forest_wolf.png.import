@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://003BPJh1fGrKV"
-path="res://.godot/imported/enemy_forest_wolf.png-e8fe11eb67f54f7495a571bd822b33eb.ctex"
+uid="uid://001hlkao4tp66"
+path="res://.godot/imported/enemy_forest_wolf.png-404512b328a59e1002005e370b7acb0c.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/enemy_forest_wolf.png"
-dest_files=["res://.godot/imported/enemy_forest_wolf.png-e8fe11eb67f54f7495a571bd822b33eb.ctex"]
+dest_files=["res://.godot/imported/enemy_forest_wolf.png-404512b328a59e1002005e370b7acb0c.ctex"]
 
 [params]
 

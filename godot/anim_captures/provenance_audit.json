@@ -1,0 +1,65 @@
+{
+  "jar_path": "input/Heroes Lore Zero 360x640 Spanish.jar",
+  "hero_class": "Asesino (Class 1)",
+  "cif_structure": "hero/h1",
+  "total_assets_audited": 134,
+  "passed": 134,
+  "discrepancies": 0,
+  "exact_match_ratio": 1.0,
+  "status": "PASS_100_PERCENT",
+  "layers_verified": [
+    {
+      "layer": 0,
+      "path": "hero/0/00.mpm",
+      "desc": "Cabeza y Cabello Rojo Canónico"
+    },
+    {
+      "layer": 1,
+      "path": "hero/1/l00.mpm",
+      "desc": "Chaleco Marrón/Rojizo Ligero (dq.a() == false -> l00)"
+    },
+    {
+      "layer": 2,
+      "path": "hero/2/l00.mpm",
+      "desc": "Pantalón Morado, Brazos Desnudos y Muñequeras Azules"
+    },
+    {
+      "layer": 3,
+      "path": "hero/3/l00.mpm",
+      "desc": "Botas de Cuero Ágil"
+    },
+    {
+      "layer": 4,
+      "path": "hero/4/1.mpm",
+      "desc": "Tajos VFX Dorados Integrados"
+    },
+    {
+      "layer": 5,
+      "path": "hero/eh.mpm",
+      "desc": "Expresiones y Ojos Turquesa"
+    },
+    {
+      "layer": 6,
+      "path": "hero/w/400.mpm",
+      "desc": "Daga Principal"
+    },
+    {
+      "layer": 7,
+      "path": "hero/w/400.mpm",
+      "desc": "Daga Secundaria (Doble Empuñadura)"
+    }
+  ],
+  "direction_mapping": {
+    "North (Up)": 1,
+    "South (Down)": 2,
+    "West (Left)": 3,
+    "East (Right)": 4
+  },
+  "animation_mapping": {
+    "Anim 0 (Idle)": "8 frames (Reposo con respiración)",
+    "Anim 2 (Combat Walk)": "4 frames base expandidos a 8 frames de marcha con armas listas",
+    "Anim 6 (Combo 1 Attack)": "5 frames de tajo giratorio con tajos VFX en F1 y F3",
+    "Anim 7 (Combo 2 Finisher)": "3 frames de salto y estocada vertical",
+    "Anim 4 (Death)": "9 frames de caída"
+  }
+}

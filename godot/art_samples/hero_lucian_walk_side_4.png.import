@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://000J8Y8h411nu"
-path="res://.godot/imported/hero_lucian_walk_side_4.png-6a1e3f6dce0df6a753e362ba75fd3970.ctex"
+uid="uid://001PEcMyb7Eeb"
+path="res://.godot/imported/hero_lucian_walk_side_4.png-3901ebdf600e77e88e870351299d675b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/hero_lucian_walk_side_4.png"
-dest_files=["res://.godot/imported/hero_lucian_walk_side_4.png-6a1e3f6dce0df6a753e362ba75fd3970.ctex"]
+dest_files=["res://.godot/imported/hero_lucian_walk_side_4.png-3901ebdf600e77e88e870351299d675b.ctex"]
 
 [params]
 

@@ -31,6 +31,8 @@ dist/
 build/
 .venv/
 venv/
+tools/*.png
+tools/*.jpg
 
 # ── Editor y OS ───────────────────────────────────────────────────────────────
 .vscode/

@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://000CSW3TU5hEp"
-path="res://.godot/imported/npc_aldren.png-ebae24d13afa4911b3298a7cdc0a71e0.ctex"
+uid="uid://002hLc6UebIPG"
+path="res://.godot/imported/npc_aldren.png-f6ae9888389e87c2f4a42a2b3c0e7f85.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://art_samples/npc_aldren.png"
-dest_files=["res://.godot/imported/npc_aldren.png-ebae24d13afa4911b3298a7cdc0a71e0.ctex"]
+dest_files=["res://.godot/imported/npc_aldren.png-f6ae9888389e87c2f4a42a2b3c0e7f85.ctex"]
 
 [params]
 

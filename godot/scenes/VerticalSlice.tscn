@@ -5,13 +5,8 @@
 [ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://scenes/NPCTrainer.tscn" id="4_npc"]
 [ext_resource type="PackedScene" path="res://scenes/PropChest.tscn" id="5_chest"]
-[ext_resource type="PackedScene" path="res://scenes/PropTree.tscn" id="6_tree"]
 [ext_resource type="PackedScene" path="res://scenes/EnemyWolf.tscn" id="7_wolf"]
 [ext_resource type="Texture2D" path="res://art_samples/map_silverleaf.png" id="8_map"]
-[ext_resource type="PackedScene" path="res://scenes/PropVillageHouse.tscn" id="9_house"]
-[ext_resource type="PackedScene" path="res://scenes/PropCottage.tscn" id="10_cottage"]
-[ext_resource type="PackedScene" path="res://scenes/PropLantern.tscn" id="11_lantern"]
-[ext_resource type="PackedScene" path="res://scenes/PropBarrel.tscn" id="12_barrel"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_top"]
 size = Vector2(1856, 64)

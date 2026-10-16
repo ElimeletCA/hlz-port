@@ -88,7 +88,7 @@ func update_exp(current: int, next: int) -> void:
 
 
 func update_level(lvl: int, character_name: String = "Lucian") -> void:
-	name_label.text = "%s  ·  Nv. %d Guerrero" % [character_name, lvl]
+	name_label.text = "%s  ·  Nv. %d Asesino" % [character_name, lvl]
 
 
 func update_potions(hp_count: int, mp_count: int) -> void:

@@ -33,18 +33,18 @@ polygon = PackedVector2Array(-24, -4, -14, -8, 0, -10, 14, -8, 24, -4, 24, 4, 14
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_wolf_tex")
-offset = Vector2(0, -28)
+offset = Vector2(0, -96)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -10)
+position = Vector2(0, -16)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_wolf")
 
 [node name="HPBar" type="ProgressBar" parent="."]
 offset_left = -28.0
-offset_top = -68.0
+offset_top = -165.0
 offset_right = 28.0
-offset_bottom = -62.0
+offset_bottom = -159.0
 theme_override_styles/background = SubResource("StyleBoxFlat_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
 max_value = 45.0

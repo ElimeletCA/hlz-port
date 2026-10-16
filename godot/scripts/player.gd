@@ -96,20 +96,52 @@ var is_invulnerable: bool = false
 var invulnerable_timer: float = 0.0
 var move_dir: Vector2 = Vector2.ZERO
 
-# Texturas direccionales ilustradas de Lucian
+# Offset canónico del sprite para que los pies queden exactamente sobre la sombra en (0, 0)
+const SPRITE_OFFSET_DEFAULT: Vector2 = Vector2(0, -100)
+
+# Texturas direccionales base de Lucian (Idle F0)
 var tex_down: Texture2D
 var tex_up: Texture2D
 var tex_side: Texture2D
+var tex_left: Texture2D
+var tex_right: Texture2D
 
-# Fotogramas del ciclo de marcha canónico (8 frames por dirección)
+# Ciclos de Idle con respiración (8 frames por dirección)
+var idle_frames_down: Array[Texture2D] = []
+var idle_frames_up: Array[Texture2D] = []
+var idle_frames_left: Array[Texture2D] = []
+var idle_frames_right: Array[Texture2D] = []
+
+# Fotogramas del ciclo de marcha canónico con armas listas (8 frames por dirección)
 var walk_frames_down: Array[Texture2D] = []
 var walk_frames_up: Array[Texture2D] = []
+var walk_frames_left: Array[Texture2D] = []
+var walk_frames_right: Array[Texture2D] = []
 var walk_frames_side: Array[Texture2D] = []
 
-# Variables para animación de paso y polvo
+# Fotogramas del ataque básico Combo 1 con tajos VFX (5 frames por dirección)
+var atk_frames_down: Array[Texture2D] = []
+var atk_frames_up: Array[Texture2D] = []
+var atk_frames_left: Array[Texture2D] = []
+var atk_frames_right: Array[Texture2D] = []
+
+# Fotogramas del remate aéreo Combo 2 (3 frames por dirección)
+var combo_frames_down: Array[Texture2D] = []
+var combo_frames_up: Array[Texture2D] = []
+var combo_frames_left: Array[Texture2D] = []
+var combo_frames_right: Array[Texture2D] = []
+
+# Fotogramas de caída / muerte (9 frames)
+var dead_frames: Array[Texture2D] = []
+
+# Variables para control y temporización de animaciones
 var walk_anim_timer: float = 0.0
 var idle_anim_timer: float = 0.0
 var step_dust_cooldown: float = 0.0
+var attack_timer: float = 0.0
+var attack_hit_triggered: bool = false
+var combo_stage: int = 0
+var combo_window_timer: float = 0.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var shadow: Polygon2D = $Shadow
@@ -122,44 +154,97 @@ var fireball_scene: PackedScene
 
 func _ready() -> void:
 	fireball_scene = load("res://scenes/Fireball.tscn")
-	
-	# Cargar sprites direccionales canónicos
-	var down_path := "res://art_samples/hero_lucian_down.png"
+	sprite.offset = SPRITE_OFFSET_DEFAULT
+
+	var prefix := "res://art_samples/hero_lucian_"
+	if character_class == "Guerrero":
+		prefix = "res://art_samples/hero_lucian_warrior_"
+
+	# Cargar sprites direccionales canónicos base
+	var down_path := prefix + "down.png"
 	if ResourceLoader.exists(down_path):
 		tex_down = load(down_path) as Texture2D
-	elif ResourceLoader.exists("res://art_samples/hero_lucian_idle.png"):
-		tex_down = load("res://art_samples/hero_lucian_idle.png") as Texture2D
-		
-	var up_path := "res://art_samples/hero_lucian_up.png"
+	elif ResourceLoader.exists(prefix + "idle.png"):
+		tex_down = load(prefix + "idle.png") as Texture2D
+
+	var up_path := prefix + "up.png"
 	if ResourceLoader.exists(up_path):
 		tex_up = load(up_path) as Texture2D
-		
-	var side_path := "res://art_samples/hero_lucian_side.png"
+
+	var side_path := prefix + "side.png"
 	if ResourceLoader.exists(side_path):
 		tex_side = load(side_path) as Texture2D
-		
+
+	var left_path := prefix + "left.png"
+	if ResourceLoader.exists(left_path):
+		tex_left = load(left_path) as Texture2D
+
+	var right_path := prefix + "right.png"
+	if ResourceLoader.exists(right_path):
+		tex_right = load(right_path) as Texture2D
+
 	if tex_down:
 		sprite.texture = tex_down
 
-	# Cargar ciclo de marcha canónico (8 fotogramas por dirección)
-	for i in range(8):
-		var p_down := "res://art_samples/hero_lucian_walk_down_%d.png" % i
-		if ResourceLoader.exists(p_down):
-			walk_frames_down.append(load(p_down) as Texture2D)
-			
-		var p_up := "res://art_samples/hero_lucian_walk_up_%d.png" % i
-		if ResourceLoader.exists(p_up):
-			walk_frames_up.append(load(p_up) as Texture2D)
-			
-		var p_side := "res://art_samples/hero_lucian_walk_side_%d.png" % i
-		if ResourceLoader.exists(p_side):
-			walk_frames_side.append(load(p_side) as Texture2D)
-	
-	var slash_path := "res://art_samples/vfx_sword_slash.png"
-	if ResourceLoader.exists(slash_path):
-		var slash_tex := load(slash_path) as Texture2D
-		if slash_tex:
-			slash_vfx.texture = slash_tex
+	# Cargar animación de Idle con respiración (8 fotogramas)
+	for d in ["down", "up", "left", "right"]:
+		var arr: Array[Texture2D] = []
+		for i in range(8):
+			var p := prefix + "idle_%s_%d.png" % [d, i]
+			if ResourceLoader.exists(p):
+				arr.append(load(p) as Texture2D)
+		match d:
+			"down": idle_frames_down = arr
+			"up": idle_frames_up = arr
+			"left": idle_frames_left = arr
+			"right": idle_frames_right = arr
+
+	# Cargar ciclo de marcha canónico con armas listas (8 fotogramas por dirección)
+	for d in ["down", "up", "left", "right", "side"]:
+		var arr: Array[Texture2D] = []
+		for i in range(8):
+			var p := prefix + "walk_%s_%d.png" % [d, i]
+			if ResourceLoader.exists(p):
+				arr.append(load(p) as Texture2D)
+		match d:
+			"down": walk_frames_down = arr
+			"up": walk_frames_up = arr
+			"left": walk_frames_left = arr
+			"right": walk_frames_right = arr
+			"side": walk_frames_side = arr
+
+	# Cargar animación de ataque combo 1 con tajos VFX (5 fotogramas por dirección)
+	for d in ["down", "up", "left", "right"]:
+		var arr: Array[Texture2D] = []
+		for i in range(5):
+			var p := prefix + "atk_%s_%d.png" % [d, i]
+			if ResourceLoader.exists(p):
+				arr.append(load(p) as Texture2D)
+		match d:
+			"down": atk_frames_down = arr
+			"up": atk_frames_up = arr
+			"left": atk_frames_left = arr
+			"right": atk_frames_right = arr
+
+	# Cargar animación de remate aéreo combo 2 (3 fotogramas por dirección)
+	for d in ["down", "up", "left", "right"]:
+		var arr: Array[Texture2D] = []
+		for i in range(3):
+			var p := prefix + "combo_%s_%d.png" % [d, i]
+			if ResourceLoader.exists(p):
+				arr.append(load(p) as Texture2D)
+		match d:
+			"down": combo_frames_down = arr
+			"up": combo_frames_up = arr
+			"left": combo_frames_left = arr
+			"right": combo_frames_right = arr
+
+	# Cargar animación de caída / muerte (9 fotogramas)
+	for i in range(9):
+		var p := prefix + "dead_%d.png" % i
+		if ResourceLoader.exists(p):
+			dead_frames.append(load(p) as Texture2D)
+
 	slash_vfx.visible = false
 	
 	GameClock.game_tick.connect(_on_game_tick)
@@ -218,75 +303,96 @@ func _physics_process(delta: float) -> void:
 	# Movimiento direccional
 	move_dir = InputManager.get_movement_vector()
 	
-	if current_state != State.ATTACK and current_state != State.SKILL_CAST and current_state != State.HURT:
+	# Ventana de encadenamiento de combo
+	if combo_window_timer > 0.0:
+		combo_window_timer -= delta
+		if combo_window_timer <= 0.0:
+			combo_stage = 0
+			combo_window_timer = 0.0
+
+	# 1. Estado ATAQUE: Reproduce fotogramas canónicos con tajos VFX y sincronización de impacto
+	if current_state == State.ATTACK:
+		velocity = Vector2.ZERO
+		attack_timer += delta
+		var cur_atk_frames := _get_current_atk_frames()
+		var total_frames := cur_atk_frames.size()
+		var fps := 14.0
+		var cur_frame_idx := int(attack_timer * fps)
+
+		if cur_frame_idx < total_frames:
+			sprite.texture = cur_atk_frames[cur_frame_idx]
+			_apply_facing_flip()
+
+			if combo_stage == 0:
+				if (cur_frame_idx == 1 or cur_frame_idx == 3) and not attack_hit_triggered:
+					_trigger_attack_hit(false)
+					attack_hit_triggered = true
+				elif cur_frame_idx != 1 and cur_frame_idx != 3:
+					attack_hit_triggered = false
+			else:
+				if cur_frame_idx == 1 and not attack_hit_triggered:
+					_trigger_attack_hit(true)
+					attack_hit_triggered = true
+				elif cur_frame_idx != 1:
+					attack_hit_triggered = false
+		else:
+			# Fin de la animación de ataque -> Transición limpia a reposo
+			current_state = State.IDLE
+			attack_timer = 0.0
+			attack_hit_triggered = false
+			combo_window_timer = 0.40
+			combo_stage = (combo_stage + 1) % 2
+			idle_anim_timer = 0.0
+			_update_facing_sprite()
+
+	# 2. Estados de Movimiento y Reposo
+	elif current_state != State.SKILL_CAST and current_state != State.HURT:
 		if move_dir.length() > 0.05:
 			current_state = State.MOVE
 			_update_facing_direction(move_dir)
 			velocity = move_dir.normalized() * BASE_SPEED_4X
 			move_and_slide()
-			
-			# Ciclo de animación canónico frame-by-frame (8 fotogramas a 12 FPS)
-			walk_anim_timer += delta * 12.0
-			var frame_idx := int(fposmod(walk_anim_timer, 8.0))
-			
-			match current_dir:
-				Direction.DOWN:
-					if frame_idx < walk_frames_down.size():
-						sprite.texture = walk_frames_down[frame_idx]
-					sprite.flip_h = false
-				Direction.UP:
-					if frame_idx < walk_frames_up.size():
-						sprite.texture = walk_frames_up[frame_idx]
-					sprite.flip_h = false
-				Direction.RIGHT:
-					if frame_idx < walk_frames_side.size():
-						sprite.texture = walk_frames_side[frame_idx]
-					sprite.flip_h = false
-				Direction.LEFT:
-					if frame_idx < walk_frames_side.size():
-						sprite.texture = walk_frames_side[frame_idx]
-					sprite.flip_h = true
-					
-			sprite.offset = Vector2(0, -64)
-			sprite.rotation = 0.0
-			sprite.scale = Vector2.ONE
-			shadow.scale = Vector2.ONE
-			
-			# Emisión de polvo ligero en pisadas (frames de apoyo del paso)
+
+			# Ciclo de marcha canónico con armas listas (10 FPS)
+			walk_anim_timer += delta * 10.0
+			var cur_walk_frames := _get_current_walk_frames()
+			if not cur_walk_frames.is_empty():
+				var f_idx := int(fposmod(walk_anim_timer, float(cur_walk_frames.size())))
+				sprite.texture = cur_walk_frames[f_idx]
+			_apply_facing_flip()
+
+			# Emisión de polvo ligero en pisadas
 			step_dust_cooldown -= delta
-			if (frame_idx == 1 or frame_idx == 5) and step_dust_cooldown <= 0.0:
+			var step_f := int(fposmod(walk_anim_timer, 4.0))
+			if (step_f == 1 or step_f == 3) and step_dust_cooldown <= 0.0:
 				_spawn_step_dust()
-				step_dust_cooldown = 0.18
+				step_dust_cooldown = 0.20
 		else:
+			if current_state != State.IDLE:
+				idle_anim_timer = 0.0
 			current_state = State.IDLE
 			velocity = Vector2.ZERO
 			walk_anim_timer = 0.0
-			
-			match current_dir:
-				Direction.DOWN:
-					if tex_down: sprite.texture = tex_down
-					sprite.flip_h = false
-				Direction.UP:
-					if tex_up: sprite.texture = tex_up
-					sprite.flip_h = false
-				Direction.RIGHT:
-					if tex_side: sprite.texture = tex_side
-					sprite.flip_h = false
-				Direction.LEFT:
-					if tex_side: sprite.texture = tex_side
-					sprite.flip_h = true
-					
-			sprite.offset = Vector2(0, -64)
-			sprite.rotation = 0.0
-			sprite.scale = Vector2.ONE
-			shadow.scale = Vector2.ONE
-	elif current_state != State.SKILL_CAST and current_state != State.HURT:
-		velocity = Vector2.ZERO
-		
+
+			# Ciclo de respiración en reposo (6 FPS)
+			idle_anim_timer += delta * 6.0
+			var cur_idle_frames := _get_current_idle_frames()
+			if not cur_idle_frames.is_empty():
+				var f_idx := int(fposmod(idle_anim_timer, float(cur_idle_frames.size())))
+				sprite.texture = cur_idle_frames[f_idx]
+			else:
+				_update_facing_sprite()
+			_apply_facing_flip()
+
+	sprite.offset = SPRITE_OFFSET_DEFAULT
+	sprite.rotation = 0.0
+	sprite.scale = Vector2.ONE
+	shadow.scale = Vector2.ONE
+
 	# Ataque Básico Melee
 	if Input.is_action_just_pressed("attack") and _can_act():
 		perform_attack()
-		
+
 	# Los 6 Slots de Acción
 	if Input.is_action_just_pressed("slot_1_skill") and _can_act():
 		use_slot_1_skill()
@@ -308,23 +414,76 @@ func _can_act() -> bool:
 	return current_state != State.ATTACK and current_state != State.SKILL_CAST and current_state != State.HURT and current_state != State.DEAD
 
 
+func _get_current_walk_frames() -> Array[Texture2D]:
+	match current_dir:
+		Direction.DOWN: return walk_frames_down
+		Direction.UP: return walk_frames_up
+		Direction.LEFT: return walk_frames_left if not walk_frames_left.is_empty() else walk_frames_side
+		Direction.RIGHT: return walk_frames_right if not walk_frames_right.is_empty() else walk_frames_side
+	return walk_frames_down
+
+
+func _get_current_idle_frames() -> Array[Texture2D]:
+	match current_dir:
+		Direction.DOWN: return idle_frames_down
+		Direction.UP: return idle_frames_up
+		Direction.LEFT: return idle_frames_left if not idle_frames_left.is_empty() else idle_frames_right
+		Direction.RIGHT: return idle_frames_right
+	return idle_frames_down
+
+
+func _get_current_atk_frames() -> Array[Texture2D]:
+	var target_list = atk_frames_down if combo_stage == 0 else combo_frames_down
+	match current_dir:
+		Direction.DOWN:
+			return atk_frames_down if combo_stage == 0 else combo_frames_down
+		Direction.UP:
+			return atk_frames_up if combo_stage == 0 else combo_frames_up
+		Direction.LEFT:
+			var arr = atk_frames_left if combo_stage == 0 else combo_frames_left
+			if arr.is_empty():
+				return atk_frames_right if combo_stage == 0 else combo_frames_right
+			return arr
+		Direction.RIGHT:
+			return atk_frames_right if combo_stage == 0 else combo_frames_right
+	return target_list
+
+
+func _apply_facing_flip() -> void:
+	if current_dir == Direction.LEFT:
+		if walk_frames_left.is_empty():
+			sprite.flip_h = true
+		else:
+			sprite.flip_h = false
+	else:
+		sprite.flip_h = false
+
+
+func _update_facing_sprite() -> void:
+	match current_dir:
+		Direction.DOWN:
+			if tex_down: sprite.texture = tex_down
+		Direction.UP:
+			if tex_up: sprite.texture = tex_up
+		Direction.LEFT:
+			if tex_left:
+				sprite.texture = tex_left
+			elif tex_side:
+				sprite.texture = tex_side
+		Direction.RIGHT:
+			if tex_right:
+				sprite.texture = tex_right
+			elif tex_side:
+				sprite.texture = tex_side
+	_apply_facing_flip()
+
+
 func _update_facing_direction(input: Vector2) -> void:
 	if absf(input.x) > absf(input.y) * 0.8:
 		current_dir = Direction.RIGHT if input.x > 0 else Direction.LEFT
-		if tex_side:
-			sprite.texture = tex_side
-		sprite.flip_h = (current_dir == Direction.LEFT)
 	else:
-		if input.y > 0:
-			current_dir = Direction.DOWN
-			if tex_down:
-				sprite.texture = tex_down
-			sprite.flip_h = false
-		else:
-			current_dir = Direction.UP
-			if tex_up:
-				sprite.texture = tex_up
-			sprite.flip_h = false
+		current_dir = Direction.DOWN if input.y > 0 else Direction.UP
+	_update_facing_sprite()
 
 
 func _get_dir_vector() -> Vector2:
@@ -363,10 +522,10 @@ func use_slot_1_skill() -> void:
 	slash_vfx.visible = true
 	
 	var tween := create_tween()
-	tween.tween_property(sprite, "offset", Vector2(0, -64) + dir_vec * 24.0, 0.08)
+	tween.tween_property(sprite, "offset", SPRITE_OFFSET_DEFAULT + dir_vec * 24.0, 0.08)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.25, 0.85), 0.08)
 	tween.parallel().tween_property(slash_vfx, "modulate:a", 0.0, 0.25)
-	tween.tween_property(sprite, "offset", Vector2(0, -64), 0.12)
+	tween.tween_property(sprite, "offset", SPRITE_OFFSET_DEFAULT, 0.12)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.12)
 	tween.tween_callback(func():
 		slash_vfx.visible = false
@@ -549,30 +708,34 @@ func use_slot_6_item_mp() -> void:
 
 func perform_attack() -> void:
 	current_state = State.ATTACK
+	velocity = Vector2.ZERO
+	attack_timer = 0.0
+	attack_hit_triggered = false
+	walk_anim_timer = 0.0
+	
 	var dir_vec := _get_dir_vector()
 	attack_area.position = dir_vec * 48
-	slash_vfx.position = dir_vec * 44
-	slash_vfx.rotation = dir_vec.angle()
-	slash_vfx.modulate = Color(1.3, 1.3, 1.4, 1.0)
-	slash_vfx.visible = true
 	
-	# Estocada ágil con dagas (avance rápido en la dirección y retorno)
-	var lunge_offset := dir_vec * 16.0
-	var tween := create_tween()
-	tween.tween_property(sprite, "offset", Vector2(0, -64) + lunge_offset, 0.07).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(sprite, "scale", Vector2(1.15, 0.88), 0.07)
-	tween.parallel().tween_property(slash_vfx, "modulate:a", 0.0, 0.20)
-	tween.tween_property(sprite, "offset", Vector2(0, -64), 0.10).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.10)
-	tween.tween_callback(func():
-		slash_vfx.visible = false
-		slash_vfx.modulate.a = 1.0
-		if current_state == State.ATTACK: current_state = State.IDLE
-	)
+	# Mostrar inmediatamente el fotograma 0 de ataque correspondiente a la dirección
+	var cur_atk_frames := _get_current_atk_frames()
+	if not cur_atk_frames.is_empty():
+		sprite.texture = cur_atk_frames[0]
+	_apply_facing_flip()
+
+
+func _trigger_attack_hit(is_finisher: bool = false) -> void:
+	var dir_vec := _get_dir_vector()
+	attack_area.position = dir_vec * 48
 	
 	for body in attack_area.get_overlapping_bodies():
 		if body != self and body.has_method("take_damage"):
-			_deal_damage_to(body)
+			if is_finisher:
+				var crit_dmg := int(base_atk * 2.2)
+				body.take_damage(crit_dmg, true, global_position)
+				if body.has_method("spawn_floating_text"):
+					body.spawn_floating_text("¡REMATE CRÍTICO!", Color(1.0, 0.85, 0.2))
+			else:
+				_deal_damage_to(body)
 
 
 func _deal_damage_to(target: Node) -> void:
@@ -656,8 +819,17 @@ func _die() -> void:
 	velocity = Vector2.ZERO
 	emit_signal("died")
 	_spawn_floating_text("HAS MUERTO", Color(0.9, 0.1, 0.1))
-	var tween := create_tween()
-	tween.tween_property(sprite, "modulate:a", 0.0, 1.2)
+	
+	if not dead_frames.is_empty():
+		var tween := create_tween()
+		for i in range(dead_frames.size()):
+			var f_tex := dead_frames[i]
+			tween.tween_callback(func(): sprite.texture = f_tex)
+			tween.tween_interval(0.08)
+		tween.tween_property(sprite, "modulate:a", 0.0, 1.2)
+	else:
+		var tween := create_tween()
+		tween.tween_property(sprite, "modulate:a", 0.0, 1.2)
 
 
 func _try_interact() -> void:
