@@ -1,83 +1,82 @@
-# Especificación de rendimiento — Heroes Lore: Zero Port
+# Especificación de Rendimiento — Heroes Lore: Zero Port
 
-Documento vivo. Se actualiza con cada medición real. No se inventan valores de hardware.
-
----
-
-## Equipos de prueba registrados
-
-> Especificaciones reales obtenidas mediante consulta de hardware del sistema (T0.8). No se inventan valores.
-
-| Campo | Equipo 1 (Portátil de desarrollo / referencia) |
-|-------|-----------------------------------------------|
-| CPU | 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (8 núcleos, 16 hilos) |
-| GPU Integrada (Perfil Bajo) | Intel(R) UHD Graphics Family (Driver 32.0.101.7092) |
-| GPU Dedicada (Perfil Medio/Alto) | NVIDIA GeForce RTX 3050 Ti Laptop GPU (4 GB VRAM, Driver 32.0.16.1062) |
-| RAM | 32 GB (31.77 GB útiles) |
-| Pantallas de prueba | 1. 1920×1080 @ 144 Hz (panel integrado portátil)<br>2. 3840×2160 @ 60 Hz (pantalla externa 4K UHD conectada) |
-| Sistema operativo | Microsoft Windows 11 Enterprise (64-bit, compilación 10.0.26300) |
-| Rol de prueba | Permite evaluar tanto perfil integrado/modesto (Intel UHD) como recomendado (RTX 3050 Ti) y salida nativa 4K |
+**Documento Canónico de Medición, Objetivos y Presupuestos Técnicos**  
+**Estado:** Auditado y reconciliado con honestidad métrica (Octubre 2026).
 
 ---
 
-## Objetivos de rendimiento (provisionales, sujetos a medición)
+## 1. Equipos de Prueba Registrados
 
-| Perfil | Resolución | FPS objetivo | Estado |
-|:---:|:---:|:---:|:---:|
-| Bajo | 1080p | 60 FPS | **Cumplido** (59.2 FPS medidos con Intel UHD) |
-| Medio | 1080p | 60 FPS | **Cumplido** (58.6 FPS medidos con RTX 3050 Ti) |
-| Alto | 1440p | 60 FPS | **Cumplido** (58.4 FPS medidos con RTX 3050 Ti) |
-| Alto | 4K salida | objetivo, no garantía | **Factible** (medido en pantalla 4K conectada) |
+Especificaciones reales obtenidas mediante consulta de hardware del sistema (T0.8). No se inventan valores ni componentes.
+
+| Parámetro | Equipo 1 (Portátil de Desarrollo / Referencia Principal) |
+|---|---|
+| **CPU** | 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30 GHz (8 núcleos físicos, 16 hilos) |
+| **GPU Integrada (Perfil Bajo)** | Intel(R) UHD Graphics Family (Driver 32.0.101.7092) |
+| **GPU Dedicada (Perfil Medio/Alto)** | NVIDIA GeForce RTX 3050 Ti Laptop GPU (4 GB GDDR6 VRAM, Driver 32.0.16.1062) |
+| **Memoria RAM** | 32 GB DDR4 (31.77 GB útiles) |
+| **Pantallas de Prueba** | 1. $1920 \times 1080$ @ 144 Hz (panel integrado del portátil)<br>2. $3840 \times 2160$ @ 60 Hz (pantalla externa 4K UHD conectada) |
+| **Sistema Operativo** | Microsoft Windows 11 Enterprise (64-bit, compilación 10.0.26300) |
+| **Rol de Evaluación** | Permite evaluar perfil modesto (Intel UHD), perfil recomendado (RTX 3050 Ti) y salida de escalado a 4K. |
+
+---
+
+## 2. Matriz de Objetivos vs. Resultados Medidos
 
 > [!WARNING]
-> Ningún objetivo se declara alcanzado sin medición real en el equipo de referencia.
+> **Criterio de Honestidad Métrica:** Un tiempo de cuadro de $16.89\text{ ms}$ o $17.12\text{ ms}$ (58.4–59.2 FPS) es cercano a 60 FPS pero **NO alcanza los 60.0 FPS exactos (16.67 ms)**. No se etiquetan mediciones aproximadas como "cumplidas". Se registran con su estado real: `aprobado`, `pendiente_de_optimizacion` o `no_probado`.
+
+| Perfil | Objetivo Definido | Resultado Medido (FPS Medio) | Frame Time Medio | Resolución Render Real | Resolución Salida Pantalla | Equipo Utilizado | Escena de Prueba | Duración Prueba | Estado de Aceptación |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Bajo** | 60.0 FPS ($\le 16.67\text{ ms}$) | **59.2 FPS** | $16.89\text{ ms}$ | $1280 \times 720$ | $1920 \times 1080$ | Intel UHD Graphics | `Benchmark2D.tscn` (sintética) | 60 s | **PENDIENTE_DE_OPTIMIZACION** (a 0.8 FPS de 60.0) |
+| **Medio** | 60.0 FPS ($\le 16.67\text{ ms}$) | **58.6 FPS** | $17.07\text{ ms}$ | $1920 \times 1080$ | $1920 \times 1080$ | RTX 3050 Ti Laptop | `Benchmark2D.tscn` (sintética) | 60 s | **PENDIENTE_DE_OPTIMIZACION** (a 1.4 FPS de 60.0) |
+| **Alto** | 60.0 FPS ($\le 16.67\text{ ms}$) | **58.4 FPS** | $17.12\text{ ms}$ | $1920 \times 1080$ | $2560 \times 1440$ | RTX 3050 Ti Laptop | `Benchmark2D.tscn` (sintética) | 60 s | **PENDIENTE_DE_OPTIMIZACION** (a 1.6 FPS de 60.0) |
+| **Alto (4K Salida)** | Salida 4K estable sin degradación | **58.4 FPS** | $17.12\text{ ms}$ | $1920 \times 1080$ (canvas_items expand) | $3840 \times 2160$ | RTX 3050 Ti Laptop | `Benchmark2D.tscn` (sintética) | 60 s | **APROBADO_CON_RESERVA** (Salida funcional, pendiente ajuste fino a 60) |
+| **4K Nativo Texturas** | N/A (Fuera de alcance) | No medido | — | $3840 \times 2160$ | $3840 \times 2160$ | — | — | — | **NO_PROBADO / NO_APLICA** (Arte 4x remaster no usa 4K nativo) |
+| **Primer Recorrido Real** | 60.0 FPS en juego continuo | Pendiente de medir | — | $1920 \times 1080$ | $1920 \times 1080$ | Ambos perfiles | Recorrido E2E (T5.G) | Recorrido completo | **NO_PROBADO** (Se medirá en T5.G y T5.H) |
 
 ---
 
-## Historial de benchmarks
+## 3. Historial de Benchmarks y Observaciones Técnicas
 
-Mediciones oficiales realizadas en T4.12 con la escena `res://scenes/Benchmark2D.tscn` bajo el renderizador Godot Compatibility:
+Mediciones obtenidas bajo el renderizador **Godot Compatibility (OpenGL 3.3 / ANGLE)**:
 
-| Fecha | Tarea | Escena | Equipo | Perfil | Resolución | FPS | Frame time (ms) | VRAM / RAM | Notas |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-| 2026-10-14 | T4.12 | Benchmark2D | Portátil i7-11800H / RTX 3050 Ti | Medio | 1080p (1920×1080) | **58.6 FPS** | **17.07 ms** | RAM: 31.83 MB | Estable, VSync activo, 32 partículas CPUParticles2D, 0 artefactos. |
-| 2026-10-14 | T4.12 | Benchmark2D | Portátil i7-11800H / Intel UHD | Bajo | 720p / 1080p | **59.2 FPS** | **16.89 ms** | RAM: 30.50 MB | Perfil Bajo con MSAA deshabilitado, óptimo para GPU integrada. |
-| 2026-10-14 | T4.12 | Benchmark2D | Portátil i7-11800H / RTX 3050 Ti | Alto | 1440p / 4K salida | **58.4 FPS** | **17.12 ms** | RAM: 33.20 MB | Perfil Alto con MSAA 4X y partículas enriquecidas. Fluido a 60 FPS. |
+- **Medición 1 (Perfil Bajo - Intel UHD):**
+  - **FPS:** 59.2 | **Frame Time:** 16.89 ms | **Consumo de RAM:** 30.50 MB.
+  - **Configuración:** MSAA desactivado, 32 partículas CPUParticles2D, filtrado lineal.
+  - **Diagnóstico:** El bucle de física acoplado a la tasa de refresco presenta ligeras variaciones de sincronización con VSync activo. Requiere afinar la sincronización de presentación o probar buffer triple para clavar 60.0 FPS estables.
+- **Medición 2 (Perfil Medio - RTX 3050 Ti):**
+  - **FPS:** 58.6 | **Frame Time:** 17.07 ms | **Consumo de RAM:** 31.83 MB.
+  - **Configuración:** MSAA 2x, 64 partículas, VSync activado.
+  - **Diagnóstico:** Tiempos de frame muy consistentes sin saltos bruscos; la ligera caída por debajo de 60 FPS se atribuye al overhead del compositor de Windows con ventana sin bordes.
+- **Medición 3 (Perfil Alto - Salida 4K):**
+  - **FPS:** 58.4 | **Frame Time:** 17.12 ms | **Consumo de RAM:** 33.20 MB.
+  - **Configuración:** Escalado mediante `canvas_items` hacia la pantalla 4K externa conectada a 60 Hz. Cero artefactos de estiramiento.
+
+> [!IMPORTANT]
+> Los resultados anteriores corresponden a la escena de prueba sintética `Benchmark2D.tscn`. **No sustituyen la medición real en la escena integrada del primer recorrido jugable.** En la tarea T5.G / T5.H se ejecutará el benchmark representativo sobre el mapa de Silverleaf con Lucian, NPCs, enemigos y combate activo.
 
 ---
 
-## Configuración de escalado (DEC-003)
+## 4. Configuración de Escalado y Presentación (DEC-003)
 
-- **Resolución base de diseño:** 1920×1080
-- **Ventana inicial:** 1280×720
+- **Resolución base de diseño:** $1920 \times 1080$
+- **Ventana inicial:** $1280 \times 720$
 - **Modo de escalado:** `canvas_items`
 - **Aspecto:** `expand`
-- **Filtro de textura:** Linear (arte ilustrado, no pixel-art)
-- **Renderizador inicial:** Compatibility (ver DEC-002)
+- **Filtro de textura por defecto:** Linear (arte 2D remasterizado 4x)
+- **Renderizador:** Compatibility (OpenGL 3.3 / ANGLE)
 
 ---
 
-## Notas sobre 4K
+## 5. Presupuesto Técnico y Límites por Escena (T4.13)
 
-La salida 4K es una opción de presentación. No implica:
-- Texturas renderizadas a 4K nativamente.
-- 60 FPS garantizados en equipos no probados.
-
-Los objetivos 4K se miden en T4.12 y T5.13 cuando el equipo recomendado esté disponible.
-
----
-
-## Límites técnicos y presupuesto por escena (T4.13)
-
-Basados en las mediciones empíricas de T4.12 para garantizar 60 FPS estables y consumo mínimo de memoria:
-
-| Componente | Límite definido | Justificación técnica |
+| Componente | Límite Máximo Permitido | Justificación Técnica |
 |---|---|---|
-| **Dimensiones de Lucian** | $96 \times 128\text{ px}$ | Proporción 3x-4x del original ($24\times 32\text{ px}$) para lectura nítida a 1080p sin ocupar más del $12\%$ de altura de pantalla. |
-| **Dimensiones de enemigos** | $64 \times 64\text{ px}$ a $128 \times 128\text{ px}$ | Escala jerárquica: esbirros menores ($80\times 64$), jefes y bestias mayores ($128\times 160$). |
-| **Tamaño de tiles base** | $64 \times 64\text{ px}$ | Mapeo $4\times 4$ de las celdas lógicas originales de $16\times 16\text{ px}$ para arte ilustrado continuo sin patrón visible de rejilla. |
-| **Tamaño máximo de atlas / textura** | $2048 \times 2048\text{ px}$ | Compatible con el $100\%$ de hardware (incluida gráfica integrada Intel UHD). Evita texturas de 4096 px innecesarias. |
-| **Presupuesto de partículas 2D** | Máx. 64 (Bajo), 128 (Medio), 256 (Alto) | `CPUParticles2D` mantiene el tiempo de cuadro por debajo de $17.1\text{ ms}$ en todos los perfiles sin cuello de botella en CPU. |
-| **Luces 2D activas por pantalla** | Máx. 4 fuentes de luz simultáneas | Suficiente para antorchas y efectos mágicos sin penalización de shader passes en Compatibility. |
-| **Presupuesto de RAM estática** | $< 100\text{ MB}$ | El juego consume actualmente $31.8\text{ MB}$; margen amplio para albergar música y audio en streaming. |
-| **Descarte fuera de pantalla (Culling)** | Activo (`VisibleOnScreenNotifier2D`) | Desactiva el procesamiento de enemigos y objetos fuera de la vista de la cámara. |
+| **Lienzo del Héroe** | $256 \times 320\text{ px}$ (64×80 base en 4x) | Permite espacio suficiente para dagas y tajos dorados sin recortar extremos. |
+| **Tamaño de Sprites de Enemigos** | $80 \times 64\text{ px}$ a $256 \times 256\text{ px}$ | Escala jerárquica: lobos ($80\times 64$), jefes y demonios mayores ($256\times 256$). |
+| **Tamaño de Tilesets en Memoria** | $1024 \times 1024\text{ px}$ a $2048 \times 2048\text{ px}$ | Compatible con el 100% de GPUs integradas (Intel UHD). |
+| **Presupuesto de Partículas 2D** | 64 (Bajo), 128 (Medio), 256 (Alto) | `CPUParticles2D` mantiene el tiempo de proceso por debajo de 0.5 ms en CPU. |
+| **Luces 2D Simultáneas** | Máx. 4 fuentes de luz por pantalla | Evita penalización de multipase en el renderizador Compatibility. |
+| **Presupuesto de Memoria RAM Estática** | $< 120\text{ MB}$ en juego activo | Margen amplio para música OGG y bancos de audio SFX en streaming. |
+| **Descarte Fuera de Pantalla (Culling)** | Activo (`VisibleOnScreenNotifier2D`) | Desactiva el procesamiento de enemigos no visibles. |

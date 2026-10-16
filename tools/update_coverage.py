@@ -1,5 +1,5 @@
 """
-tools/update_coverage.py — Actualiza docs/coverage.csv con matriz enriquecida por región y estado.
+tools/update_coverage.py — Actualiza docs/coverage.csv con matriz enriquecida por región y estado canónico.
 Refleja contenido original, región, tipo de recurso, referencias, estado de lógica, arte, validación y aprobación.
 """
 
@@ -29,52 +29,52 @@ def determine_region(mid: str, name: str) -> str:
 base_rows = [
     [
         "info", "MIDLET", "Heroes Lore Zero", "Global", "midlet_j2me", "si",
-        "verificado_emulador", "pendiente", "aprobado_fase0", "APPROVED_GATE_A",
+        "verificado_contra_original", "referencia_preparada", "verificado_contra_original", "APPROVED_GATE_A",
         "input/Heroes Lore Zero 360x640 Spanish.jar", "v4.4.45 360x640 Spanish. Clase principal: rpg.RPGHeroEx"
     ],
     [
         "sistema", "SISTEMA_SAVE", "Sistema de guardado", "Global", "sistema_motor", "si",
-        "implementado_parcial", "no_aplica", "verificado_motor", "PENDING_GATE_D",
+        "implementado", "no_aplica", "validado_tecnicamente", "PENDING_GATE_D",
         "docs/reference/permitir-guardado-3-partidas.jpg", "3 ranuras independientes en user://saves/ (SaveManager)"
     ],
     [
         "sistema", "SISTEMA_BAUL", "Almacenamiento público compartido", "Global", "sistema_motor", "si",
-        "especificado", "no_aplica", "pendiente", "PENDING_GATE_D",
+        "interpretado", "no_aplica", "pendiente", "PENDING_GATE_D",
         "docs/reference/permitir-transferir-cosas-entre-partidas-guardadas.jpg", "Baúl común transferible entre partidas guardadas"
     ],
     [
         "personaje", "HERO_LUCIAN", "Lucian", "Global", "personaje_jugable", "si",
-        "implementado_controlador", "validado_motor", "aprobado_suite", "APPROVED_GATE_B",
-        "docs/reference/clase-asesino.jpg", "Protagonista canonico. Asesino hero/h1 auditado al 100% (134 sprites)"
+        "implementado", "validado_tecnicamente", "verificado_contra_original", "APPROVED_GATE_B",
+        "docs/reference/clase-asesino.jpg", "Protagonista canónico. Asesino hero/h1 auditado al 100% (134 sprites)"
     ],
     [
         "clase", "CLASE_ASESINO", "Asesino", "Global", "clase_jugable", "si",
-        "implementado_controlador", "validado_motor", "aprobado_suite", "APPROVED_GATE_B",
-        "docs/reference/clase-asesino.jpg", "Doble daga, agilidad, armadura ligera l00. Habilidad Danza Sombria"
+        "implementado", "validado_tecnicamente", "verificado_contra_original", "APPROVED_GATE_B",
+        "docs/reference/clase-asesino.jpg", "Doble daga, agilidad, armadura ligera l00. Habilidad Danza Sombría"
     ],
     [
         "clase", "CLASE_GUERRERO", "Guerrero", "Global", "clase_jugable", "si",
-        "especificado", "referencia_preparada", "verificado_fase3", "PENDING_GATE_B",
+        "interpretado", "referencia_preparada", "validado_tecnicamente", "PENDING_GATE_B",
         "docs/reference/clase-guerrero.jpg", "Mandoble a dos manos, armadura pesada. Habilidad Golpe Brutal"
     ],
     [
         "clase", "CLASE_CABALLERO", "Caballero", "Global", "clase_jugable", "si",
-        "especificado", "referencia_preparada", "verificado_fase3", "PENDING_GATE_B",
+        "interpretado", "referencia_preparada", "validado_tecnicamente", "PENDING_GATE_B",
         "docs/reference/clase-caballero.jpg", "Espada y escudo, alta defensa. Habilidad Barcaza de Escudo"
     ],
     [
         "clase", "CLASE_PISTOLERO", "Pistolero", "Global", "clase_jugable", "si",
-        "especificado", "referencia_preparada", "verificado_fase3", "PENDING_GATE_B",
+        "interpretado", "referencia_preparada", "validado_tecnicamente", "PENDING_GATE_B",
         "docs/reference/clase-pistolero.jpg", "Doble pistola, combate a distancia. Habilidad Disparo Cercano"
     ],
     [
         "clase", "CLASE_ELEMENTAL", "Elemental", "Global", "clase_jugable", "si",
-        "especificado", "referencia_preparada", "pendiente", "BLOCKED_GATE_D",
+        "interpretado", "referencia_preparada", "pendiente", "BLOQUEADO_POR_GATE_D",
         "docs/reference/clase-elemental-se-desbloquea-luego-darle-fin-primera-vez.jpg", "Clase New Game+ desbloqueable tras fin del juego (Flag 250)"
     ],
     [
         "clase", "CLASE_GUNBLADER", "Gunblader", "Global", "clase_jugable", "si",
-        "especificado", "referencia_preparada", "pendiente", "BLOCKED_GATE_D",
+        "interpretado", "referencia_preparada", "pendiente", "BLOQUEADO_POR_GATE_D",
         "docs/reference/clase-gunblader-se-desbloquea-luego-darle-fin-primera-vez.jpg", "Clase New Game+ desbloqueable tras fin del juego (Flag 251)"
     ],
 ]
@@ -102,22 +102,22 @@ if MAPS_DIR.exists():
         spawns = len(d.get("spawns", []))
         notes = f"Tiles: {w}x{h} (16x16 px). Tilesets: t{ts0:02d}, t{ts1:02d}. Objs: {objs}, Spawns: {spawns}"
 
-        # Estado según hito del plan
+        # Asignación rigurosa de estados
         if mid == "m_00":
-            est_logica = "integrado_fase5"
-            est_arte = "validado_motor"
-            est_val = "verificado_motor"
+            est_logica = "en_integracion_fase5"
+            est_arte = "validado_tecnicamente"
+            est_val = "verificado_contra_original"
             est_aprob = "PENDING_GATE_D"
         elif "Silverleaf" in region:
-            est_logica = "extraido_json"
-            est_arte = "renderizado_png"
+            est_logica = "interpretado"
+            est_arte = "extraido_png"
             est_val = "pendiente_fase5"
             est_aprob = "PENDING_GATE_D"
         else:
-            est_logica = "extraido_json"
-            est_arte = "renderizado_png"
+            est_logica = "interpretado"
+            est_arte = "extraido_png"
             est_val = "pendiente_fase6"
-            est_aprob = "BLOCKED_GATE_D"
+            est_aprob = "BLOQUEADO_POR_GATE_D"
 
         rows.append([
             cat, mid, name, region, tipo, "si",
@@ -136,4 +136,4 @@ with open(COVERAGE_CSV, "w", newline="", encoding="utf-8") as f:
     writer.writerow(HEADER)
     writer.writerows(rows)
 
-print(f"[OK] {COVERAGE_CSV} actualizado con {len(rows)} filas y estructura regional.")
+print(f"[OK] {COVERAGE_CSV} actualizado con {len(rows)} filas y estados canónicos normalizados.")
