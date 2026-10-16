@@ -92,21 +92,29 @@ Formato estándar de entrada:
 - **Qué se hizo:** 
   - Creada la escena canónica `godot/scenes/MainMenu.tscn` y el script `godot/scripts/main_menu.gd`.
   - Configurado `run/main_scene="res://scenes/MainMenu.tscn"` en `project.godot` y actualizado `Main.tscn` para redirigir transparentemente al menú.
-  - Opciones implementadas: "NUEVA PARTIDA", "CONTINUAR" (reactivo, validando integridad real del JSON y seleccionando el guardado válido más reciente por metadatos), "OPCIONES" y "SALIR".
+  - Opciones implementadas: "NUEVA PARTIDA", "CONTINUAR" (reactivo, validando integridad semántica del JSON y seleccionando el guardado válido más reciente por metadatos), "OPCIONES" y "SALIR".
   - Panel modal de Opciones completo: Modo de Pantalla (Ventana, Sin Bordes, Pantalla Completa), Resolución (1280x720 a 4K), V-Sync y Perfil Gráfico (Bajo, Medio, Alto) conectado con `DisplayManager` y `ProfileManager`.
-  - Soporte completo para navegación por foco con Teclado (Enter, Espacio, Flechas, Escape) y Mando/Gamepad (D-pad, Stick, Botón A interactuar, Botón B cancelar/volver).
+  - Soporte de controles en `InputManager`: mapeo explícito de acciones de interfaz (`ui_accept`, `ui_cancel`, `ui_down`, `ui_up`) tanto para teclado como para gamepad.
   - Integrada la textura original de título `ui_title.png` extraída del JAR.
-  - Perfeccionado `SaveManager`: detección de archivos ausentes, validación de JSON corrupto/vacío, selección de ranura más reciente (`get_latest_save_slot()`) por marca de tiempo ISO-8601/unix y fallback ante corrupción.
-  - Asegurada la herramienta `tools/update_coverage.py` para proteger filas manuales contra borrados silenciosos.
+  - Aislamiento estricto de guardado en `SaveManager`: soporte para `user://test_saves/` independiente de `user://saves/` de producción mediante `set_save_dir()`, `reset_save_dir()`, `get_save_dir()` y limpieza protegida con `clean_test_saves_dir()`.
+  - Validación semántica rigurosa en `SaveManager` con discriminación de 5 estados (`SaveStatus`: `FILE_MISSING`, `FILE_EMPTY`, `JSON_SYNTAX_ERROR`, `SEMANTICALLY_INVALID`, `VALID`) auditando metadatos (`save_slot`, `version`, `timestamp`) y estado de juego (`character_class`, `level`, `current_hp`, `max_hp`).
+  - Protección del generador de cobertura `tools/update_coverage.py`: validación de unicidad de IDs, copias de seguridad `.bak` automáticas, rechazo con código 1 ante duplicados y protección de filas manuales, verificado mediante `tests/test_coverage_updater.py`.
 - **Cómo se verificó:**
-  - Batería de pruebas automatizadas ampliada `godot/scenes/TestMainMenu.tscn` (`scripts/test_main_menu.gd`): **58/58 aserciones aprobadas (100% PASS, 0 FAIL)** en modo headless y ventana.
-  - Pruebas de método para `SaveManager`: archivos ausentes, archivos vacíos, JSON corrupto, múltiples ranuras con timestamps cronológicos y fallback ante corrupción.
-  - Pruebas de método para `DisplayManager` y `ProfileManager`: modos de ventana, resoluciones, vsync, perfiles y multiplicador de partículas.
-  - Pruebas de interacción real con teclado (`LiveInput_Keyboard`): navegación por foco, apertura con Enter/Espacio, cierre modal con Escape.
-  - Pruebas de interacción real con mando (`LiveInput_Gamepad`): navegación con D-pad, activación con Botón A, cierre modal con Botón B.
+  - Batería de pruebas automatizadas y de seguridad `godot/scenes/TestMainMenu.tscn` (`scripts/test_main_menu.gd`): **69/69 aserciones aprobadas (100% PASS, 0 FAIL)** en modo headless y ventana.
+  - Prueba de protección de datos reales: creación de archivo canario en `user://saves/` demostrando que permanece 100% intacto e inalterado antes, durante y después de toda la suite.
+  - Pruebas del esquema semántico de guardado cubriendo los 5 estados, tipos incorrectos, valores fuera de rango, inconsistencias de HP y versiones incompatibles.
+  - Pruebas de selección cronológica por metadatos de timestamps y descarte de slots corruptos.
+  - Pruebas de Managers (`DisplayManager` y `ProfileManager`): modos de ventana, resoluciones, vsync, perfiles y multiplicadores de partículas.
+  - Pruebas de entrada simulada diferenciadas por software:
+    - Mapeo en `InputMap` verificado para teclado y gamepad.
+    - Eventos crudos de teclado (`SimulatedKeyboard_RawEvents` con `InputEventKey`).
+    - Eventos crudos de mando (`SimulatedGamepad_RawEvents` con `InputEventJoypadButton`).
+    - Acciones abstractas de motor (`ActionSimulation_Navigation` con `InputEventAction`).
+    - Se aclara explícitamente que las pruebas con dispositivos físicos de hardware (teclado USB y mando físico) son pruebas manuales complementarias.
+  - Pruebas automatizadas de cobertura `tests/test_coverage_updater.py`: **4/4 pruebas aprobadas (100% PASS, 0 FAIL)**.
   - Reporte de telemetría exportado en `godot/anim_captures/main_menu_test_results.json`.
   - Captura real en ventana generada en `godot/anim_captures/main_menu_preview.png`.
-  - Cero regresiones en `test_combat_parity.py` (7/7 OK) y `AnimReview.tscn`.
+  - Cero regresiones en `test_combat_parity.py` (7/7 OK) y `AnimReview.tscn` (1,548 PASS, 0 FAIL, 4 NOT TESTED).
 - **Pendiente o dudas:** La opción "Nueva Partida" utiliza temporalmente el punto de integración hacia T5.B. Se mantiene explícito que la transición narrativa al prólogo (T5.C) y al mapa (T5.D) permanece pendiente y no se declara completa hasta que se implemente y pruebe `CharacterSelect.tscn`.
 
 #### T5.B · Selección de Personaje y Persistencia de Clase

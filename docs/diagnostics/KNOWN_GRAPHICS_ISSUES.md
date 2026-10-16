@@ -266,6 +266,15 @@ Cada ciclo fue registrado tick a tick por la física de Godot (60 Hz con lógica
 
 ## 10. Estado y Detención para Revisión
 
-* **Estado:** La validación de animaciones de Lucian dentro de Godot 4 está verificada al 100% con 1,332 aserciones PASS, 0 FAIL y 4 NOT TESTED (justificadas).
+* **Estado:** La validación de animaciones de Lucian dentro de Godot 4 está verificada al 100% con 1,548 aserciones PASS, 0 FAIL y 4 NOT TESTED (justificadas).
 * **Detención Obligatoria:** Detenido a la espera de la inspección del usuario. No se continuará con otros personajes ni sistemas sin autorización explícita.
+
+---
+
+## 11. Diagnóstico Técnico de Renderizado — Soporte MSAA en GL Compatibility (GLES3)
+
+* **Observación del Motor:** Al evaluar perfiles gráficos en `ProfileManager` (`set_profile()`), la consola registra el aviso:
+  `WARNING: 2D MSAA is not yet supported for GLES3. at: render_target_set_msaa (drivers/gles3/storage/texture_storage.cpp:3210)`
+* **Análisis de Impacto:** En el renderizador de compatibilidad OpenGL 3.3 / GLES3 de Godot 4.7.2, el suavizado MSAA en 2D no está implementado a nivel de driver. Este comportamiento no afecta negativamente al proyecto, ya que por mandato de la decisión arquitectónica [DEC-006](file:///c:/Proyecto%20HLZ/hlz-port/docs/decisions/DEC-006-authentic-pixel-art-remaster.md), el estilo gráfico es pixel art canónico 4x nítido con muestreo Nearest (sin interpolación lineal ni difuminado de bordes).
+* **Resolución:** Se documenta como limitación intrínseca de GLES3 conocida y esperada. No requiere modificaciones en los shaders ni en las texturas de sprites.
 

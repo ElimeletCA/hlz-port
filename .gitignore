@@ -38,8 +38,9 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# ── Logs temporales ───────────────────────────────────────────────────────────
+# ── Logs y copias temporales ──────────────────────────────────────────────────
 *.log
+*.bak
 
 # ── Emulador J2ME (datos locales de ejecucion y guardado) ─────────────────────
 config/

@@ -101,6 +101,14 @@ func _setup_default_actions() -> void:
 		_key(KEY_ESCAPE), _key(KEY_BACKSPACE),
 		_joy_button(JOY_BUTTON_B)
 	])
+	
+	# 5. Mapeos complementarios para navegación e interacción de interfaz (UI Navigation)
+	_register_action_supplement("ui_accept", [_joy_button(JOY_BUTTON_A), _key(KEY_ENTER), _key(KEY_SPACE)])
+	_register_action_supplement("ui_cancel", [_joy_button(JOY_BUTTON_B), _key(KEY_ESCAPE)])
+	_register_action_supplement("ui_down", [_joy_button(JOY_BUTTON_DPAD_DOWN), _key(KEY_DOWN), _key(KEY_S)])
+	_register_action_supplement("ui_up", [_joy_button(JOY_BUTTON_DPAD_UP), _key(KEY_UP), _key(KEY_W)])
+	_register_action_supplement("ui_left", [_joy_button(JOY_BUTTON_DPAD_LEFT), _key(KEY_LEFT), _key(KEY_A)])
+	_register_action_supplement("ui_right", [_joy_button(JOY_BUTTON_DPAD_RIGHT), _key(KEY_RIGHT), _key(KEY_D)])
 
 
 func _register_action(action_name: String, events: Array, deadzone: float = 0.5) -> void:
@@ -110,6 +118,14 @@ func _register_action(action_name: String, events: Array, deadzone: float = 0.5)
 		InputMap.action_erase_events(action_name)
 	for ev in events:
 		if ev:
+			InputMap.action_add_event(action_name, ev)
+
+
+func _register_action_supplement(action_name: String, events: Array) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name)
+	for ev in events:
+		if ev and not InputMap.action_has_event(action_name, ev):
 			InputMap.action_add_event(action_name, ev)
 
 

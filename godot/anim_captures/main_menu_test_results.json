@@ -3,6 +3,27 @@
 		{
 			"actual": "true",
 			"expected": "true",
+			"property": "production_canary_created",
+			"result": "PASS",
+			"test": "SaveIsolation_Setup"
+		},
+		{
+			"actual": "user://test_saves/",
+			"expected": "user://test_saves/",
+			"property": "save_dir_switched_to_test",
+			"result": "PASS",
+			"test": "SaveIsolation_Setup"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "canary_intact_after_switch",
+			"result": "PASS",
+			"test": "SaveIsolation_Setup"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
 			"property": "main_menu_valid",
 			"result": "PASS",
 			"test": "NodesExistence"
@@ -36,102 +57,137 @@
 			"test": "NodesExistence"
 		},
 		{
-			"actual": "false",
-			"expected": "false",
-			"property": "slot1_valid_when_missing",
-			"result": "PASS",
-			"test": "Method_SaveManager_Missing"
-		},
-		{
-			"actual": "{  }",
-			"expected": "{  }",
-			"property": "slot1_load_when_missing",
-			"result": "PASS",
-			"test": "Method_SaveManager_Missing"
-		},
-		{
-			"actual": "false",
-			"expected": "false",
-			"property": "has_any_save_when_empty",
-			"result": "PASS",
-			"test": "Method_SaveManager_Missing"
-		},
-		{
 			"actual": "0",
 			"expected": "0",
-			"property": "latest_slot_when_empty",
+			"property": "status_file_missing",
 			"result": "PASS",
-			"test": "Method_SaveManager_Missing"
+			"test": "SaveSchema_Missing"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "slot2_valid_when_empty_file",
+			"property": "is_save_valid_false",
 			"result": "PASS",
-			"test": "Method_SaveManager_EmptyFile"
-		},
-		{
-			"actual": "false",
-			"expected": "false",
-			"property": "slot2_has_save_when_empty_file",
-			"result": "PASS",
-			"test": "Method_SaveManager_EmptyFile"
+			"test": "SaveSchema_Missing"
 		},
 		{
 			"actual": "{  }",
 			"expected": "{  }",
-			"property": "slot2_load_when_empty_file",
+			"property": "load_game_empty",
 			"result": "PASS",
-			"test": "Method_SaveManager_EmptyFile"
+			"test": "SaveSchema_Missing"
+		},
+		{
+			"actual": "1",
+			"expected": "1",
+			"property": "status_file_empty",
+			"result": "PASS",
+			"test": "SaveSchema_Empty"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "slot2_valid_when_corrupt_json",
+			"property": "is_save_valid_false",
 			"result": "PASS",
-			"test": "Method_SaveManager_CorruptJSON"
+			"test": "SaveSchema_Empty"
+		},
+		{
+			"actual": "2",
+			"expected": "2",
+			"property": "status_json_syntax_error",
+			"result": "PASS",
+			"test": "SaveSchema_SyntaxError"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "slot2_has_save_when_corrupt_json",
+			"property": "is_save_valid_false",
 			"result": "PASS",
-			"test": "Method_SaveManager_CorruptJSON"
+			"test": "SaveSchema_SyntaxError"
 		},
 		{
-			"actual": "{  }",
-			"expected": "{  }",
-			"property": "slot2_load_when_corrupt_json",
+			"actual": "false",
+			"expected": "false",
+			"property": "missing_metadata_rejected",
 			"result": "PASS",
-			"test": "Method_SaveManager_CorruptJSON"
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "wrong_type_level_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "out_of_range_level_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "zero_hp_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "max_hp_lower_than_current_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "unknown_class_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "incompatible_version_rejected",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
+		},
+		{
+			"actual": "3",
+			"expected": "3",
+			"property": "status_semantically_invalid",
+			"result": "PASS",
+			"test": "SaveSchema_Semantic"
 		},
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "slot1_valid",
+			"property": "dict_valid_approved",
 			"result": "PASS",
-			"test": "Method_SaveManager_Timestamps"
+			"test": "SaveSchema_Valid"
+		},
+		{
+			"actual": "4",
+			"expected": "4",
+			"property": "status_valid",
+			"result": "PASS",
+			"test": "SaveSchema_Valid"
 		},
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "slot2_valid",
+			"property": "is_save_valid_true",
 			"result": "PASS",
-			"test": "Method_SaveManager_Timestamps"
+			"test": "SaveSchema_Valid"
 		},
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "slot3_valid",
+			"property": "canary_intact_after_schema_tests",
 			"result": "PASS",
-			"test": "Method_SaveManager_Timestamps"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "has_any_save_true",
-			"result": "PASS",
-			"test": "Method_SaveManager_Timestamps"
+			"test": "SaveIsolation_Check"
 		},
 		{
 			"actual": "2",
@@ -148,9 +204,9 @@
 			"test": "Method_SaveManager_Timestamps"
 		},
 		{
-			"actual": "false",
-			"expected": "false",
-			"property": "slot3_now_invalid",
+			"actual": "2",
+			"expected": "2",
+			"property": "slot3_status_syntax_error",
 			"result": "PASS",
 			"test": "Method_SaveManager_CorruptFallback"
 		},
@@ -253,13 +309,6 @@
 			"test": "Method_ProfileManager"
 		},
 		{
-			"actual": "Bajo",
-			"expected": "Bajo",
-			"property": "profile_low_name",
-			"result": "PASS",
-			"test": "Method_ProfileManager"
-		},
-		{
 			"actual": "0.5",
 			"expected": "0.5",
 			"property": "profile_low_multiplier",
@@ -270,13 +319,6 @@
 			"actual": "2",
 			"expected": "2",
 			"property": "profile_high",
-			"result": "PASS",
-			"test": "Method_ProfileManager"
-		},
-		{
-			"actual": "Alto",
-			"expected": "Alto",
-			"property": "profile_high_name",
 			"result": "PASS",
 			"test": "Method_ProfileManager"
 		},
@@ -295,88 +337,102 @@
 			"test": "Method_ProfileManager"
 		},
 		{
-			"actual": "1.0",
-			"expected": "1.0",
-			"property": "profile_medium_multiplier",
+			"actual": "true",
+			"expected": "true",
+			"property": "has_action_ui_down",
 			"result": "PASS",
-			"test": "Method_ProfileManager"
-		},
-		{
-			"actual": "BtnNewGame:<Button#38218499569>",
-			"expected": "BtnNewGame:<Button#38218499569>",
-			"property": "initial_focus_is_new_game",
-			"result": "PASS",
-			"test": "LiveInput_Keyboard"
-		},
-		{
-			"actual": "BtnOptions:<Button#38319162871>",
-			"expected": "BtnOptions:<Button#38319162871>",
-			"property": "focus_moves_to_options",
-			"result": "PASS",
-			"test": "LiveInput_Keyboard"
-		},
-		{
-			"actual": "BtnNewGame:<Button#38218499569>",
-			"expected": "BtnNewGame:<Button#38218499569>",
-			"property": "focus_returns_to_new_game",
-			"result": "PASS",
-			"test": "LiveInput_Keyboard"
+			"test": "InputMap_Association"
 		},
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "options_opened_via_accept_key",
+			"property": "has_action_ui_up",
 			"result": "PASS",
-			"test": "LiveInput_Keyboard"
+			"test": "InputMap_Association"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "has_action_ui_accept",
+			"result": "PASS",
+			"test": "InputMap_Association"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "has_action_ui_cancel",
+			"result": "PASS",
+			"test": "InputMap_Association"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "has_action_interact",
+			"result": "PASS",
+			"test": "InputMap_Association"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "has_action_cancel",
+			"result": "PASS",
+			"test": "InputMap_Association"
+		},
+		{
+			"actual": "BtnOptions:<Button#40198211063>",
+			"expected": "BtnOptions:<Button#40198211063>",
+			"property": "ui_down_action_navigates",
+			"result": "PASS",
+			"test": "ActionSimulation_Navigation"
+		},
+		{
+			"actual": "BtnNewGame:<Button#40097547761>",
+			"expected": "BtnNewGame:<Button#40097547761>",
+			"property": "ui_up_action_navigates_back",
+			"result": "PASS",
+			"test": "ActionSimulation_Navigation"
+		},
+		{
+			"actual": "BtnOptions:<Button#40198211063>",
+			"expected": "BtnOptions:<Button#40198211063>",
+			"property": "key_down_shifts_focus",
+			"result": "PASS",
+			"test": "SimulatedKeyboard_RawEvents"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "key_enter_opens_options",
+			"result": "PASS",
+			"test": "SimulatedKeyboard_RawEvents"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "menu_buttons_hidden_on_options_open",
+			"property": "key_escape_closes_options",
 			"result": "PASS",
-			"test": "LiveInput_Keyboard"
+			"test": "SimulatedKeyboard_RawEvents"
+		},
+		{
+			"actual": "BtnOptions:<Button#40198211063>",
+			"expected": "BtnOptions:<Button#40198211063>",
+			"property": "joy_dpad_down_shifts_focus",
+			"result": "PASS",
+			"test": "SimulatedGamepad_RawEvents"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "joy_button_a_triggers_new_game",
+			"result": "PASS",
+			"test": "SimulatedGamepad_RawEvents"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "options_closed_via_escape_key",
+			"property": "joy_button_b_closes_modal",
 			"result": "PASS",
-			"test": "LiveInput_Keyboard"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "menu_buttons_restored_on_options_close",
-			"result": "PASS",
-			"test": "LiveInput_Keyboard"
-		},
-		{
-			"actual": "BtnOptions:<Button#38319162871>",
-			"expected": "BtnOptions:<Button#38319162871>",
-			"property": "gamepad_dpad_down_navigates",
-			"result": "PASS",
-			"test": "LiveInput_Gamepad"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "gamepad_button_a_triggers_new_game",
-			"result": "PASS",
-			"test": "LiveInput_Gamepad"
-		},
-		{
-			"actual": "false",
-			"expected": "false",
-			"property": "gamepad_button_b_closes_modal",
-			"result": "PASS",
-			"test": "LiveInput_Gamepad"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "gamepad_restores_menu_state",
-			"result": "PASS",
-			"test": "LiveInput_Gamepad"
+			"test": "SimulatedGamepad_RawEvents"
 		},
 		{
 			"actual": "true",
@@ -405,12 +461,35 @@
 			"property": "stub_closed",
 			"result": "PASS",
 			"test": "NewGame_IntegrationPoint"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "canary_untouched_after_entire_suite",
+			"result": "PASS",
+			"test": "SaveIsolation_Final"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "canary_cleaned_up_safely",
+			"result": "PASS",
+			"test": "SaveIsolation_Final"
+		},
+		{
+			"actual": "user://saves/",
+			"expected": "user://saves/",
+			"property": "save_dir_restored_to_default",
+			"result": "PASS",
+			"test": "SaveIsolation_Final"
 		}
 	],
 	"fail": 0,
-	"pass": 58,
-	"suite": "T5.A MainMenu Acceptance Test Extended",
-	"timestamp": "2026-10-16T18:06:19",
-	"total_assertions": 58,
+	"isolated_test_dir": "user://test_saves/",
+	"pass": 69,
+	"production_save_dir_protected": "user://saves/",
+	"suite": "T5.A MainMenu Final Acceptance & Safety Test",
+	"timestamp": "2026-10-16T18:31:25",
+	"total_assertions": 69,
 	"verdict": "PASS"
 }

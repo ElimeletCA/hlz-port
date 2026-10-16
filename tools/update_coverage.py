@@ -1,10 +1,13 @@
 """
 tools/update_coverage.py — Actualiza docs/coverage.csv preservando filas manuales y estados existentes.
-Evita el borrado silencioso de filas gestionadas manualmente y asegura la trazabilidad documental.
+Evita el borrado silencioso de filas gestionadas manualmente, rechaza IDs duplicados e inconsistencias
+estructurales con código de salida no nulo, y genera una copia de seguridad antes de cualquier cambio.
 """
 
 import csv
 import json
+import shutil
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -85,26 +88,76 @@ base_rows = [
     ],
 ]
 
-def load_existing_coverage(csv_path: Path) -> dict:
-    """Carga filas existentes indizadas por id para preservar cambios manuales."""
+def validate_and_load_existing_coverage(csv_path: Path) -> dict:
+    """
+    Carga y valida rigurosamente el CSV existente.
+    Si detecta IDs duplicados o inconsistencias estructurales, reporta las filas
+    afectadas y lanza ValueError impidiendo cualquier sobreescritura.
+    """
     if not csv_path.exists():
         return {}
-    existing = {}
+
+    errors = []
+    seen_ids = {} # id -> {"line": int, "row": dict}
+    existing_rows = {}
+
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            row_id = row.get("id")
-            if row_id:
-                existing[row_id] = row
-    return existing
+        if reader.fieldnames is None:
+            raise ValueError(f"El archivo {csv_path} está vacío o carece de encabezado válido.")
+            
+        # Comprobar que los campos esenciales existen
+        missing_headers = [h for h in ["categoria", "id", "nombre_original"] if h not in reader.fieldnames]
+        if missing_headers:
+            raise ValueError(f"Encabezado inválido en {csv_path}: faltan columnas requeridas: {missing_headers}")
 
-def main():
-    existing_rows = load_existing_coverage(COVERAGE_CSV)
+        for line_num, row in enumerate(reader, start=2): # Línea 2 es la primera fila de datos
+            row_id = row.get("id")
+            if row_id is None or not row_id.strip():
+                errors.append(f"Línea {line_num}: campo 'id' vacío o ausente (contenido fila: {row})")
+                continue
+
+            row_id = row_id.strip()
+            cat = row.get("categoria", "").strip()
+
+            if row_id in seen_ids:
+                prev_line = seen_ids[row_id]["line"]
+                prev_cat = seen_ids[row_id]["row"].get("categoria", "").strip()
+                errors.append(
+                    f"Línea {line_num}: ID duplicado detectado: '{row_id}' (categoría '{cat}'). "
+                    f"Ya definido en línea {prev_line} (categoría '{prev_cat}')."
+                )
+            else:
+                seen_ids[row_id] = {"line": line_num, "row": row}
+                existing_rows[row_id] = row
+
+    if errors:
+        msg = f"[ERROR CRÍTICO] Se encontraron {len(errors)} error(es) en {csv_path}:\n"
+        msg += "\n".join(f"  - {err}" for err in errors)
+        msg += "\n[ABORTADO] No se modificará el CSV para evitar corrupción o pérdida de filas."
+        raise ValueError(msg)
+
+    return existing_rows
+
+
+def update_coverage(csv_path: Path = COVERAGE_CSV, maps_dir: Path = MAPS_DIR, backup: bool = True) -> int:
+    """
+    Actualiza el archivo de cobertura de manera segura:
+    1. Valida unicidad de IDs y estructura.
+    2. Preserva filas manuales.
+    3. Crea backup previo.
+    4. Escribe de forma atómica.
+    """
+    try:
+        existing_rows = validate_and_load_existing_coverage(csv_path)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 1
+
     preserved_manual_count = 0
     updated_map_count = 0
     added_new_count = 0
     
-    # Conjunto para rastrear qué IDs han sido procesados
     processed_ids = set()
     final_rows = []
 
@@ -114,7 +167,6 @@ def main():
         b_id = b_dict["id"]
         processed_ids.add(b_id)
         if b_id in existing_rows:
-            # Conservar estados y notas manuales existentes
             curr = existing_rows[b_id]
             final_rows.append(curr)
             preserved_manual_count += 1
@@ -122,9 +174,9 @@ def main():
             final_rows.append(b_dict)
             added_new_count += 1
 
-    # 2. Procesar mapas desde out/maps/
-    if MAPS_DIR.exists():
-        map_files = sorted(MAPS_DIR.glob("*.json"))
+    # 2. Procesar mapas desde maps_dir
+    if maps_dir.exists():
+        map_files = sorted(maps_dir.glob("*.json"))
         for mf in map_files:
             with open(mf, "r", encoding="utf-8") as f:
                 d = json.load(f)
@@ -147,18 +199,15 @@ def main():
             processed_ids.add(mid)
 
             if mid in existing_rows:
-                # Actualizar metadatos técnicos (dimensiones, tilesets) conservando estados de auditoría manual
                 curr = existing_rows[mid]
                 curr["region"] = region
                 curr["tipo_recurso"] = tipo
                 curr["fuente_referencia"] = raw_name
-                # Solo actualizar notas técnicas si las notas no fueron personalizadas manualmente
                 if "Tiles:" in curr.get("notas", ""):
                     curr["notas"] = notes
                 final_rows.append(curr)
                 updated_map_count += 1
             else:
-                # Nuevo mapa no presente en el CSV
                 if mid == "m_00":
                     est_logica = "en_integracion_fase5"
                     est_arte = "validado_tecnicamente"
@@ -199,17 +248,34 @@ def main():
             preserved_manual_count += 1
             print(f"[PRESERVADO] Fila gestionada manualmente conservada: {row_id} ({row_data.get('categoria')})")
 
-    # 4. Escribir CSV final respetando el encabezado canónico
-    with open(COVERAGE_CSV, "w", newline="", encoding="utf-8") as f:
+    # 4. Crear copia de seguridad antes de modificar si el archivo existe
+    if backup and csv_path.exists():
+        backup_file = csv_path.with_suffix(".csv.bak")
+        shutil.copy2(csv_path, backup_file)
+        print(f"[BACKUP] Copia de seguridad creada: {backup_file}")
+
+    # 5. Escribir de forma atómica en archivo temporal y renombrar
+    temp_file = csv_path.with_suffix(".csv.tmp")
+    with open(temp_file, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=HEADER)
         writer.writeheader()
         writer.writerows(final_rows)
 
-    print(f"[OK] {COVERAGE_CSV} actualizado de forma segura:")
+    temp_file.replace(csv_path)
+
+    print(f"[OK] {csv_path} actualizado de forma segura:")
     print(f"  - Total filas escritas: {len(final_rows)}")
     print(f"  - Filas manuales/existentes preservadas intactas: {preserved_manual_count}")
     print(f"  - Mapas actualizados sin sobreescribir auditoría: {updated_map_count}")
     print(f"  - Nuevas filas añadidas: {added_new_count}")
+    return 0
+
+
+def main():
+    target_csv = Path(sys.argv[1]) if len(sys.argv) > 1 else COVERAGE_CSV
+    code = update_coverage(csv_path=target_csv)
+    sys.exit(code)
+
 
 if __name__ == "__main__":
     main()
