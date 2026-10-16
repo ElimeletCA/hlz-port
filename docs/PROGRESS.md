@@ -92,17 +92,22 @@ Formato estándar de entrada:
 - **Qué se hizo:** 
   - Creada la escena canónica `godot/scenes/MainMenu.tscn` y el script `godot/scripts/main_menu.gd`.
   - Configurado `run/main_scene="res://scenes/MainMenu.tscn"` en `project.godot` y actualizado `Main.tscn` para redirigir transparentemente al menú.
-  - Opciones implementadas: "NUEVA PARTIDA", "CONTINUAR" (reactivo, desactivado sin partida guardada, habilitado con número de slot si existe partida), "OPCIONES" y "SALIR".
-  - Panel modal de Opciones completo: Modo de Pantalla (Ventana, Pantalla Completa, Borderless), Resolución (1280x720 a 4K), V-Sync y Perfil Gráfico (Bajo, Medio, Alto) conectado con `DisplayManager` y `ProfileManager`.
+  - Opciones implementadas: "NUEVA PARTIDA", "CONTINUAR" (reactivo, validando integridad real del JSON y seleccionando el guardado válido más reciente por metadatos), "OPCIONES" y "SALIR".
+  - Panel modal de Opciones completo: Modo de Pantalla (Ventana, Sin Bordes, Pantalla Completa), Resolución (1280x720 a 4K), V-Sync y Perfil Gráfico (Bajo, Medio, Alto) conectado con `DisplayManager` y `ProfileManager`.
   - Soporte completo para navegación por foco con Teclado (Enter, Espacio, Flechas, Escape) y Mando/Gamepad (D-pad, Stick, Botón A interactuar, Botón B cancelar/volver).
   - Integrada la textura original de título `ui_title.png` extraída del JAR.
-  - Ampliado `SaveManager` con `has_any_save()` y `get_latest_save_slot()`.
+  - Perfeccionado `SaveManager`: detección de archivos ausentes, validación de JSON corrupto/vacío, selección de ranura más reciente (`get_latest_save_slot()`) por marca de tiempo ISO-8601/unix y fallback ante corrupción.
+  - Asegurada la herramienta `tools/update_coverage.py` para proteger filas manuales contra borrados silenciosos.
 - **Cómo se verificó:**
-  - Batería de pruebas automatizadas `godot/scenes/TestMainMenu.tscn` (`scripts/test_main_menu.gd`): **21/21 aserciones aprobadas (100% PASS, 0 FAIL)** en modo headless y ventana.
+  - Batería de pruebas automatizadas ampliada `godot/scenes/TestMainMenu.tscn` (`scripts/test_main_menu.gd`): **58/58 aserciones aprobadas (100% PASS, 0 FAIL)** en modo headless y ventana.
+  - Pruebas de método para `SaveManager`: archivos ausentes, archivos vacíos, JSON corrupto, múltiples ranuras con timestamps cronológicos y fallback ante corrupción.
+  - Pruebas de método para `DisplayManager` y `ProfileManager`: modos de ventana, resoluciones, vsync, perfiles y multiplicador de partículas.
+  - Pruebas de interacción real con teclado (`LiveInput_Keyboard`): navegación por foco, apertura con Enter/Espacio, cierre modal con Escape.
+  - Pruebas de interacción real con mando (`LiveInput_Gamepad`): navegación con D-pad, activación con Botón A, cierre modal con Botón B.
   - Reporte de telemetría exportado en `godot/anim_captures/main_menu_test_results.json`.
   - Captura real en ventana generada en `godot/anim_captures/main_menu_preview.png`.
-  - Cero regresiones en `test_combat_parity.py` (7/7 OK) y `AnimReview.tscn` (1,548 PASS, 0 FAIL, 4 NOT TESTED).
-- **Pendiente o dudas:** La opción "Nueva Partida" muestra el punto de integración limpio hacia T5.B. La pantalla de selección de personaje se implementará en la siguiente tarea (T5.B).
+  - Cero regresiones en `test_combat_parity.py` (7/7 OK) y `AnimReview.tscn`.
+- **Pendiente o dudas:** La opción "Nueva Partida" utiliza temporalmente el punto de integración hacia T5.B. Se mantiene explícito que la transición narrativa al prólogo (T5.C) y al mapa (T5.D) permanece pendiente y no se declara completa hasta que se implemente y pruebe `CharacterSelect.tscn`.
 
 #### T5.B · Selección de Personaje y Persistencia de Clase
 - **Estado:** `pendiente` (Próxima tarea a ejecutar)

@@ -88,8 +88,8 @@ func _setup_options_ui() -> void:
 	# Modos de ventana
 	opt_window_mode.clear()
 	opt_window_mode.add_item("Ventana", DisplayManager.WindowMode.WINDOWED)
-	opt_window_mode.add_item("Pantalla Completa", DisplayManager.WindowMode.FULLSCREEN)
 	opt_window_mode.add_item("Sin Bordes (Borderless)", DisplayManager.WindowMode.BORDERLESS)
+	opt_window_mode.add_item("Pantalla Completa", DisplayManager.WindowMode.FULLSCREEN)
 	opt_window_mode.select(int(DisplayManager.current_window_mode))
 	
 	# Resoluciones
@@ -114,20 +114,22 @@ func _setup_options_ui() -> void:
 # --- Manejadores de Botones Principales ---
 
 func _on_btn_new_game_pressed() -> void:
-	print("[MainMenu] Selección: Nueva Partida iniciada.")
+	print("[MainMenu] Selección: Nueva Partida iniciada (Punto de integración temporal T5.B).")
 	emit_signal("new_game_requested")
 	
-	# Comprobar si ya existe la escena de selección de personaje (T5.B)
+	# Punto de integración temporal con T5.B (Selección de Personaje).
+	# La transición narrativa y de escena NO se considera completa hasta que
+	# exista y se pruebe 'CharacterSelect.tscn' en T5.B.
 	var char_select_path := "res://scenes/CharacterSelect.tscn"
 	if ResourceLoader.exists(char_select_path):
 		get_tree().change_scene_to_file(char_select_path)
 	else:
-		# Punto de integración limpio con T5.B (Selección de Personaje)
 		_show_stub_modal(
-			"PUNTO DE INTEGRACIÓN: SELECCIÓN DE PERSONAJE (T5.B)\n\n" +
-			"La ruta hacia la Selección de Personaje ha sido activada con éxito.\n" +
-			"En la siguiente tarea (T5.B) se implementará la pantalla canónica\n" +
-			"con las 4 clases originales (Asesino, Guerrero, Caballero, Pistolero)."
+			"PUNTO DE INTEGRACIÓN TEMPORAL: SELECCIÓN DE PERSONAJE (T5.B)\n\n" +
+			"Punto de entrada de Nueva Partida verificado hacia T5.B.\n\n" +
+			"AVISO: La transición narrativa al prólogo (T5.C) y al mapa (T5.D)\n" +
+			"permanece pendiente y no se declara completa hasta la construcción\n" +
+			"y prueba de 'CharacterSelect.tscn' en la siguiente tarea."
 		)
 
 

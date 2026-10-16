@@ -1,6 +1,6 @@
 """
-tools/update_coverage.py — Actualiza docs/coverage.csv con matriz enriquecida por región y estado canónico.
-Refleja contenido original, región, tipo de recurso, referencias, estado de lógica, arte, validación y aprobación.
+tools/update_coverage.py — Actualiza docs/coverage.csv preservando filas manuales y estados existentes.
+Evita el borrado silencioso de filas gestionadas manualmente y asegura la trazabilidad documental.
 """
 
 import csv
@@ -10,6 +10,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MAPS_DIR = REPO_ROOT / "out" / "maps"
 COVERAGE_CSV = REPO_ROOT / "docs" / "coverage.csv"
+
+HEADER = [
+    "categoria", "id", "nombre_original", "region", "tipo_recurso", "referencia_disponible",
+    "estado_logica", "estado_arte", "estado_validacion", "estado_aprobacion",
+    "fuente_referencia", "notas"
+]
 
 def determine_region(mid: str, name: str) -> str:
     n_lower = name.lower()
@@ -79,61 +85,131 @@ base_rows = [
     ],
 ]
 
-rows = list(base_rows)
+def load_existing_coverage(csv_path: Path) -> dict:
+    """Carga filas existentes indizadas por id para preservar cambios manuales."""
+    if not csv_path.exists():
+        return {}
+    existing = {}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row_id = row.get("id")
+            if row_id:
+                existing[row_id] = row
+    return existing
 
-if MAPS_DIR.exists():
-    map_files = sorted(MAPS_DIR.glob("*.json"))
-    for mf in map_files:
-        with open(mf, "r", encoding="utf-8") as f:
-            d = json.load(f)
-        raw_name = d.get("name", mf.stem)
-        mid = raw_name.replace("m/m/", "m_").replace("m/m2/", "m2_").replace(".m", "")
-        loc = d.get("location_name", "")
-        sub = d.get("sub_location", "")
-        name = f"{loc} - {sub}" if sub else loc
-        w = d.get("width", 0)
-        h = d.get("height", 0)
-        ts0 = d.get("tileset_0", 0)
-        ts1 = d.get("tileset_1", 255)
-        cat = "jefe" if ("Jefe" in loc or "jefe" in sub.lower()) else "mapa"
-        tipo = "arena_jefe" if cat == "jefe" else "mapa_entorno"
-        region = determine_region(mid, name)
-        objs = len(d.get("objects", []))
-        spawns = len(d.get("spawns", []))
-        notes = f"Tiles: {w}x{h} (16x16 px). Tilesets: t{ts0:02d}, t{ts1:02d}. Objs: {objs}, Spawns: {spawns}"
+def main():
+    existing_rows = load_existing_coverage(COVERAGE_CSV)
+    preserved_manual_count = 0
+    updated_map_count = 0
+    added_new_count = 0
+    
+    # Conjunto para rastrear qué IDs han sido procesados
+    processed_ids = set()
+    final_rows = []
 
-        # Asignación rigurosa de estados
-        if mid == "m_00":
-            est_logica = "en_integracion_fase5"
-            est_arte = "validado_tecnicamente"
-            est_val = "verificado_contra_original"
-            est_aprob = "PENDING_GATE_D"
-        elif "Silverleaf" in region:
-            est_logica = "interpretado"
-            est_arte = "extraido_png"
-            est_val = "pendiente_fase5"
-            est_aprob = "PENDING_GATE_D"
+    # 1. Procesar base_rows: si ya existe en CSV, conservar estado manual
+    for b in base_rows:
+        b_dict = dict(zip(HEADER, b))
+        b_id = b_dict["id"]
+        processed_ids.add(b_id)
+        if b_id in existing_rows:
+            # Conservar estados y notas manuales existentes
+            curr = existing_rows[b_id]
+            final_rows.append(curr)
+            preserved_manual_count += 1
         else:
-            est_logica = "interpretado"
-            est_arte = "extraido_png"
-            est_val = "pendiente_fase6"
-            est_aprob = "BLOQUEADO_POR_GATE_D"
+            final_rows.append(b_dict)
+            added_new_count += 1
 
-        rows.append([
-            cat, mid, name, region, tipo, "si",
-            est_logica, est_arte, est_val, est_aprob,
-            raw_name, notes
-        ])
+    # 2. Procesar mapas desde out/maps/
+    if MAPS_DIR.exists():
+        map_files = sorted(MAPS_DIR.glob("*.json"))
+        for mf in map_files:
+            with open(mf, "r", encoding="utf-8") as f:
+                d = json.load(f)
+            raw_name = d.get("name", mf.stem)
+            mid = raw_name.replace("m/m/", "m_").replace("m/m2/", "m2_").replace(".m", "")
+            loc = d.get("location_name", "")
+            sub = d.get("sub_location", "")
+            name = f"{loc} - {sub}" if sub else loc
+            w = d.get("width", 0)
+            h = d.get("height", 0)
+            ts0 = d.get("tileset_0", 0)
+            ts1 = d.get("tileset_1", 255)
+            cat = "jefe" if ("Jefe" in loc or "jefe" in sub.lower()) else "mapa"
+            tipo = "arena_jefe" if cat == "jefe" else "mapa_entorno"
+            region = determine_region(mid, name)
+            objs = len(d.get("objects", []))
+            spawns = len(d.get("spawns", []))
+            notes = f"Tiles: {w}x{h} (16x16 px). Tilesets: t{ts0:02d}, t{ts1:02d}. Objs: {objs}, Spawns: {spawns}"
 
-HEADER = [
-    "categoria", "id", "nombre_original", "region", "tipo_recurso", "referencia_disponible",
-    "estado_logica", "estado_arte", "estado_validacion", "estado_aprobacion",
-    "fuente_referencia", "notas"
-]
+            processed_ids.add(mid)
 
-with open(COVERAGE_CSV, "w", newline="", encoding="utf-8") as f:
-    writer = csv.writer(f)
-    writer.writerow(HEADER)
-    writer.writerows(rows)
+            if mid in existing_rows:
+                # Actualizar metadatos técnicos (dimensiones, tilesets) conservando estados de auditoría manual
+                curr = existing_rows[mid]
+                curr["region"] = region
+                curr["tipo_recurso"] = tipo
+                curr["fuente_referencia"] = raw_name
+                # Solo actualizar notas técnicas si las notas no fueron personalizadas manualmente
+                if "Tiles:" in curr.get("notas", ""):
+                    curr["notas"] = notes
+                final_rows.append(curr)
+                updated_map_count += 1
+            else:
+                # Nuevo mapa no presente en el CSV
+                if mid == "m_00":
+                    est_logica = "en_integracion_fase5"
+                    est_arte = "validado_tecnicamente"
+                    est_val = "verificado_contra_original"
+                    est_aprob = "PENDING_GATE_D"
+                elif "Silverleaf" in region:
+                    est_logica = "interpretado"
+                    est_arte = "extraido_png"
+                    est_val = "pendiente_fase5"
+                    est_aprob = "PENDING_GATE_D"
+                else:
+                    est_logica = "interpretado"
+                    est_arte = "extraido_png"
+                    est_val = "pendiente_fase6"
+                    est_aprob = "BLOQUEADO_POR_GATE_D"
 
-print(f"[OK] {COVERAGE_CSV} actualizado con {len(rows)} filas y estados canónicos normalizados.")
+                new_row = {
+                    "categoria": cat,
+                    "id": mid,
+                    "nombre_original": name,
+                    "region": region,
+                    "tipo_recurso": tipo,
+                    "referencia_disponible": "si",
+                    "estado_logica": est_logica,
+                    "estado_arte": est_arte,
+                    "estado_validacion": est_val,
+                    "estado_aprobacion": est_aprob,
+                    "fuente_referencia": raw_name,
+                    "notas": notes
+                }
+                final_rows.append(new_row)
+                added_new_count += 1
+
+    # 3. Preservar CUALQUIER otra fila manual que estuviera en el CSV y no coincida con mapas o base_rows
+    for row_id, row_data in existing_rows.items():
+        if row_id not in processed_ids:
+            final_rows.append(row_data)
+            preserved_manual_count += 1
+            print(f"[PRESERVADO] Fila gestionada manualmente conservada: {row_id} ({row_data.get('categoria')})")
+
+    # 4. Escribir CSV final respetando el encabezado canónico
+    with open(COVERAGE_CSV, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=HEADER)
+        writer.writeheader()
+        writer.writerows(final_rows)
+
+    print(f"[OK] {COVERAGE_CSV} actualizado de forma segura:")
+    print(f"  - Total filas escritas: {len(final_rows)}")
+    print(f"  - Filas manuales/existentes preservadas intactas: {preserved_manual_count}")
+    print(f"  - Mapas actualizados sin sobreescribir auditoría: {updated_map_count}")
+    print(f"  - Nuevas filas añadidas: {added_new_count}")
+
+if __name__ == "__main__":
+    main()

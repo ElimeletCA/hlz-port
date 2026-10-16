@@ -38,23 +38,128 @@
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "new_game_enabled",
+			"property": "slot1_valid_when_missing",
 			"result": "PASS",
-			"test": "NewGameButton"
+			"test": "Method_SaveManager_Missing"
 		},
 		{
-			"actual": "true",
-			"expected": "true",
-			"property": "new_game_visible",
+			"actual": "{  }",
+			"expected": "{  }",
+			"property": "slot1_load_when_missing",
 			"result": "PASS",
-			"test": "NewGameButton"
+			"test": "Method_SaveManager_Missing"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "continue_enabled_when_save_exists",
+			"property": "has_any_save_when_empty",
 			"result": "PASS",
-			"test": "ContinueButton_HasSave"
+			"test": "Method_SaveManager_Missing"
+		},
+		{
+			"actual": "0",
+			"expected": "0",
+			"property": "latest_slot_when_empty",
+			"result": "PASS",
+			"test": "Method_SaveManager_Missing"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "slot2_valid_when_empty_file",
+			"result": "PASS",
+			"test": "Method_SaveManager_EmptyFile"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "slot2_has_save_when_empty_file",
+			"result": "PASS",
+			"test": "Method_SaveManager_EmptyFile"
+		},
+		{
+			"actual": "{  }",
+			"expected": "{  }",
+			"property": "slot2_load_when_empty_file",
+			"result": "PASS",
+			"test": "Method_SaveManager_EmptyFile"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "slot2_valid_when_corrupt_json",
+			"result": "PASS",
+			"test": "Method_SaveManager_CorruptJSON"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "slot2_has_save_when_corrupt_json",
+			"result": "PASS",
+			"test": "Method_SaveManager_CorruptJSON"
+		},
+		{
+			"actual": "{  }",
+			"expected": "{  }",
+			"property": "slot2_load_when_corrupt_json",
+			"result": "PASS",
+			"test": "Method_SaveManager_CorruptJSON"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "slot1_valid",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "slot2_valid",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "slot3_valid",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "has_any_save_true",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "2",
+			"expected": "2",
+			"property": "latest_slot_is_slot2",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "3",
+			"expected": "3",
+			"property": "latest_slot_updates_to_slot3",
+			"result": "PASS",
+			"test": "Method_SaveManager_Timestamps"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "slot3_now_invalid",
+			"result": "PASS",
+			"test": "Method_SaveManager_CorruptFallback"
+		},
+		{
+			"actual": "2",
+			"expected": "2",
+			"property": "latest_slot_fallback_to_slot2",
+			"result": "PASS",
+			"test": "Method_SaveManager_CorruptFallback"
 		},
 		{
 			"actual": "false",
@@ -66,92 +171,246 @@
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "continue_shows_slot",
+			"property": "continue_shows_slot2",
 			"result": "PASS",
 			"test": "ContinueButton_Reactive"
 		},
 		{
-			"actual": "false",
-			"expected": "false",
-			"property": "options_modal_initially_hidden",
+			"actual": "true",
+			"expected": "true",
+			"property": "continue_disabled_after_cleanup",
 			"result": "PASS",
-			"test": "OptionsFlow"
+			"test": "ContinueButton_Reactive"
 		},
 		{
 			"actual": "true",
 			"expected": "true",
-			"property": "options_modal_opens",
+			"property": "continue_shows_sin_partida",
 			"result": "PASS",
-			"test": "OptionsFlow"
+			"test": "ContinueButton_Reactive"
+		},
+		{
+			"actual": "1",
+			"expected": "1",
+			"property": "window_mode_borderless",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
+		},
+		{
+			"actual": "2",
+			"expected": "2",
+			"property": "window_mode_fullscreen",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
+		},
+		{
+			"actual": "0",
+			"expected": "0",
+			"property": "window_mode_windowed",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
+		},
+		{
+			"actual": "(1280, 720)",
+			"expected": "(1280, 720)",
+			"property": "resolution_720p",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
+		},
+		{
+			"actual": "(1920, 1080)",
+			"expected": "(1920, 1080)",
+			"property": "resolution_1080p",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
+		},
+		{
+			"actual": "(3840, 2160)",
+			"expected": "(3840, 2160)",
+			"property": "resolution_4k",
+			"result": "PASS",
+			"test": "Method_DisplayManager"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "menu_buttons_hidden_in_options",
+			"property": "vsync_disabled",
 			"result": "PASS",
-			"test": "OptionsFlow"
+			"test": "Method_DisplayManager"
 		},
 		{
-			"actual": "3",
-			"expected": "3",
-			"property": "window_modes_count",
+			"actual": "true",
+			"expected": "true",
+			"property": "vsync_enabled",
 			"result": "PASS",
-			"test": "OptionsControls"
+			"test": "Method_DisplayManager"
 		},
 		{
-			"actual": "5",
-			"expected": "5",
-			"property": "resolutions_count",
+			"actual": "0",
+			"expected": "0",
+			"property": "profile_low",
 			"result": "PASS",
-			"test": "OptionsControls"
+			"test": "Method_ProfileManager"
 		},
 		{
-			"actual": "3",
-			"expected": "3",
-			"property": "profiles_count",
+			"actual": "Bajo",
+			"expected": "Bajo",
+			"property": "profile_low_name",
 			"result": "PASS",
-			"test": "OptionsControls"
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "0.5",
+			"expected": "0.5",
+			"property": "profile_low_multiplier",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "2",
+			"expected": "2",
+			"property": "profile_high",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "Alto",
+			"expected": "Alto",
+			"property": "profile_high_name",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "1.5",
+			"expected": "1.5",
+			"property": "profile_high_multiplier",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "1",
+			"expected": "1",
+			"property": "profile_medium",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "1.0",
+			"expected": "1.0",
+			"property": "profile_medium_multiplier",
+			"result": "PASS",
+			"test": "Method_ProfileManager"
+		},
+		{
+			"actual": "BtnNewGame:<Button#38218499569>",
+			"expected": "BtnNewGame:<Button#38218499569>",
+			"property": "initial_focus_is_new_game",
+			"result": "PASS",
+			"test": "LiveInput_Keyboard"
+		},
+		{
+			"actual": "BtnOptions:<Button#38319162871>",
+			"expected": "BtnOptions:<Button#38319162871>",
+			"property": "focus_moves_to_options",
+			"result": "PASS",
+			"test": "LiveInput_Keyboard"
+		},
+		{
+			"actual": "BtnNewGame:<Button#38218499569>",
+			"expected": "BtnNewGame:<Button#38218499569>",
+			"property": "focus_returns_to_new_game",
+			"result": "PASS",
+			"test": "LiveInput_Keyboard"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "options_opened_via_accept_key",
+			"result": "PASS",
+			"test": "LiveInput_Keyboard"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "options_modal_closes",
+			"property": "menu_buttons_hidden_on_options_open",
 			"result": "PASS",
-			"test": "OptionsFlow"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "menu_buttons_restored",
-			"result": "PASS",
-			"test": "OptionsFlow"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "stub_modal_opens",
-			"result": "PASS",
-			"test": "NewGameTransition"
-		},
-		{
-			"actual": "true",
-			"expected": "true",
-			"property": "stub_contains_t5b",
-			"result": "PASS",
-			"test": "NewGameTransition"
+			"test": "LiveInput_Keyboard"
 		},
 		{
 			"actual": "false",
 			"expected": "false",
-			"property": "stub_modal_closes",
+			"property": "options_closed_via_escape_key",
 			"result": "PASS",
-			"test": "NewGameTransition"
+			"test": "LiveInput_Keyboard"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "menu_buttons_restored_on_options_close",
+			"result": "PASS",
+			"test": "LiveInput_Keyboard"
+		},
+		{
+			"actual": "BtnOptions:<Button#38319162871>",
+			"expected": "BtnOptions:<Button#38319162871>",
+			"property": "gamepad_dpad_down_navigates",
+			"result": "PASS",
+			"test": "LiveInput_Gamepad"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "gamepad_button_a_triggers_new_game",
+			"result": "PASS",
+			"test": "LiveInput_Gamepad"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "gamepad_button_b_closes_modal",
+			"result": "PASS",
+			"test": "LiveInput_Gamepad"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "gamepad_restores_menu_state",
+			"result": "PASS",
+			"test": "LiveInput_Gamepad"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "stub_modal_visible",
+			"result": "PASS",
+			"test": "NewGame_IntegrationPoint"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "stub_references_t5b",
+			"result": "PASS",
+			"test": "NewGame_IntegrationPoint"
+		},
+		{
+			"actual": "true",
+			"expected": "true",
+			"property": "stub_explicit_disclaimer_narrative_pending",
+			"result": "PASS",
+			"test": "NewGame_IntegrationPoint"
+		},
+		{
+			"actual": "false",
+			"expected": "false",
+			"property": "stub_closed",
+			"result": "PASS",
+			"test": "NewGame_IntegrationPoint"
 		}
 	],
 	"fail": 0,
-	"pass": 21,
-	"suite": "T5.A MainMenu Acceptance Test",
-	"timestamp": "2026-10-16T12:05:11",
-	"total_assertions": 21,
+	"pass": 58,
+	"suite": "T5.A MainMenu Acceptance Test Extended",
+	"timestamp": "2026-10-16T18:06:19",
+	"total_assertions": 58,
 	"verdict": "PASS"
 }
