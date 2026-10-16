@@ -1,315 +1,304 @@
-# Plan 0-100: port fan-made de Heroes Lore: Zero a PC (Godot 4)
+# Plan Maestro de Desarrollo: Heroes Lore: Zero para PC (Godot 4)
 
-Documento de trabajo para un agente de IA · Uso personal · Windows · Godot 4 · Juego 2D de vista cenital inspirado visualmente en Bleaklight Falls · Arte ilustrado/hand-painted estilizado · Toda la historia y el contenido original confirmado en la versión completa
+Documento canónico de arquitectura, metodología y planificación técnica incremental.  
+**Plataforma objetivo:** PC (Windows) · **Motor:** Godot 4.7.2 Standard (GDScript) · **Perspectiva:** 2D cenital ligeramente elevada (~30º) · **Estilo visual:** 2D ilustrado y remasterizado 4x pixel-perfect fiel al original de 2008, con composición inspirada en Bleaklight Falls · **Alcance:** 100% de la historia y contenido original confirmado en la versión completa.
 
-**Requisitos principales aprobados:** el juego será 2D, con vista cenital o ligeramente elevada, composición de escenarios detallada y una estética ilustrada moderna inspirada en rasgos generales de Bleaklight Falls: lectura clara del terreno, ambientes expresivos, capas visuales y arte dibujado. La referencia es orientativa: no se copian sus sprites, escenarios, interfaz ni diseños. El arte nuevo se genera con IA y lo retoca manualmente el usuario antes de su aprobación e integración. El proyecto debe funcionar en PC modestos y portátiles, admitir salida hasta 4K y ofrecer perfiles gráficos escalables. La resolución 4K de salida no implica exigir recursos renderizados a 4K ni garantizar 60 FPS en todos los equipos; se medirán objetivos por hardware. La versión completa debe incluir toda la historia y todo el contenido original verificado, no solo la historia principal ni una selección reducida.
+---
 
-## 0. Cómo usar este documento
+## 1. Filosofía Oficial de Desarrollo
 
-Este plan está escrito para que un agente de IA lo ejecute fase por fase. Cada fase tiene tareas numeradas (T2.3, T5.1…), entregables y un criterio de aceptación comprobable. El marcador 🧑 indica un punto donde hace falta una persona (grabar gameplay, juzgar el feeling, confirmar visualmente).
+Este proyecto sigue cinco principios rectores irrenunciables para garantizar calidad, fidelidad y avance sostenible:
 
-Qué se sabe del juego (inspección del .jar, sin decodificar aún):
+### Principio A: Base técnica suficiente sin sistemas aislados innecesarios
+Primero se estabilizan los fundamentos indispensables para el primer recorrido jugable (extracción, mapas, animaciones, movimiento, colisiones, diálogos, eventos, combate, UI básica y guardado). No se construyen sistemas masivos o abstractos por adelantado. La infraestructura mínima se integra en un flujo real y se amplía únicamente conforme la historia lo demande.
 
-- MIDlet Heroes Lore Zero v4.4.45, versión modificada (360x640, español), 1.145 archivos.
-- 144 clases Java ofuscadas; el punto de entrada es `rpg/RPGHeroEx`.
-- 460 archivos `.mpm` (formato propio; son gráficos, animaciones y datos, hipótesis), \~140 `.m` (mapas, hipótesis) en `m/m` y `m/m2`, 141 archivos `mmi` de 70 bytes (atributos de tiles o colisión, hipótesis), 31 `.tdf` (texto y misiones, hipótesis).
-- 16 MIDI en `snd/b`, 14 WAV de 8 kHz, 8 bits, mono en `snd/e`.
-- 39 PNG solo de UI en la raíz y `sks/`. Fuente propia (`ftd/table`, `dotFontSmall.dat`).
-- Carpetas probables: `hero/` (héroe, armas, equipo), `en/` (enemigos y stats), `itm/` (objetos), `img/`, `s/`, `t/`.
+### Principio B: Construir el primer recorrido jugable de principio a fin (Fase 5)
+Antes de emprender la producción masiva de mapas, enemigos y personajes, se debe completar un primer recorrido integrado que inicie desde el arranque del ejecutable (`scenes/Main.tscn`) hasta el primer combate completo y el guardado persistente. El jugador no debe necesitar comandos de consola, teletransportes, scripts de depuración ni escenas sandbox para recorrerlo.
 
-Todo lo marcado como hipótesis debe verificarse en la Fase 2 leyendo el código decompilado. Nunca se asume. El arte original y sus sprites/tiles sirven para estudiar diseños, paletas, animaciones, hitboxes, distribución y atmósfera. La presentación final será 2D renovada: los recursos originales podrán usarse como referencia técnica, pero el arte nuevo debe generarse, retocarse y aprobarse según la guía visual, sin asumir que extraer un sprite equivale a tener un asset final aprobado. Los datos de mapas, stats, animaciones, hitboxes, textos y progresión se usan como fuente de paridad y se verifican contra el juego original.
+### Principio C: Completar el juego siguiendo el orden de la historia original (Fase 6)
+Una vez aprobado formalmente el primer recorrido por el usuario (Gate D), el desarrollo del resto de la aventura se ejecuta estrictamente de forma cronológica, región por región y según la progresión del juego original. Cada región debe quedar jugable, integrada con el progreso acumulado y verificada antes de iniciar la siguiente.
 
-## 1. Requisitos y decisiones del proyecto
+### Principio D: Preservar la fidelidad al original
+Mapas, misiones, textos, diálogos, personajes, fórmulas de combate, curvas de experiencia, comportamientos de IA y secretos se extraen y verifican a partir del archivo JAR original (`Heroes Lore Zero 360x640 Spanish.jar`), el código decompilado y el emulador J2ME. No se inventa contenido para llenar vacíos. Cualquier incertidumbre técnica se registra en `docs/OPEN_QUESTIONS.md` separando hechos comprobados de hipótesis.
 
-| Tema | Decisión |
-| --- | --- |
-| Motor | Godot 4.x estable. Fijar una versión y sus plantillas de exportación antes del desarrollo real; no actualizar el motor en mitad de una fase sin ejecutar la batería de pruebas. |
-| Plataforma | Windows, con atención explícita a portátiles y PC de gama baja o media. |
-| Dimensión y perspectiva | Juego 2D con vista cenital / top-down, ligeramente elevada en la composición del arte cuando proceda. No se construirán escenarios ni personajes 3D como base del proyecto. La cámara y el encuadre se fijarán mediante un prototipo 2D en la Fase 4. |
-| Estilo visual | Arte 2D ilustrado y estilizado, con apariencia pintada a mano, escenarios con personalidad, vegetación y elementos de entorno detallados pero legibles, paleta coherente, sombras pintadas y capas para sugerir profundidad. Bleaklight Falls es referencia de perspectiva, composición y sensación visual general, no una plantilla para copiar assets. La identidad de Heroes Lore: Zero debe seguir siendo reconocible. |
-| Presentación en PC | Orientación horizontal como objetivo para PC, sin estirar el arte ni alterar la distribución jugable. Definir reglas para mapas menores que el encuadre y validar cómo adaptar el original vertical 360×640 sin inventar zonas jugables. |
-| Resolución y rendimiento | Compatibilidad con salida hasta 4K. Separar resolución de pantalla, escala del viewport 2D, escala de texturas y escala de UI. Buscar 1080p/60 FPS en el equipo mínimo de referencia con perfil bajo, sujeto a medición; medir salida 4K/60 FPS en equipos recomendados cuando sea viable. No prometer rendimiento universal sin pruebas. |
-| Escalabilidad | Perfiles Bajo, Medio y Alto. Ajustar efectos, iluminación 2D, partículas, filtros, resolución/escala de render, densidad de elementos decorativos y efectos de postprocesado según sea necesario. No reducir legibilidad de personajes, proyectiles, colisiones o UI al bajar calidad. |
-| Renderizador | Partir de Godot Compatibility como candidato por su orientación a hardware amplio; comparar con Mobile en una escena 2D representativa si se usan luces, shaders o efectos que lo justifiquen. Elegir con mediciones y documentar la decisión en `docs/spec/performance.md`. No añadir complejidad gráfica que no mejore claramente el resultado. |
-| Arte nuevo | Flujo IA → selección → retoque manual del usuario → limpieza de imagen y animación → preparación de spritesheets/atlases → prueba en Godot → aprobación. Los recursos originales son referencia de diseño y estructura; el arte final debe cumplir `art/STYLE.md`. |
-| Animación | Sprites 2D por fotogramas como método principal. `AnimatedSprite2D`, `SpriteFrames`, `AnimationPlayer` y/o técnicas de animación por partes se usarán según lo que resulte más fiable para cada recurso. La salida de IA debe corregirse manualmente para mantener identidad, silueta, proporciones y continuidad entre frames. |
-| Control | Mando como control principal, teclado como respaldo y ratón cuando sea útil en menús. Conservar las reglas de movimiento del original como referencia; la entrada analógica se adapta a las direcciones y al modelo de movimiento verificados, sin alterar silenciosamente el combate. |
-| Audio | Mejorado: música y efectos limpios, con interruptor para el audio original cuando sea técnicamente viable. |
-| Calidad de vida | Guardado libre en cualquier momento, minimapa y marcadores de misión mejorados. |
-| Alcance de la versión completa | Toda la historia y todo el contenido original confirmado en la versión de referencia: mapas, misiones, diálogos, NPC, enemigos, jefes, objetos, equipo, habilidades, minijuegos, secretos y extras que existan. Ninguna categoría original se descarta simplemente por coste; se puede desarrollar por entregas internas, pero la versión 1.0 no se declara completa hasta cubrirla. |
-| Fidelidad | Conservar historia, textos, distribución de mapas, stats, fórmulas y progresión, salvo diferencias técnicas documentadas y aprobadas. Los rediseños 2D deben conservar rasgos, colores, siluetas y equipo que permitan reconocer personajes y criaturas. |
-| Distribución | Solo uso personal. Aun así, el `.jar`, los assets convertidos y el arte generado no se suben a git. |
+### Principio E: Cada cambio verificable, reversible y comiteado de inmediato
+Cada tarea cuenta con identificador único, dependencias explícitas, archivos afectados, prueba reproducible y criterio de aceptación objetivo. Todo cambio se comitea atómicamente de manera inmediata. Ninguna prueba se declara aprobada sin haber sido medida efectivamente.
 
-## 2. Reglas de trabajo del agente (metodología)
+---
 
-1. **Los archivos son la memoria.** Antes de empezar cada sesión, leer `docs/PLAN.md`, `docs/PROGRESS.md` y `docs/OPEN_QUESTIONS.md`. Al terminar, actualizarlos.
-2. **Una tarea, un commit.** Ciclo: leer tarea → plan de 3-5 líneas → implementar → verificar con comandos → commit con el ID de tarea → anotar en PROGRESS.md.
-3. **Verificar antes de avanzar.** No se pasa de fase hasta cumplir su criterio de aceptación. Las verificaciones son scripts que se pueden relanzar (`tools/verify_fase2.py`, etc.).
-4. **No inventar.** Los formatos y las fórmulas se deducen del código decompilado y de comparar con el emulador. Si hay duda, se anota en OPEN\_QUESTIONS.md y se sigue con otra tarea.
-5. **Dos vías separadas.** Vía A: herramientas en Python fuera de Godot (extractor, conversores, verificadores). Vía B: proyecto Godot que solo consume datos ya convertidos.
-6. **Todo guiado por datos.** Nada de stats, textos ni mapas escritos a mano en el código de Godot.
-7. **Godot por línea de comandos.** Las escenas (`.tscn`) y scripts (`.gd`) son texto, así que el agente los edita directamente y ejecuta `godot --headless --path godot/ ...` para comprobar errores y correr tests.
-8. **MCP es opcional.** Existen servidores MCP comunitarios para Godot (Coding-Solo/godot-mcp, GDAI MCP, bradypp/godot-mcp y satelliteoflove/godot-mcp, este último con control del editor e inyección de input para pruebas). Ayudan a controlar el editor y a probar el juego en ejecución, pero el plan funciona con solo shell y archivos. Revisar el README de cada uno antes de instalarlo, porque su mantenimiento varía.
-9. **Capacidades mínimas del agente:** shell en Windows, lectura y escritura de archivos, ejecutar Python, Java y Godot. Si el agente no puede ver imágenes, los checkpoints 🧑 sustituyen toda verificación visual.
-10. **Tests.** Usar GUT o gdUnit4 para lógica en Godot y `pytest` para las herramientas Python.
+## 2. Decisiones Técnicas Consolidadas del Proyecto
 
-**Regla 11 · Arte generado con IA.** Todo recurso visual generado se registra en `art/manifest.csv` con, como mínimo: ID, categoría, herramienta/modelo y versión, prompt, semilla si existe, referencias utilizadas, licencia/términos revisados, archivos de origen, estado del retoque, dimensiones, número de frames si corresponde, formato de exportación y aprobación. No se inventan metadatos; si no están disponibles, anotar `no disponible`.
+| Parámetro | Decisión Canónica | Justificación / Evidencia |
+|---|---|---|
+| **Juego** | Port fan-made de *Heroes Lore: Zero* (J2ME, 2008). | Preservación de la obra en PC moderno con mejoras de calidad de vida. |
+| **Motor** | Godot Engine 4.7.2 Standard (versión estable local fijada). | `Godot_v4.7.2-stable_win64.exe`. Compatibilidad comprobada en modo headless y gráfico (DEC-001). |
+| **Lenguaje** | GDScript para runtime del juego; Python 3.11 para herramientas de extracción y validación. | Rendimiento óptimo en Godot 4 y versatilidad de procesamiento binario en herramientas. |
+| **Continuidad del Motor** | No migrar a libGDX ni otros frameworks. | Mantener inversión técnica realizada en Godot 4 y GDScript (DEC-005). |
+| **Plataforma Inicial** | Windows 10 / 11 de 64 bits. | Ejecutable independiente con dependencias autocontenidas. |
+| **Perspectiva y Dimensión** | 2D con vista cenital ligeramente elevada (~30º). | Variante B aprobada: Zoom 2.0x, offset vertical `(0, -80 px)`, sin construcción 3D (DEC-004, `docs/spec/camera.md`). |
+| **Referencia Visual** | Inspiración en *Bleaklight Falls* para composición, capas y lectura de terreno. | No se copian assets ni recursos propietarios; se preserva la identidad original de HLZ. |
+| **Dirección Artística** | 2D ilustrado y remasterizado 4x pixel-perfect. | Extracción fiel de capas originales del JAR con reescalado entero 4x (DEC-006). |
+| **Representación de Lucian** | Clase 1 Asesino (`hero/h1`), doble daga `hero/w/400`, chaleco `hero/1/l00`, pantalón morado `hero/2/l00`. | 134/134 sprites auditados con paridad criptográfica 100% contra bytecode J2ME (DEC-007). |
+| **Mapeo de Marcha** | 4 fotogramas base J2ME repetidos consecutivamente (`i % 4`) para formar 8 archivos a 10 FPS. | Fluidez sin deformaciones ni saltos; cero caídas a reposo durante el movimiento (DEC-008). |
+| **Controles** | Mando/Gamepad como opción principal (stick con zona muerta 0.20, D-pad, botones); teclado WASD como alternativa. | `InputManager` centralizado (`godot/scripts/input_manager.gd`). |
+| **Rendimiento** | 60 FPS estables en equipo modesto (Intel UHD); soporte hasta 4K en hardware dedicado. | Renderizador Compatibility (OpenGL 3.3 / ANGLE), perfiles Bajo, Medio y Alto medidos (DEC-002, DEC-003). |
+| **Calidad de Vida (QoL)** | Guardado libre en 3 ranuras, baúl común transferible, minimapa y marcadores de misión. | Especificado en `docs/spec/events_quests.md` y `docs/reference/`. |
+| **Distribución y Git** | Uso personal. JAR original, assets crudos y datos extraídos locales excluidos por `.gitignore`. | `.gitignore` activo; preservación estricta de archivos locales. |
 
-**Regla 12 · Flujo obligatorio del arte 2D.** Referencia → generación con IA → selección → retoque manual del usuario → limpieza de transparencia, bordes, anatomía, paleta y proporciones → preparación de frames o tiles → prueba dentro del juego → integración → aprobación. Para sprites animados, comprobar continuidad visual entre frames, pivote/punto de apoyo, escala y tiempo de animación. El agente organiza fuentes, atlas, nombres y verificaciones, pero no marca un recurso como aprobado por el usuario.
+---
 
-**Regla 13 · Consistencia visual.** Antes de producir arte en volumen, crear y aprobar `art/STYLE.md` con la perspectiva cenital, referencias permitidas, paleta por bioma, lenguaje de formas, nivel de detalle, contraste, iluminación pintada, escala de personajes, tamaños base de sprites, reglas de contorno, sombras, densidad de escenario, tratamiento de vegetación, efectos y UI. Bleaklight Falls se utiliza como referencia de alto nivel para composición y lectura de la vista cenital; no se copian directamente personajes, sprites, mapas, interfaz ni recursos propietarios. El arte debe mantener la identidad de Heroes Lore: Zero.
+## 3. Puertas de Aprobación Explícitas (Gates)
 
-**Regla 14 · Umbral de integración 2D.** Ningún recurso entra al juego solo porque lo haya generado la IA. Debe tener transparencia limpia cuando corresponda, bordes sin artefactos, tamaño y pivote coherentes, silueta legible en el tamaño de juego, paleta compatible y exportación en formato adecuado (preferentemente PNG/WebP según compatibilidad y uso; conservar fuentes editables). Los sprites animados necesitan frames coherentes y temporización revisada; los tiles necesitan bordes que conecten sin costuras; los elementos superpuestos necesitan capas y orden de dibujo correctos. Cada recurso debe probarse dentro del mapa y la cámara definitivos.
+El proyecto implementa 6 puertas de calidad formales. Cada puerta exige criterios cuantitativos, evidencias registradas y un documento formal en `docs/gates/`:
 
-**Regla 15 · Rendimiento por perfiles de hardware.** No se usa “4K a 60 FPS” como criterio único. Separar resolución de salida, escala del viewport 2D, dimensiones de texturas y escala de UI. Registrar pruebas en al menos un equipo modesto y otro recomendado cuando estén disponibles. Guardar resultados y especificaciones reales en `docs/spec/performance.md`; no inventar características de hardware. Si un equipo no está disponible para prueba, dejarlo como pendiente y nunca como aprobado.
-
-**Regla 16 · Alcance completo, no recortado.** El objetivo de la versión 1.0 es reproducir toda la historia y todo el contenido original confirmado. El vertical slice sirve para validar tecnología y sensación de juego, no para limitar el alcance final. Toda entidad o actividad descubierta durante la ingeniería inversa se registra en `docs/coverage.csv`; las entradas dudosas se investigan y no se eliminan por conveniencia.
-
-**Regla 17 · Decisiones de alto impacto.** Registrar en `docs/DECISIONS.md` las decisiones que afecten a perspectiva/encuadre, formato de mapas, tilesets, capas y orden de dibujo, hitboxes, pipeline de sprites, guardados y compatibilidad de hardware. Cada entrada incluye contexto, decisión, alternativas, evidencia de prueba y tareas afectadas si cambia.
-
-Plantilla de entrada en `docs/PROGRESS.md`:
-
-```
-## T2.3 · estado: hecho | en curso | bloqueado
-- Qué se hizo:
-- Cómo se verificó (comando y resultado):
-- Pendiente o dudas (→ OPEN_QUESTIONS.md):
+```mermaid
+flowchart TD
+    G_A["Gate A: Recursos Decodificados Correctamente\n(docs/gates/gate_a_resources.md)\n[ESTADO: APPROVED]"]
+    --> G_B["Gate B: Fundamentos Gráficos y Animaciones\n(docs/gates/gate_b_graphics_anims.md)\n[ESTADO: APPROVED]"]
+    --> G_C["Gate C: Primer Recorrido Completo Integrado\n(docs/gates/gate_c_first_walkthrough.md)\n[ESTADO: PENDING]"]
+    --> G_D["Gate D: Aprobación Humana del Vertical Slice\n(docs/gates/vertical_slice_approval.md)\n[ESTADO: PENDING - BLOQUEANTE]"]
+    --> G_E["Gate E: Integración Regional Fase 6\n(docs/gates/gate_e_region_template.md)\n[ESTADO: BLOQUEADO POR GATE D]"]
+    --> G_F["Gate F: Versión Final 1.0\n(docs/gates/gate_f_release_1_0.md)\n[ESTADO: PENDING]"]
 ```
 
-## 3. Estructura del repositorio
+1. **Gate A — Recursos decodificados correctamente:** (`docs/gates/gate_a_resources.md` · **APPROVED**).
+2. **Gate B — Fundamentos gráficos y animaciones:** (`docs/gates/gate_b_graphics_anims.md` · **APPROVED**).
+3. **Gate C — Primer recorrido completo integrado:** (`docs/gates/gate_c_first_walkthrough.md` · **PENDING**).
+4. **Gate D — Aprobación humana del Vertical Slice:** (`docs/gates/vertical_slice_approval.md` · **PENDING · BLOQUEANTE**).
+   - Bloquea absolutamente el inicio de la producción masiva de la Fase 6.
+   - Requiere la prueba jugable directa y la firma explícita del usuario (`APPROVED`).
+5. **Gate E — Cada región integrada:** (`docs/gates/gate_e_region_template.md` · **BLOQUEADO POR GATE D**).
+   - Aplicable a cada una de las 5 regiones de la Fase 6 antes de permitir el paso a la siguiente.
+6. **Gate F — Versión final y empaquetado:** (`docs/gates/gate_f_release_1_0.md` · **PENDING**).
 
-```text
-heroes-port/
-  input/            # el .jar original (en .gitignore)
-  reverse/          # clases decompiladas y mapping.txt
-  docs/
-    PLAN.md  PROGRESS.md  OPEN_QUESTIONS.md  DECISIONS.md
-    formats/        # especificación de formatos binarios
-    spec/           # especificación inversa de combate, IA, misiones, stats, cámara y rendimiento
-      content_scope.md  performance.md  camera.md
-    gates/
-      vertical_slice_approval.md  # aprobación explícita antes de producción masiva
-    reference/      # capturas, vídeos y notas de referencia
-    coverage.csv    # cobertura de contenido + estados de implementación y arte
-  tools/            # extractor, conversores y verificadores Python
-  out/              # datos extraídos/conversos: mapas, tablas, texto, MIDI y WAV (en .gitignore)
-  art/
-    STYLE.md        # biblia visual 2D aprobada e inspirada a alto nivel en la referencia
-    manifest.csv    # procedencia, prompts, retoque, dimensiones, frames, QA y aprobación
-    refs/           # referencias originales, capturas y hojas de diseño
-    concepts/       # imágenes y conceptos generados con IA
-    raw/            # salidas sin retocar
-    work/           # archivos fuente editables y retoque manual
-    sheets/         # spritesheets, atlas y tilesheets en preparación
-    final/          # sprites, tiles, efectos y UI aprobados para el juego
-  godot/            # proyecto Godot 4 2D, escenas y scripts
-  tests/            # pruebas de lógica, importación, mapas y regresión
+---
+
+## 4. Fases y Tareas de Desarrollo
+
+### FASE 0 — Entorno Reproducible y Control del Proyecto
+**Objetivo:** Establecer un entorno de ingeniería estable, verificable y con dependencias fijadas.  
+**Criterio de salida:** Herramientas responden a comandos de versión, proyecto Godot ejecuta en headless y gráfico con código de salida 0, `.gitignore` protege recursos privados.  
+**Estado:** **COMPLETA (100%)**
+
+- **T0.1** Instalación y verificación de herramientas (Git, Python 3.11, JDK 17, Godot 4.7.2, FFmpeg, FluidSynth, Vineflower, Krita).
+- **T0.2** Estructura del repositorio, configuración de `.gitignore` y documentos base.
+- **T0.3** Registro de integridad SHA-256 del JAR original (`F4F280AE...` en `docs/spec/content_scope.md`).
+- **T0.4** Inicialización del proyecto Godot 4.7.2 con renderizador Compatibility y resolución 1920×1080.
+- **T0.5** Validación técnica del pipeline de importación 2D y canal alfa (`godot/scenes/TestPipeline.tscn`).
+- **T0.6** Guía visual base `art/STYLE.md` y catálogo `art/manifest.csv`.
+- **T0.7** Documentos de arquitectura: `DECISIONS.md`, `OPEN_QUESTIONS.md`, `spec/performance.md`, `spec/content_scope.md`.
+- **T0.8** Registro de especificaciones de hardware del equipo de desarrollo.
+- **T0.9** Escena de benchmark 2D sintética (`godot/scenes/Benchmark2D.tscn`) con perfiles de rendimiento.
+
+---
+
+### FASE 1 — Referencia Completa del Juego Original
+**Objetivo:** Construir una base documental y audiovisual verificable del juego J2ME original ejecutado en emulador.  
+**Criterio de salida:** Inventario completo de contenido en `docs/coverage.csv`, tasa de ticks medida (`TICK_HZ = 14 Hz`), 6 clases identificadas y referencias de mapas disponibles.  
+**Estado:** **PARCIAL / EN PROGRESO** (Fundamentos cubiertos; grabación continua regional en curso).
+
+- **T1.1** [HECHO] Ejecución de `Heroes Lore Zero 360x640 Spanish.jar` en FreeJ2ME-Plus con soporte de mando.
+- **T1.2** [EN CURSO] Registro audiovisual de referencia: capturas y videos de clases, guardado y mapas en `docs/reference/`.
+- **T1.3** [HECHO] Matriz de cobertura inicial en `docs/coverage.csv` (151 entidades catalogadas con jerarquía regional).
+- **T1.4** [HECHO] Medición de la frecuencia del bucle de lógica original: `TICK_HZ = 14 Hz` (~71.4 ms/tick).
+
+---
+
+### FASE 2 — Ingeniería Inversa y Reconstrucción de Recursos (Gate A)
+**Objetivo:** Decompilar, decodificar y validar la totalidad de los datos y recursos binarios del JAR original.  
+**Criterio de salida:** 100% de los archivos del JAR extraídos sin excepciones, mapas exportados a JSON, sprites reconstruidos en PNG con canal alfa y auditados fuera del motor.  
+**Estado:** **COMPLETA (100% - Gate A Aprobado)**
+
+- **T2.1** [HECHO] Inventario completo del JAR: 1,112 archivos clasificados en `docs/inventory.csv`.
+- **T2.2** [HECHO] Decompilación de las 144 clases Java con Vineflower a `reverse/decompiled/`.
+- **T2.3** [HECHO] Mapeo de clases ofuscadas en `reverse/mapping.txt` (bucle, gráficos, sonido, mapas, combate).
+- **T2.4** [HECHO] Especificación formal de formatos binarios en `docs/formats/` (`mpm.md`, `map_m.md`, `tdf.md`, `mmi.md`).
+- **T2.5** [HECHO] Implementación de parsers modulares en `tools/parsers/` para cada formato binario.
+- **T2.6** [HECHO] Extractor automatizado `tools/extract.py`: exporta 141 mapas JSON, 751 cadenas de texto, 3,199 sprites PNG, 17 MIDI y 14 WAV.
+- **T2.7** [HECHO] Suite de verificación y hojas de contacto (`tools/verify_fase2.py`, `render_maps.py`, `make_contact_sheets.py`).
+- **T2.8** [HECHO] Catálogo de diseño de entidades y diferenciación de hechos observados vs interpretaciones (`art/refs/catalog.md`).
+
+---
+
+### FASE 3 — Especificación Inversa de la Lógica de Juego
+**Objetivo:** Documentar matemáticamente y formalizar todas las reglas, fórmulas y sistemas originales antes de su implementación general.  
+**Criterio de salida:** Documentación exhaustiva en `docs/spec/*.md` con pseudocódigo, tablas numéricas y tests de paridad independientes.  
+**Estado:** **COMPLETA (100%)**
+
+- **T3.1** [HECHO] Motor y bucle de simulación: desacoplamiento de reloj a 14 Hz con interpolación visual en `docs/spec/engine.md`.
+- **T3.2** [HECHO] Sistema de movimiento, velocidades (3 px/tick = 42 px/s), colisiones bitwise de casillas en `docs/spec/movement.md`.
+- **T3.3** [HECHO] Fórmulas de combate: daño físico, mitigación por defensa, tirada de crítico (`dg.java:2165`), evasión y robo de vida en `docs/spec/combat.md`.
+- **T3.4** [HECHO] Curva exponencial de experiencia, escalado de stats de las 6 clases e inventario en `docs/spec/progression.md`.
+- **T3.5** [HECHO] Máquina de estados de IA (6 fases), radios de aggro y patrones de 11 jefes en `docs/spec/ai_enemies.md`.
+- **T3.6** [HECHO] Sistema de eventos, bitset de flags de historia (`dq.java`), triggers de mapas y guardado en `docs/spec/events_quests.md`.
+- **T3.7** [HECHO] Suite de pruebas automatizadas de paridad numérica (`tests/test_combat_parity.py` - 7/7 tests aprobados).
+
+---
+
+### FASE 4 — Fundamentos Técnicos Integrados (Gate B)
+**Objetivo:** Construir los sistemas de infraestructura técnica mínima requeridos por el juego en Godot 4.  
+**Criterio de salida:** Autoloads operativos, cámara aprobada, controles universales, suite de animación verificada con paridad criptográfica 100%.  
+**Estado:** **COMPLETA (100% - Gate B Aprobado)**
+
+- **T4.1 & T4.2** [HECHO] Gestor de pantalla y ventana `DisplayManager` (`godot/scripts/display_manager.gd`) con soporte de 720p a 4K.
+- **T4.3** [HECHO] Reloj de lógica dual desacoplada `GameClock` (`godot/scripts/game_clock.gd`) a 14 Hz exactos con factor alfa.
+- **T4.4** [HECHO] Cargador de datos `DataLoader` (`godot/scripts/data_loader.gd`) que consume mapas y textos desde `out/`.
+- **T4.5 & T4.6** [HECHO] Prototipo de encuadre y cámara 2D (`godot/scenes/CameraComparison.tscn`).
+- **T4.7** [HECHO] Aprobación explícita de la Variante B (Cenital amplia, zoom 2.0x, offset -80 px) en `docs/spec/camera.md`.
+- **T4.8** [HECHO] Mapeo de acciones abstractas en `InputManager` (`godot/scripts/input_manager.gd`) con mando y teclado.
+- **T4.9** [HECHO] Suite de perfiles gráficos y medición de rendimiento `ProfileManager` (`godot/scripts/profile_manager.gd`).
+- **T4.10** [HECHO] Auditoría exhaustiva de Lucian Asesino (`hero/h1`), composición de 8 capas canónicas y resolución de defectos (`KNOWN_GRAPHICS_ISSUES.md`).
+- **T4.11** [HECHO] Suite de validación en vivo de animaciones en Godot (`godot/scripts/anim_review.gd`): 1,552 aserciones (1,548 PASS, 0 FAIL, 4 NOT TESTED). Gate B aprobado.
+
+---
+
+### FASE 5 — Primer Recorrido Completo y Puerta de Aprobación (Gates C y D)
+**Objetivo:** Construir el hito de integración más crucial: el primer recorrido jugable continuo e ininterrumpido desde el inicio del juego hasta el guardado y continuación.  
+**Dependencias:** Fases 0 a 4 completas.  
+**Criterio de salida:** Recorrido E2E superado sin errores, suite de integración limpia (Gate C) y firma formal del usuario en `docs/gates/vertical_slice_approval.md` (Gate D).  
+**Estado:** **EN CURSO (Próxima fase activa de desarrollo)**
+
+```mermaid
+flowchart LR
+    T5A["T5.A\nMenú Principal"] --> T5B["T5.B\nSelección de Clase"]
+    T5B --> T5C["T5.C\nPrólogo Narrativo"]
+    T5C --> T5D["T5.D\nAldea Silverleaf\n(Mapa 00)"]
+    T5D --> T5E["T5.E\nPrimer Combate\nCompleto"]
+    T5E --> T5F["T5.F\nPersistencia y\nContinuación"]
+    T5F --> T5G["T5.G\nPrueba E2E\nIntegrada (Gate C)"]
+    T5G --> T5H["T5.H\nAprobación Humana\n(Gate D - Bloqueante)"]
 ```
 
-## 4. Fase 0 · Preparación del entorno (0 → 5 %)
+#### T5.A — Menú Principal y Navegación
+- **Objetivo:** Crear la escena de arranque principal con opciones de Nueva Partida, Continuar (habilitada solo si existe partida válida), Opciones y Salir.
+- **Archivos:** `godot/scenes/MainMenu.tscn`, `godot/scripts/main_menu.gd`.
+- **Pruebas:** Navegación fluida con stick/D-pad de mando y flechas/Enter de teclado, foco visual claro en botones, salida limpia.
+- **Criterio de aceptación:** Flujo de arranque estándar sin errores de consola; selección de "Nueva Partida" transiciona limpiamente a T5.B.
 
-- **T0.1** Instalar mediante winget o instaladores oficiales: Git, Python 3.11 o superior, JDK, Godot 4.x, FFmpeg, FluidSynth, ImHex, Vineflower o CFR, un editor de imágenes 2D (por ejemplo Krita o GIMP), las herramientas de generación de imágenes que se elijan tras revisar sus licencias y un emulador J2ME de PC (FreeJ2ME-Plus o KEmulator). Blender es opcional, no una dependencia del arte principal.
-- **T0.2** Crear el repositorio con la estructura de la sección 3, `.gitignore` (input, out, reverse, arte fuente privado si corresponde) y los documentos base de seguimiento, decisiones, alcance y rendimiento.
-- **T0.3** Copiar el `.jar` a `input/`, calcular su SHA-256 y registrarlo en la documentación.
-- **T0.4** Crear el proyecto Godot 4 2D vacío y comprobar que `godot --headless --quit` termina sin errores.
-- **T0.5** Validar un flujo mínimo IA → retoque en editor 2D → PNG con transparencia → importación en Godot → visualización a diferentes escalas. Probar también el flujo de creación/edición de un spritesheet y de un tilesheet.
-- **T0.6** Crear una plantilla de `art/manifest.csv` con procedencia, licencia, prompt disponible, retoque, dimensiones, frames, formato, prueba en escena y aprobación. Crear un borrador de `art/STYLE.md` que describa la nueva dirección visual 2D.
-- **T0.7** Crear `docs/DECISIONS.md`, `docs/spec/performance.md` y `docs/spec/content_scope.md`. En `content_scope.md`, definir la matriz inicial del contenido e indicar las hipótesis por verificar en el `.jar`.
-- **T0.8** Registrar las especificaciones reales de los equipos de prueba disponibles (CPU, GPU/gráfica integrada, RAM, resolución de pantalla y sistema operativo). Definir provisionalmente un equipo mínimo y uno recomendado sin inventar componentes; si solo hay un equipo, documentar la limitación.
-- **T0.9** Preparar una escena 2D de benchmark con un mapa de tiles, personaje animado, enemigos, elementos superpuestos, partículas y los efectos 2D que se estén considerando. Esta escena servirá para comparar renderer, perfiles y resolución de salida.
+#### T5.B — Selección de Personaje y Persistencia de Clase
+- **Objetivo:** Implementar la pantalla canónica de selección de clase original (Asesino, Guerrero, Caballero, Pistolero), mostrando retrato, atributos base y descripción.
+- **Archivos:** `godot/scenes/CharacterSelect.tscn`, `godot/scripts/character_select.gd`.
+- **Pruebas:** La clase elegida inicializa los atributos, habilidades y sprites correctos en el nodo `Player` y en los metadatos de sesión.
+- **Criterio de aceptación:** Al elegir Asesino (o cualquier clase inicial confirmada), el juego inicia con el equipamiento y stats documentados en `docs/spec/progression.md`.
 
-**Criterio de salida:** todas las herramientas responden a sus comandos de versión, el repositorio tiene su primer commit, el flujo de imagen 2D se valida dentro de Godot y existen los documentos de alcance, decisiones, estilo y rendimiento. Las muestras artísticas requieren aprobación humana.
+#### T5.C — Prólogo y Secuencia Narrativa Inicial
+- **Objetivo:** Reconstruir la secuencia de introducción, diálogos y eventos narrativos que dan inicio a la aventura según el orden original del JAR (`m/m/00` y `t/m/0.tdf`).
+- **Archivos:** `godot/scenes/Prologue.tscn`, `godot/scripts/dialog_box.gd`, `godot/scripts/event_manager.gd`.
+- **Pruebas:** Reproducción automática de cinemática/diálogo con avance mediante botón de interacción (`[A]` / `[Espacio]`).
+- **Criterio de aceptación:** El jugador completa el prólogo y toma el control activo en Aldea Silverleaf sin necesidad de comandos especiales.
 
-## 5. Fase 1 · Verdad de referencia con emulador (5 → 12 %)
+#### T5.D — Inicio de la Aventura y Exploración de Aldea Silverleaf
+- **Objetivo:** Conectar al jugador en el mapa genuino 4x de Aldea Silverleaf (`m_00`), permitiendo movimiento, colisión con edificios/árboles, e interacción con al menos un NPC de la aldea.
+- **Archivos:** `godot/scenes/World.tscn`, `godot/scripts/world.gd`, `godot/art_samples/map_silverleaf.png`.
+- **Pruebas:** Desplazamiento en las 4 direcciones a 42 px/s, cámara Variante B centrada con anticipación, colisión con el entorno sin atravesar muros, apertura de diálogo con NPC.
+- **Criterio de aceptación:** El jugador puede explorar la aldea con mando y teclado y salir por el sendero exterior hacia la zona de combate.
 
-- **T1.1** Ejecutar el .jar en el emulador en 360x640.
-- **T1.2** 🧑 Grabar una partida completa (video con inputs visibles) y capturas de cada mapa, jefe y minijuego. Guardar en `docs/reference/`.
-- **T1.3** Rellenar `docs/coverage.csv` con una fila por mapa, enemigo, jefe, NPC importante, objeto, minijuego y misión, con columna de estado.
-- **T1.4** Medir la tasa de lógica original (ticks por segundo) con el video y anotarla como `TICK_HZ` provisional.
+#### T5.E — Primer Combate Completo y Recompensa
+- **Objetivo:** Implementar el primer encuentro hostil canónico en la salida de Silverleaf (Lobo del bosque o guardia hostil).
+- **Archivos:** `godot/scenes/EnemyWolf.tscn`, `godot/scripts/enemy_wolf.gd`, `godot/scripts/player.gd`.
+- **Pruebas:** Ciclo de IA (detección, persecución, ataque), recepción de daño mutuo, ejecución de Combo 1 / Combo 2 de Lucian con tajos VFX dorados, muerte del enemigo y entrega de EXP (+10) y botín.
+- **Criterio de aceptación:** Combate resuelto según las fórmulas matemáticas de `docs/spec/combat.md`, con animación de muerte y HUD actualizado.
 
-Criterio: existe material de referencia para toda la historia y `coverage.csv` tiene una fila por cada contenido visto. Se incluyen de forma explícita los minijuegos, los extras y las rutas opcionales que se hayan confirmado en la versión de referencia, porque el objetivo final es cubrir el contenido completo.
+#### T5.F — Persistencia y Continuación de Partida
+- **Objetivo:** Integrar el punto de guardado (menú de pausa o altar/estatua de guardado), escribir el estado a `user://saves/save_slot_1.json`, salir al Menú Principal y continuar la partida.
+- **Archivos:** `godot/scripts/save_manager.gd`, `godot/scenes/MainMenu.tscn`.
+- **Pruebas:** Guardar tras el combate, salir al menú, verificar que la opción "Continuar" está activa, cargar y comprobar que el jugador reaparece con el nivel, HP, EXP y posición correctos.
+- **Criterio de aceptación:** Paridad exacta de datos serializados y deserializados sin desincronización de escena.
 
-## 6. Fase 2 · Ingeniería inversa y extractor (12 → 30 %)
+#### T5.G — Prueba de Integración Extremo a Extremo (E2E - Gate C)
+- **Objetivo:** Automatizar y ejecutar el recorrido continuo completo: *Main.tscn -> Menú -> Selección de Personaje -> Prólogo -> Silverleaf -> NPC -> Combate -> Victoria -> Guardar -> Salir -> Continuar*.
+- **Archivos:** `tests/test_walkthrough_e2e.py` o suite de automatización en Godot.
+- **Pruebas:** Ejecución en modo headless y gráfico registrando telemetría y capturas de cada hito.
+- **Criterio de aceptación:** Cero errores de script, cero excepciones de render y todas las transiciones validadas. Gate C pasa a `APPROVED`.
 
-- **T2.1** Inventariar el .jar (tamaño, extensión, hash por archivo) en `docs/inventory.csv`.
-- **T2.2** Decompilar todas las clases a `reverse/decompiled/` y comprobar que compila o al menos que se lee.
-- **T2.3** Renombrar clases y métodos ofuscados según su función en `reverse/mapping.txt`. Empezar por `rpg/RPGHeroEx` y seguir las llamadas hasta el cargador de recursos, la clase que dibuja, la lógica de mapas y el combate.
-- **T2.4** Localizar cómo se lee cada tipo de archivo (secuencias de lectura de bytes, shorts y strings) y escribir `docs/formats/<formato>.md` con la estructura campo por campo.
-- **T2.5** Implementar parsers en Python, en este orden: `.mpm` (imágenes, paletas, animaciones, hitboxes), paleta `hero/h.p`, mapas `.m`, atributos `mmi`, `.tdf`, tablas de objetos y enemigos, datos de héroe y armas, fuente `ftd/table`, `s/cif` y `en/cif`.
-- **T2.6** Exportador `python tools/extract.py input/juego.jar out/` que genere:
-  - Sprites originales en PNG (solo referencia de diseño) con un JSON de animaciones (frames, offsets, duración, hitboxes).
-  - Mapas en JSON (capas, tiles, colisión, eventos, NPC, portales, texto).
-  - Texto en JSON en español.
-  - Tablas de datos (objetos, enemigos, héroe, habilidades) en JSON.
-  - Música MIDI y efectos WAV copiados tal cual para la Fase 7.
-- **T2.7** Verificadores: ningún archivo sin parsear, hojas de contacto (contact sheets) con todos los sprites y renders de cada mapa para comparar con las capturas de la Fase 1.
-- **T2.8** Preparar referencias artísticas por categorías: héroe, NPC, enemigos, jefes, armas/equipo, objetos, tiles/escenarios y efectos. Registrar rasgos reconocibles, dirección de lectura, paleta, proporciones y animaciones; distinguir los hechos observados de las interpretaciones estéticas del rediseño 2D.
+#### T5.H — Demostración Jugable y Aprobación de la Persona Responsable (Gate D)
+- **Objetivo:** Entrega del Vertical Slice completo a la persona responsable del proyecto para su evaluación jugable, visual y de rendimiento.
+- **Archivos:** `docs/gates/vertical_slice_approval.md`.
+- **Revisión humana requerida:** Sensación a los mandos, arte 2D, animación, fluidez a 60 FPS, coherencia narrativa y guardado.
+- **Criterio de aceptación:** Registro explícito de `APPROVED` firmado por el usuario en `vertical_slice_approval.md`.
 
-Criterio: `tools/verify_fase2.py` informa 100 % de archivos del .jar parseados sin errores y todos los mapas se renderizan. 🧑 Revisar las hojas de contacto y 10 mapas contra el emulador. Las hojas de referencia permiten identificar los rasgos que deben conservarse y preparar muestras coherentes con el estilo 2D ilustrado aprobado; la validación visual de las muestras sigue siendo un checkpoint humano.
+---
 
-## 7. Fase 3 · Especificación inversa de la lógica (30 → 40 %)
+### FASE 6 — Producción de la Historia, Región por Región (Gate E)
+**Objetivo:** Desarrollar todo el contenido restante del juego en estricto orden cronológico por regiones, asegurando que cada zona quede 100% jugable e integrada antes de avanzar.  
+**Dependencia bloqueante:** **Gate D estrictamente aprobado por el usuario.**  
+**Criterio de salida:** Las 5 regiones completadas, 141 mapas integrados, todas las misiones y jefes funcionales, `docs/coverage.csv` al 100% verificado.
 
-- **T3.1** Documentar el bucle principal, la máquina de estados y la tasa de ticks real (actualizar `TICK_HZ`).
-- **T3.2** Documentar el movimiento original: por casillas o píxeles, velocidades, direcciones disponibles, tamaño de tile, límites del mapa, puntos de apoyo del sprite y reglas de colisión. El mando puede leer un stick analógico, pero la interpretación de ese input debe respetar el comportamiento original verificado; cualquier libertad de movimiento añadida se documenta y se prueba como cambio de control.
-- **T3.3** Combate: fórmulas de daño, defensa, crítico, esquiva, ataque a distancia, habilidades, costes, cooldowns y estados alterados. Validar contra datos reales de las tablas y secuencias observadas.
-- **T3.4** Progresión: curva de experiencia, subida de stats, equipo, drops, precios y tiendas.
-- **T3.5** IA de enemigos y jefes: patrones, rangos, tiempos, fases, distancias de detección y reglas de ataque.
-- **T3.6** Sistema de eventos y misiones: cómo los mapas y los `.tdf` disparan diálogos, flags y cinemáticas, además del formato de guardado original.
-- **T3.7** Opcional: instrumentar el original (emulador o recompilación con un shim MIDP) para registrar trazas de referencia (HP, posición, flags por tick) con semilla de azar fija.
+#### Orden Cronológico de Producción Regional:
+1. **Región 1 — Aldea Silverleaf y Territorios Cercanos:** Mapas `m_00`, `m_07` (Orfanato), `m2_d5`, `m2_d6`.
+2. **Región 2 — Ciudad Humming, Aldea Melon y Puertos:** Mapas `m_03`, `m_04`, `m_05`, mazmorras adyacentes.
+3. **Región 3 — Ciudad Ciruelo, Chelen y Zonas de Caza:** Mapas `m_01`, `m_02`, `m_06`, rutas exteriores.
+4. **Región 4 — Fortaleza del Sur, Templo y Subsuelo:** Mapas `m2_a0`–`m2_b0`, `m2_b1`–`m2_b9`, `m2_e0`.
+5. **Región 5 — Arenas de Jefes Finales, Tumba y Clímax:** Mapas `m2_c1`–`m2_d4`, `m2_d7`, `m2_d9`.
 
-**Entregable:** `docs/spec/*.md` con fórmulas en pseudocódigo, supuestos explícitos y tablas de ejemplo.
+#### Metodología de 12 Pasos por Región (Gate E):
+Cada región debe ejecutar secuencialmente y documentar en su respectivo Gate E:
+1. Reconstrucción de mapas y conexiones de portales.
+2. Tilesets en 4x con colisiones bitwise verificadas.
+3. Colocación de personajes y NPCs canónicos.
+4. Diálogos y eventos enlazados desde `.tdf`.
+5. Misiones activas y banderas de progresión (`mmi/` y `dq.java`).
+6. Monstruos y variantes con IA de combate.
+7. Tiendas, forjas, cofres y economía local.
+8. Encuentros especiales y jefes de zona.
+9. Minijuegos o mecánicas secundarias asociadas.
+10. Integración con el progreso del jugador desde regiones anteriores.
+11. Pruebas automáticas de carga y navegación sin errores (`tools/verify_region.py`).
+12. Validación y aprobación humana de la región (Gate E).
 
-**Criterio:** otra persona podría implementar el combate y las misiones con esos documentos. 🧑 Revisar dudas abiertas en `docs/OPEN_QUESTIONS.md`.
+---
 
-## 8. Fase 4 · Esqueleto en Godot y presentación 2D (40 → 48 %)
+### FASE 7 — Interfaz, Audio y Calidad de Vida Completa
+**Objetivo:** Integrar el audio definitivo remasterizado, la interfaz de usuario completa y las mejoras de calidad de vida aprobadas.  
+**Criterio de salida:** Audio MIDI/WAV limpio con mezcla por buses, minimapa con niebla, marcadores de objetivo funcionales y guardado en todas las ranuras.
 
-- **T4.1** Configurar la presentación horizontal para Windows y escalas de ventana comunes. Establecer un viewport lógico 2D, filtrado de texturas y modo de escalado apropiados para arte ilustrado detallado; no imponer pixel-art ni filtro sharp-bilinear si la guía visual no lo requiere. Separar escala de contenido y escala de UI. Mantener las proporciones de los mapas y no estirar sprites para llenar pantalla.
-- **T4.2** Añadir opciones de ventana: pantalla completa, borderless, vsync, límite de FPS (60 por defecto), escalado de UI y, si resulta necesario, escala de render/viewport.
-- **T4.3** Implementar la simulación a `TICK_HZ` fijo si la referencia lo necesita, separada del render y con actualización visual estable. Documentar qué sistemas dependen de ticks de juego y cuáles del delta de render.
-- **T4.4** Crear el cargador de datos que lee `out/`: tiles, capas, colisiones, eventos, animaciones, diálogos, tablas, spritesheets, efectos y recursos de UI. Los datos de lógica deben mantenerse separados de los recursos finales de arte.
-- **T4.5** Definir cámara 2D cenital/top-down y encuadre. Resolver qué pasa si un mapa original es menor que el área visible o tiene orientación/dimensiones distintas a la ventana horizontal: centrar, usar un fondo ilustrado, extender únicamente decoración no jugable o aplicar otra solución aprobada. No inventar terreno jugable fuera del mapa original. Documentar la decisión en `docs/spec/camera.md`.
-- **T4.6** Construir dos variantes de encuadre 2D de una misma escena —cenital más directa y cenital con composición ligeramente elevada mediante el arte— sin construir una perspectiva 3D. Comparar legibilidad de caminos, escala de personajes, lectura de profundidad, cobertura visible, espacios vacíos y similitud con el original.
-- **T4.7** 🧑 Revisar las variantes y aprobar la perspectiva, zoom, tamaño de personaje en pantalla, reglas de seguimiento, límites de cámara, encuadre horizontal y orden visual de elementos. Registrar la decisión en `docs/spec/camera.md`; no mantener dos sistemas completos salvo que se apruebe expresamente.
-- **T4.8** Crear el primer lote de arte 2D mediante IA y retoque manual: héroe, enemigo, tiles de suelo, obstáculo/elemento de entorno, objeto y efecto de combate. Preparar sprites con transparencia y al menos las animaciones necesarias para la prueba. Revisar a tamaño real de juego, no solo ampliado en el editor.
-- **T4.9** Crear `InputMap` con acciones abstractas: mover, atacar, habilidades, objeto rápido, menú, interactuar y cancelar. Implementar soporte inicial para mando y teclado.
-- **T4.10** Comparar Godot Compatibility y Mobile con el benchmark 2D cuando se vayan a utilizar luces, shaders, partículas o efectos relevantes. Partir de Compatibility como candidato por compatibilidad amplia; elegir el renderizador definitivo según resultados reproducibles y documentarlo.
-- **T4.11** Crear perfiles Bajo, Medio y Alto. Los controles podrán reducir partículas, luces 2D, sombras, efectos, filtros y escala del viewport si se justifica. No degradar el contraste requerido para leer al héroe, enemigos, objetos, proyectiles, hitboxes o HUD.
-- **T4.12** Medir el benchmark en 720p/900p, 1080p, 1440p y salida 4K, en los equipos disponibles. Registrar FPS, tiempos de cuadro, memoria, escala de viewport, configuración y posibles artefactos. Revisar también tamaño de texturas, carga de atlas y uso de memoria de imágenes.
-- **T4.13** Definir límites iniciales basados en medidas para tamaño de sprites, textura máxima, atlas, cantidad de partículas, luces y elementos decorativos por escena. Usar atlas, reutilización de tiles y descarte de elementos fuera de pantalla cuando las pruebas confirmen que mejoran rendimiento y memoria.
+- **T7.1** Renderizado de las 17 pistas MIDI con FluidSynth a formato OGG con detección de loop, conservando selector para MIDI original.
+- **T7.2** Remuestreo, normalización y limpieza de los 14 efectos de sonido WAV (48 kHz) con selector de audio clásico.
+- **T7.3** Mezcla por buses de audio (Música, SFX, Interfaz) con controles de volumen independientes en Opciones.
+- **T7.4** HUD definitivo, árbol de habilidades de clase y menús 2D con navegación por foco para mando y teclado.
+- **T7.5** Minimapa en tiempo real derivado de los datos de mapa con niebla de exploración y visualización a pantalla completa.
+- **T7.6** Marcadores visuales de misión en brújula y mapa derivados de los 2,911 puntos de `out/mmi/`.
+- **T7.7** Almacenamiento público compartido (baúl común) para transferir oro y objetos entre las 3 ranuras de guardado.
 
-**Criterio de salida:** un mapa se representa correctamente, la UI permanece legible a 1080p, 1440p y salida 4K, la perspectiva 2D y la guía `art/STYLE.md` están aprobadas, y el pipeline IA → retoque manual → spritesheets/tilesheets → Godot se ha validado. En el equipo mínimo de referencia se busca 1080p/60 FPS en perfil bajo; en los equipos recomendados se mide 4K/60 FPS como objetivo, no garantía universal. 🧑 Revisar arte, encuadre, capas, legibilidad y UI.
+---
 
-## 9. Fase 5 · Vertical slice (48 → 58 %)
+### FASE 8 — QA Integral, Fidelidad y Regresión
+**Objetivo:** Batería exhaustiva de pruebas de control de calidad sobre el juego completo para garantizar cero bloqueos y paridad total.  
+**Criterio de salida:** Cero defectos bloqueantes, matriz de cobertura al 100% con evidencias, resultados claramente divididos en `PASS`, `FAIL` y `NOT TESTED`.
 
-Construir un tramo jugable representativo desde el mapa de entrenamiento (`m/m/01`) hasta el primer combate completo. Será una prueba técnica y artística, no una reducción del alcance final.
+- **T8.1** Pruebas automatizadas de fórmulas de combate y progresión en todas las clases y niveles hasta 99.
+- **T8.2** Prueba de humo global: recorrido headless de los 141 mapas verificando carga, tiles y colisiones sin excepciones.
+- **T8.3** Auditoría visual y dimensional de las plantas de todos los mapas contra las capturas del emulador original.
+- **T8.4** Verificación de rutas críticas narrativas y mitigación de bloqueos de progresión con guardados forzados.
+- **T8.5** Pruebas de rendimiento en escenas densas en perfiles Bajo, Medio y Alto en 1080p y 4K.
+- **T8.6** Partida completa jugada con mando por la persona responsable, con registro y resolución de errores en `docs/bugs.md`.
+- **T8.7** Auditoría final de coherencia de sprites y animaciones (sin parpadeos, desalineación de armas ni fallos de pivote).
 
-- **T5.1** Implementar el movimiento de acuerdo con el comportamiento original verificado, incluyendo zona muerta configurable para el stick y adaptación a las direcciones de animación disponibles. No alterar la lógica de combate por conveniencia del mando.
-- **T5.2** Implementar colisiones 2D a partir de los atributos de tiles, cuerpos/áreas de colisión y transiciones de mapa por portales.
-- **T5.3** Implementar un enemigo con IA y ciclo de combate; el ataque del jugador utilizará las hitboxes y ventanas de impacto derivadas de los datos de animación, con daño, muerte y drop.
-- **T5.4** Implementar diálogo con fuente recreada y un NPC.
-- **T5.5** Inventario mínimo: recoger un objeto de un cofre y usarlo.
-- **T5.6** Ejecutar prueba de paridad numérica: con los mismos stats, daño y experiencia coinciden con las fórmulas documentadas en la Fase 3.
-- **T5.7** Validar el conjunto mínimo de animaciones 2D del héroe (reposo, movimiento en las direcciones disponibles, ataque, habilidad, recibir daño y muerte) y un conjunto equivalente para el enemigo. Revisar consistencia entre frames, pivote, punto de apoyo, escala, tiempos, transiciones y sincronía con hitboxes. No exigir rig 3D.
-- **T5.8** Probar guardado y carga en el tramo vertical, incluido cambio de mapa y salida del juego. No producir grandes cantidades de contenido sobre un estado que no pueda restaurarse.
-- **T5.9** Ejecutar el tramo en perfiles Bajo, Medio y Alto; anotar FPS, memoria, artefactos, tiempos de carga y fallos visuales en el equipo de referencia disponible.
+---
 
-**Criterio técnico:** el tramo se juega de principio a fin con mando, guarda y carga su estado de prueba y conserva la paridad de combate aprobada. Los sprites, hitboxes, capas y colisiones funcionan en conjunto. Los perfiles de rendimiento se miden y registran. 🧑 Jugarlo y revisar la sensación de combate, el estilo visual y la claridad del escenario.
+### FASE 9 — Empaquetado y Versión Completa (Gate F)
+**Objetivo:** Preparar la versión final 1.0 lista para su distribución y uso personal en PC.  
+**Criterio de salida:** Instalación limpia, ejecución desde cero hasta los créditos y New Game+ verificado.
 
-### Puerta obligatoria de aprobación antes de la producción masiva
+- **T9.1** Menú de opciones completo: resolución, modo de pantalla, audio, controles, remapeo y asignación de mando.
+- **T9.2** Exportación del proyecto para Windows con las plantillas oficiales de Godot 4.7.2.
+- **T9.3** Script de instalación limpia `setup.bat` que valida el entorno y recursos.
+- **T9.4** Documentación de usuario, controles y manual de resolución de incidencias en `README.md`.
+- **T9.5** Etiquetado de versión `v1.0`, archivo de copias de seguridad locales y ratificación en `docs/gates/gate_f_release_1_0.md`.
 
-**No se permite iniciar la producción masiva de arte ni de contenido de la Fase 6 hasta que el usuario revise y apruebe explícitamente una única escena jugable integrada en 2D.** Haber completado cada prueba por separado no satisface esta condición: la misma escena debe demostrar conjuntamente que la perspectiva, el estilo artístico, las animaciones, la arquitectura 2D, el combate y el rendimiento funcionan al mismo tiempo. Si falla un punto, se corrige el prototipo y se repite la validación; el agente nunca puede inferir ni otorgar la aprobación.
+---
 
-- **T5.10 · Escena integrada de aprobación:** preparar una escena representativa que incluya el héroe de prueba con arte ya retocado manualmente, al menos un enemigo animado, un fragmento de mapa con tiles definitivos, un elemento superpuesto, un objeto interactivo, combate, colisiones, efectos y HUD. No usar placeholders para componentes visuales esenciales. La perspectiva y el encuadre seleccionados en T4.7 deben ser los definitivos.
-- **T5.11 · Validación visual y de arte:** comprobar el estilo 2D ilustrado, la inspiración de alto nivel en Bleaklight Falls sin copiar recursos, la identidad reconocible de Heroes Lore: Zero, la paleta, siluetas, escala, detalle, capas, sombras pintadas, coherencia de animación y legibilidad a tamaño real. Revisar también cómo se ven los assets en el mapa completo y en movimiento, no solo en imágenes aisladas.
-- **T5.12 · Validación jugable:** demostrar movimiento, orientación, reposo, desplazamiento, ataque, habilidad, daño recibido y muerte; confirmar la correspondencia entre frames y hitboxes, el ciclo de combate del enemigo, las colisiones, las interacciones y las transiciones incluidas. Las fórmulas y reglas deben coincidir con la referencia o tener una diferencia documentada y aprobada.
-- **T5.13 · Validación de rendimiento representativa:** ejecutar la misma escena integrada en perfiles Bajo, Medio y Alto, en equipos de referencia disponibles y en distintas resoluciones de salida. Registrar FPS y tiempos de cuadro, uso de memoria, escala de viewport, tamaño de texturas, atlas, cantidad de partículas/luces y fallos visibles. Probar salida 4K cuando sea posible; no exigir 4K nativo de texturas ni afirmar rendimiento en equipos no probados.
-- **T5.14 · Acta y bloqueo de producción:** guardar checklist, capturas o vídeo, resultados, incidencias conocidas y decisión humana en `docs/gates/vertical_slice_approval.md`. Estados permitidos: `pendiente`, `rechazada`, `aprobada con condiciones` o `aprobada`. La producción masiva solo se desbloquea con estado `aprobada`; si queda aprobada con condiciones, solo se permiten las tareas expresamente autorizadas y deben resolverse las condiciones antes de escalar.
+## 5. Instrucciones Obligatorias para el Agente de IA
 
-**Criterio de salida de la puerta:** el usuario ha jugado o revisado una demostración reproducible de la misma escena integrada, ha comprobado resultados visuales y técnicos y ha registrado su aprobación explícita. La ausencia de respuesta, las pruebas aisladas o una escena con placeholders en componentes esenciales no cuentan como aprobación.
+Al iniciar cualquier sesión o tarea en este repositorio:
 
-## 10. Fase 6 · Producción de arte y contenido completo (60 → 82 %)
-
-**Dependencia bloqueante:** esta fase no puede empezar en producción masiva hasta que `docs/gates/vertical_slice_approval.md` registre la aprobación explícita definida al final de la Fase 5. Antes de esa aprobación solo se permiten prototipos, mediciones, correcciones y los recursos limitados necesarios para superar la puerta. Si la aprobación se rechaza o queda condicionada, resolver incidencias y repetir el hito antes de producir por regiones.
-
-Trabajar por regiones del juego en el orden de la historia, actualizando `docs/coverage.csv` y manteniendo separado el estado del contenido jugable del estado del arte.
-
-- **T6.1** Completar el cargador de mapas: tiles, capas, colisiones, elementos sobre el jugador, eventos, NPC, portales, cofres y objetos interactivos.
-- **T6.2** Completar el motor de eventos y misiones con flags, diálogos y cinemáticas derivados de los datos originales.
-- **T6.3** Completar inventario, equipo, tiendas, mejoras, habilidades y efectos de objetos.
-- **T6.4** Producir los sprites de todos los tipos de enemigos y sus variantes por familia (`en/0` a `en/5`), con animaciones y datos ligados a la entidad de juego; organizar el trabajo en unidades verificables y commits pequeños.
-- **T6.5** Producir jefes con todos los estados, patrones y fases confirmados. Verificar frames de ataque, señales visuales y ventanas de impacto.
-- **T6.6** Implementar y verificar minijuegos y extras (`mg1-3`, lotería y otros que aparezcan en la referencia/código).
-- **T6.7** Producir e integrar estados alterados, efectos 2D, números de daño, proyectiles y señales visuales. Mantener su lectura clara en perfiles gráficos bajos.
-- **T6.8** Aplicar a cada lote de arte el flujo obligatorio: generar alternativas a partir de referencias aprobadas; seleccionar; retocar manualmente; limpiar anatomía, contornos y transparencia; mantener escala y paleta; construir y revisar los frames; exportar spritesheets, tilesheets o atlas; importar a Godot; probar en la perspectiva final; registrar y pedir aprobación. No producir cientos de recursos antes de verificar el primer lote.
-- **T6.9** Reutilizar tiles, piezas modulares, paletas, plantillas, puntos de apoyo y convenciones de animación cuando proceda, sin convertir personajes distintos en copias indistinguibles. Asociar cada recurso a su entidad y dato del juego.
-- **T6.10** Actualizar `docs/coverage.csv` con estados de arte separados: pendiente, referencia preparada, generado, retoque manual pendiente, retocado, animación pendiente, integrado, QA visual aprobado. Mantener separado este estado de la implementación jugable.
-- **T6.11** Después de cada región, ejecutar `tools/verify_region.py`, que carga todos sus mapas en modo headless sin errores; generar una captura de referencia de cada mapa relevante y 🧑 jugar la región.
-- **T6.12** Auditar atlas y memoria de texturas por región. Evitar duplicados y texturas innecesariamente grandes; verificar que la compresión no degrade visiblemente las líneas, transparencia o detalles importantes.
-
-**Criterio:** el 100 % de las categorías de contenido originales confirmadas está implementado e integrado, incluida toda la historia, misiones, mapas, NPC, enemigos, jefes, objetos, habilidades, equipo, minijuegos y extras existentes. La historia se completa de principio a fin sin bloqueos. Los recursos visuales cumplen la guía aprobada y son trazables en `art/manifest.csv`; ningún recurso se considera terminado solo por haber sido generado con IA.
-
-## 11. Fase 7 · Audio, HUD y mejoras de calidad de vida (82 → 88 %)
-
-- **T7.1** Música: renderizar los 16 MIDI con FluidSynth y un SoundFont libre de licencia compatible (verificar la licencia), detectar los puntos de bucle y guardar como OGG. Opción para volver al MIDI original.
-- **T7.2** Efectos: limpiar los WAV de 8 kHz y 8 bits (remuestreo a 48 kHz, filtrado y normalización con FFmpeg), conservando los originales como alternativa.
-- **T7.3** Mezcla por buses (música, efectos, interfaz) con volúmenes en opciones.
-- **T7.4** HUD y menús 2D nuevos, escalables hasta 4K y basados en la identidad del diseño original, con navegación completa por foco con D-pad y stick. Priorizar fuentes legibles, iconos coherentes y escalado sin deformación.
-- **T7.5** Minimapa generado a partir de los datos del mapa, con niebla de exploración y ampliación a pantalla completa.
-- **T7.6** Marcadores de misión: derivarlos de los datos de misiones. Si no alcanza, crear una tabla curada `docs/quest_markers.json`.
-- **T7.7** Guardado libre: serializar el estado completo (jugador, flags, inventario, mapas explorados) en `user://saves/` con versión de formato, varias ranuras y autoguardado.
-
-Criterio: se puede guardar y cargar en cualquier punto sin corromper el estado, y el minimapa y los marcadores funcionan en todas las regiones. 🧑 Revisar menús con mando.
-
-## 12. Fase 8 · QA y paridad (88 → 95 %)
-
-- **T8.1** Pruebas unitarias de fórmulas y sistemas contra tablas de referencia.
-- **T8.2** Prueba humo automática: recorrer o teletransportarse a todos los mapas en modo headless y comprobar que cargan sin errores, con tiles, capas y colisiones válidas.
-- **T8.3** Comparar la planta de cada mapa (muros, caminos, límites, portales, NPC, cofres y elementos interactivos) con capturas de la Fase 1. El arte rediseñado es esperado; la disposición y los eventos deben mantener la paridad.
-- **T8.4** Buscar bloqueos de progresión recorriendo la historia con guardados en puntos clave.
-- **T8.5** Repetir benchmarks en las zonas más cargadas y con los perfiles Bajo, Medio y Alto. Medir tiempos de cuadro, FPS, memoria, tiempos de carga, tamaño de atlas y picos; corregir cuellos de botella identificados.
-- **T8.6** 🧑 Jugar la partida completa con mando y mantener la lista de errores en `docs/bugs.md`; el agente los corrige uno por uno. La aceptación debe incluir capítulos, misiones, jefes, mapas, minijuegos y extras confirmados, no únicamente la ruta principal.
-- **T8.7** Verificar la matriz hardware/resolución: equipos mínimos y recomendados disponibles; perfiles bajo/medio/alto; 1080p, 1440p y salida 4K según soporte. Registrar claramente combinaciones no probadas.
-- **T8.8** Verificar que todos los elementos de `docs/spec/content_scope.md` tienen evidencia de funcionamiento o una excepción aprobada. La extracción de todos los archivos no demuestra por sí sola cobertura jugable.
-- **T8.9** Ejecutar una revisión visual de sprites animados para detectar cambios accidentales de rostro, equipo, colores, proporciones, parpadeos entre frames, halos de transparencia, pivotes incorrectos y costuras entre tiles.
-
-**Criterio:** cero errores bloqueantes, cobertura jugable del 100 % del contenido original confirmado y matriz de rendimiento reproducible con resultados etiquetados como aprobado, fallido o no probado.
-
-## 13. Fase 9 · Pulido y empaquetado (95 → 100 %)
-
-- **T9.1** Menú de opciones: video, audio, control, remapeo de botones, zona muerta, vibración, iconos según el mando (Xbox o PlayStation).
-- **T9.2** Exportar a Windows con las plantillas de exportación de Godot.
-- **T9.3** Script `setup.bat` que pide el .jar, lo valida por hash y ejecuta el extractor para generar `out/`.
-- **T9.4** README con requisitos, instalación y control, y registro de errores a archivo.
-- **T9.5** Etiquetar `v1.0` y archivar el .jar y `out/` solo en copia local.
-
-Criterio: partir de una carpeta limpia, ejecutar `setup.bat` y completar toda la historia y el contenido original confirmado. La documentación de requisitos separa con honestidad las prestaciones medidas en equipos modestos y en equipos recomendados; no se anuncia 4K nativo/60 FPS para hardware que no lo haya demostrado.
-
-## Referencias técnicas y visuales
-
-- Godot Engine, introducción oficial al desarrollo 2D: https://docs.godotengine.org/en/stable/tutorials/2d/introduction_to_2d.html
-- Godot Engine, animación de sprites 2D: https://docs.godotengine.org/en/stable/tutorials/2d/2d_sprite_animation.html
-- Godot Engine, uso de TileSets/TileMapLayer: https://docs.godotengine.org/en/stable/tutorials/2d/using_tilesets.html
-- Godot Engine, escalado y resoluciones múltiples: https://docs.godotengine.org/en/stable/tutorials/rendering/multiple_resolutions.html
-- Bleaklight Falls (página oficial de Steam): https://store.steampowered.com/app/2820610/Bleaklight_Falls/
-
-Bleaklight Falls se utiliza como referencia externa de vista cenital 2D, composición y atmósfera general. No se copiarán sus assets, sprites, personajes, mapas ni interfaz. La decisión técnica definitiva se valida con prototipos propios del proyecto y el hardware disponible.
-
-## 14. Riesgos y plan B
-
-| Riesgo | Plan B |
-| --- | --- |
-| Formato `.mpm` más complejo de lo previsto | Dedicar más tiempo a T2.3–T2.4 y apoyarse en el código decompilado; no avanzar con datos incorrectos. |
-| Volumen de sprites, animaciones y tiles 2D (cientos de enemigos/variantes y alrededor de 140 mapas, hipótesis que se debe confirmar) | Crear un sistema modular de tiles, atlas y convenciones de animación; priorizar producción por regiones; medir el coste real por sprite/animación/lote antes de escalar. |
-| Inconsistencia de la IA entre frames | Usar hojas de modelo, referencias de identidad fijas, prompts controlados y retoque manual por frame; revisar animaciones en bucle y dentro del juego; regenerar o corregir antes de aprobar. |
-| Deriva visual entre lotes | Mantener `art/STYLE.md` con ejemplos aprobados, paletas por región, tamaños base y reglas de contorno/sombra; revisar cada lote en el mapa final. |
-| Costuras en tiles o elementos demasiado repetitivos | Crear variantes aprobadas, transiciones de terreno y elementos de decoración superpuestos; verificar atlas en muestras grandes del mapa, sin cambiar la distribución jugable. |
-| Cobertura de todo el contenido original | Usar inventario y `docs/coverage.csv` como fuente de verdad; herramientas de extracción y producción regional. No declarar versión 1.0 si faltan categorías originales confirmadas. |
-| Producción masiva antes de validar estilo, cámara, combate y rendimiento | Puerta bloqueante al final de la Fase 5: una misma escena 2D jugable, evidencia reproducible y aprobación explícita del usuario en `docs/gates/vertical_slice_approval.md`. |
-| Rendimiento en equipos modestos y portátiles | Renderer candidato Compatibility, perfiles escalables, atlas eficientes, límites de partículas/luces y perfilado. La compatibilidad de salida 4K no implica texturas 4K ni garantiza 60 FPS en todo hardware. |
-| Mapa original vertical y presentación nueva horizontal | Definir una política de encuadre: centrar o adaptar composición sin deformar tiles ni inventar terreno jugable; solicitar aprobación cuando una zona no pueda adaptarse sin cambios visibles. |
-| Orden de dibujo incorrecto o sprites ocultos por elementos del entorno | Definir capas y orden Y-sort a partir del punto de apoyo del sprite; usar capas foreground/background para árboles, techos y efectos; crear tests visuales por mapa. |
-| Recursos de IA con transparencias, bordes o tamaños inconsistentes | Considerar generación como borrador; establecer validadores de dimensiones, canal alfa, atlas, pivote, recortes y nomenclatura antes de integrar. |
-| Licencias de herramientas de IA o referencias | Revisar términos de cada herramienta y registrarlos en `art/manifest.csv`; usar Bleaklight Falls como referencia conceptual de alto nivel, no como fuente de assets. |
-| Diferencias por tratarse de un `.jar` modificado | Comparar con una versión limpia si se consigue; etiquetar qué comportamiento procede de la versión inspeccionada. |
-| El agente pierde contexto en tareas largas | Mantener `PROGRESS.md`, `OPEN_QUESTIONS.md`, `DECISIONS.md` y commits pequeños al día. |
-| Sensación del combate distinta al original | Parámetros de ajuste documentados, reproducción de casos de referencia y revisión humana en el vertical slice y por región. |
-
-## 15. Prompt inicial para el agente
-
-Pega esto al empezar:
-
-```text
-Actúas como ingeniero de software senior y responsable de un flujo de producción verificable. Tu objetivo es crear un port fan-made de uso personal de Heroes Lore: Zero para PC con Godot 4, en 2D con vista cenital/top-down y una estética ilustrada moderna inspirada a alto nivel en Bleaklight Falls. No construyas el juego en 3D. La referencia visual no autoriza a copiar sus personajes, escenarios, sprites, UI ni assets. Conserva la identidad de Heroes Lore: Zero y sigue docs/PLAN.md.
-
-La lógica, los mapas, la historia y las reglas deben mantener la fidelidad al juego de referencia. La versión 1.0 debe incluir toda la historia y todo el contenido original confirmado: mapas, NPC, enemigos, jefes, misiones, objetos, habilidades, minijuegos y extras. No recortes el alcance ni declares terminado el proyecto con contenido original pendiente.
-
-El arte nuevo se genera con IA y lo retoca manualmente el usuario. Trata las generaciones como borradores, no como assets finales. Organiza fuentes, registra prompts/herramientas/licencias disponibles y prepara imágenes para retoque manual, spritesheets, tilesheets y atlas. Comprueba transparencia, bordes, paleta, silueta, escala, pivotes, continuidad de frames y lectura a tamaño real de juego. Mantén la dirección visual aprobada en art/STYLE.md y solicita aprobación humana en los puntos marcados.
-
-El juego debe funcionar también en PC modestos y portátiles. Incluye perfiles Bajo, Medio y Alto, optimiza atlas y texturas, mide el uso de memoria y ejecuta benchmarks antes de aprobar prestaciones. La salida 4K es una opción de presentación y no significa exigir assets 4K ni prometer 60 FPS en todos los equipos. Registra objetivos y resultados por cada equipo de referencia, sin inventar garantías.
-
-Reglas: trabaja fase por fase y tarea por tarea, un commit por tarea; verifica con comandos antes de avanzar; nunca asumas formatos (deduce del código decompilado); valida la perspectiva 2D con un prototipo; conserva datos, colisiones y eventos en formatos estructurados; actualiza docs/PROGRESS.md, docs/OPEN_QUESTIONS.md y docs/DECISIONS.md; registra cada recurso en art/manifest.csv; mantén art/STYLE.md, docs/spec/content_scope.md y docs/spec/performance.md actualizados; detente en los puntos 🧑 para revisión del usuario.
-
-No inicies la producción masiva de la Fase 6 hasta completar una escena 2D integrada y obtener la aprobación explícita del usuario indicada en docs/gates/vertical_slice_approval.md. La misma escena debe probar arte final de muestra, perspectiva/cámara, sprites animados, capas, colisiones, combate, UI y rendimiento. No infieras ni otorgues esa aprobación por tu cuenta.
-
-Empieza leyendo docs/PLAN.md y ejecuta la Fase 0.
-```
+1. **Lectura Previa Obligatoria:** Leer siempre `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/OPEN_QUESTIONS.md` y `docs/DECISIONS.md`.
+2. **Enfoque Atómico:** Trabajar estrictamente en **una única tarea a la vez**. No iniciar múltiples tareas en paralelo ni saltar a fases posteriores.
+3. **Respeto Absoluto a los Gates:**
+   - La Fase 5 no puede finalizar sin Gate C y Gate D.
+   - La Fase 6 (producción masiva) está **ESTRICTAMENTE BLOQUEADA** hasta que `docs/gates/vertical_slice_approval.md` registre `APPROVED` firmado por el usuario.
+   - El agente **NUNCA** puede auto-aprobar Gate D.
+4. **Política Estricta de Git:** Cada cambio realizado debe comitearse de manera inmediata con un mensaje convencional descriptivo (`feat:`, `fix:`, `docs:`, `test:`).
+5. **Pruebas Reproducibles:** Toda modificación de código debe verificarse mediante ejecución antes de dar la tarea por finalizada.
+6. **Honestidad en Resultados:** Distinguir con rigor `PASS`, `FAIL` y `NOT TESTED`. No emitir declaraciones incondicionales de éxito ni ocultar limitaciones conocidas.
+7. **Detención ante Incertidumbres o Decisiones de Alto Impacto:** Si una decisión afecta la fidelidad del juego o requiere juicio estético, documentar la pregunta en `docs/OPEN_QUESTIONS.md` y detenerse para consulta humana.
