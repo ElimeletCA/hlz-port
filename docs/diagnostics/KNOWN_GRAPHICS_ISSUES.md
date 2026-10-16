@@ -147,33 +147,35 @@ Siguiendo las directrices estrictas de auditoría, el sistema separa la validaci
 
 ### Métricas Formales de la Suite de Aserciones (`anim_validation_results.json`)
 
-* **Total de Aserciones Evaluadas:** 1,336
-* **PASS (Aprobadas):** 1,332 (100% de las propiedades evaluables)
+* **Total de Aserciones Evaluadas:** 1,552
+* **PASS (Aprobadas):** 1,548 (100% de las propiedades evaluables)
 * **FAIL (Fallos):** 0
 * **NOT TESTED (Excluidas justificadamente):** 4
-  * `velocity_physics` en Modo 1: El procesamiento físico está desactivado deliberadamente durante la inspección estática de recursos.
+  * `velocity_physics` en Modo 1: El procesamiento físico está desactivado deliberadamente durante la inspección de archivos generados.
   * `combo_window_timer` en Modo 1: La ventana de combo solo se evalúa durante la ejecución real dinámica (Modo 2).
   * `emulator_audio_sync`: La sincronización de audio J2ME requiere ejecución interactiva del MIDlet con backend de sonido activo.
   * `haptic_gamepad_vibration`: El juego original J2ME utilizaba vibrador de hardware móvil no mapeable de forma autónoma en tests headless de Godot.
-* **Dictamen Final:** `APROBADO_CON_EXITO`.
+* **Dictamen Final:** `APROBADO_CON_EXCLUSIONES` (Aprobado sin defectos, con exclusiones de hardware móvil documentadas por separado).
 
 ---
 
-## 6. Auditoría Criptográfica de Procedencia de Recursos (`provenance_audit.json`)
+## 6. Auditoría de Procedencia y Fidelidad J2ME (`provenance_audit.json`)
 
-Se ejecutó una auditoría exhaustiva píxel a píxel (`tools/verify_authentic_hero_assets.py`) comparando los 134 sprites cargados por Godot en `godot/art_samples/hero_lucian_*.png` contra composiciones maestras extraídas directamente del archivo JAR original (`input/Heroes Lore Zero 360x640 Spanish.jar`):
+Se eliminaron completamente las aserciones tautológicas de procedencia (aquellas con valores constantes hardcodeados). La suite ahora lee y valida dinámicamente el informe generado por `tools/verify_authentic_hero_assets.py` y las estructuras en memoria del nodo `Player`:
 
-* **Estructura CIF:** `hero/h1` (Clase Asesino canónica de Lucian, 8 capas).
-* **Capas Verificadas (0 a 7):**
-  * Capa 0 (`hero/0/00.mpm`): Cabeza y cabello carmesí con ahoge y coleta.
-  * Capa 1 (`hero/1/l00.mpm`): Chaleco marrón/rojizo ligero sin mangas (`dq.a() == false`).
-  * Capa 2 (`hero/2/l00.mpm`): Pantalón morado, brazos descubiertos y muñequeras azul real.
-  * Capa 3 (`hero/3/l00.mpm`): Botas de combate ágiles de cuero.
-  * Capa 4 (`hero/4/1.mpm`): Efectos de tajo e impacto VFX dorados integrados en animaciones 6 y 7.
-  * Capa 5 (`hero/eh.mpm`): Expresiones faciales y ojos esmeralda.
-  * Capa 6 (`hero/w/400.mpm`): Daga de acero principal.
-  * Capa 7 (`hero/w/400.mpm`): Daga de acero secundaria (doble empuñadura ágil).
-* **Resultado Píxel a Píxel:** **134/134 coincidencia exacta 100.0% (0 discrepancias)**.
+* **Auditoría Criptográfica Píxel a Píxel:** Compara los 134 sprites cargados en `godot/art_samples/` contra el renderizado nativo extraído directamente del JAR (`input/Heroes Lore Zero 360x640 Spanish.jar`):
+  * **Estructura CIF:** `hero/h1` (Clase Asesino canónica de Lucian, 8 capas).
+  * **Capas Verificadas (0 a 7):**
+    * Capa 0 (`hero/0/00.mpm`): Cabeza y cabello carmesí con ahoge y coleta.
+    * Capa 1 (`hero/1/l00.mpm`): Chaleco marrón/rojizo ligero sin mangas (`dq.a() == false`).
+    * Capa 2 (`hero/2/l00.mpm`): Pantalón morado, brazos descubiertos y muñequeras azul real.
+    * Capa 3 (`hero/3/l00.mpm`): Botas de combate ágiles de cuero.
+    * Capa 4 (`hero/4/1.mpm`): Efectos de tajo e impacto VFX dorados integrados en animaciones 6 y 7.
+    * Capa 5 (`hero/eh.mpm`): Expresiones faciales y ojos esmeralda.
+    * Capa 6 (`hero/w/400.mpm`): Daga de acero principal.
+    * Capa 7 (`hero/w/400.mpm`): Daga de acero secundaria (doble empuñadura ágil).
+  * **Resultado Píxel a Píxel:** **134/134 coincidencia exacta 100.0% (0 discrepancias)**.
+* **Inspección Estructural de Archivos Generados (Modo 1):** Valida para los 96 fotogramas la consistencia de archivos generados: nombre exacto, offset, escala, dimensiones de imagen (`256x320` px) y contenido gráfico no vacío (`get_used_rect().has_area() == true`). Se documenta claramente como validación de consistencia de archivos generados, no como un render independiente del motor J2ME.
 
 ---
 
@@ -187,24 +189,27 @@ Cada ciclo fue registrado tick a tick por la física de Godot (60 Hz con lógica
    * Tasa adaptada a 6 FPS (respiración natural sin vibraciones).
    * Velocidad nula `Vector2.ZERO` y estado `State.IDLE` mantenidos continuamente.
 
-2. **Marcha con Armas (Walk):**
-   * Verificado en las 4 direcciones a lo largo de 54 frames de física (ciclo de marcha completo a 10 FPS).
-   * Cobertura de los 8 pasos del ciclo (`unique_sequence = [0, 1, 2, 3, 4, 5, 6, 7, 0, 1]`).
+2. **Marcha con Armas (Walk) — Correspondencia 4 $\rightarrow$ 8 Fotogramas:**
+   * **Estructura del Ciclo de Marcha:** En el motor Java/J2ME original (`dg.java`), la marcha de combate (`Animación 2`) consta de **4 fotogramas gráficos originales** (zancada izquierda adelante, apoyo, zancada derecha adelante, apoyo contrario). Para integrarse con la cadencia de 8 pasos del motor a 10 FPS, los 8 archivos de marcha (`hero_lucian_walk_<dir>_0.png` a `7.png`) se basan en estos **4 fotogramas originales repetidos dos veces consecutivas** (`f_idx = i % 4`):
+     * `walk_<dir>_0` y `_4`: Fotograma original 0 (Inicio de zancada / paso izquierdo adelantado).
+     * `walk_<dir>_1` y `_5`: Fotograma original 1 (Contacto y apoyo del pie izquierdo).
+     * `walk_<dir>_2` y `_6`: Fotograma original 2 (Cruce de piernas / paso derecho adelantado).
+     * `walk_<dir>_3` y `_7`: Fotograma original 3 (Contacto y apoyo del pie derecho).
+   * Cobertura de los 8 pasos del ciclo (`unique_sequence = [0, 1, 2, 3, 4, 5, 6, 7, 0, 1]`) en las 4 direcciones.
    * **Cero caídas en reposo mientras existe movimiento** (falla crítica evitada).
-   * Monotonicidad sin saltos ni congelamientos.
    * Transición limpia y autónoma de vuelta a reposo y `velocity = (0, 0)` al soltar la entrada.
 
-3. **Ataque Básico Combo 1 (Anim 6):**
-   * Activado mediante entrada normal (`simulate_attack_press()`).
+3. **Ataque Básico Combo 1 (Anim 6) — Corrección de Dirección:**
+   * Se establece explícitamente la dirección esperada (`DIR_DOWN`), se actualiza el sprite y se verifica que `player.current_dir` coincide con lo declarado antes y durante el ataque.
+   * Se comprueba que el 100% de las texturas observadas contienen el identificador de dirección `_down_`.
    * Secuencia de fotogramas estricta observada: `[0, 1, 2, 3, 4]`.
    * Interrupción inmediata de la marcha y anulación de velocidad a `Vector2.ZERO`.
-   * Tajos VFX dorados integrados mostrados en pantalla.
-   * Finalización autónoma tras ~0.35s (14 FPS canónicos J2ME).
-   * Transición automática a `State.IDLE` con apertura de ventana de combo (0.40s) y avance a `combo_stage = 1`.
+   * Finalización autónoma tras ~0.35s (14 FPS canónicos J2ME), apertura de ventana de combo (0.40s) y avance a `combo_stage = 1`.
 
-4. **Remate Aéreo Combo 2 (Anim 7 · Finisher):**
-   * Encadenado de forma reactiva dentro de la ventana de combo.
-   * Secuencia de fotogramas estricta observada: `[0, 1, 2]`.
+4. **Remate Aéreo Combo 2 (Anim 7 · Finisher) — Corrección de Dirección:**
+   * Dirección esperada (`DIR_DOWN`) establecida y validada contra la dirección real del jugador.
+   * Texturas observadas validadas conteniendo `_down_`.
+   * Secuencia estricta observada: `[0, 1, 2]`.
    * Duración medida: ~0.20s a 14 FPS.
    * Finalización autónoma, retorno a `State.IDLE` y reinicio del combo a `combo_stage = 0`.
 
@@ -213,7 +218,14 @@ Cada ciclo fue registrado tick a tick por la física de Godot (60 Hz con lógica
    * La velocidad se anula de inmediato en el mismo tick de física.
 
 6. **Caducidad Autónoma de la Ventana de Combo:**
+   * Dirección establecida y validada (`DIR_DOWN`).
    * Sin entrada posterior a Combo 1, el temporizador de 0.40s decrementa hasta 0.0s y resetea automáticamente el combo a stage 0.
+
+7. **Fiabilidad del Estado Final de la Suite:**
+   * El HUD y el informe JSON evalúan dinámicamente el resultado:
+     * Si `fail_count > 0`: Muestra `ESTADO: CON DEFECTOS` en rojo y detalla el recuento de fallos.
+     * Si `not_tested_count > 0`: Informa `ESTADO: APROBADO CON EXCLUSIONES JUSTIFICADAS`, reportando por separado `pass_count` y `not_tested_count`.
+     * Cero declaraciones incondicionales de éxito.
 
 ---
 

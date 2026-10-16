@@ -83,11 +83,12 @@ func _update_hud_telemetry() -> void:
 	if player.sprite.texture:
 		tex_name = player.sprite.texture.resource_path.get_file()
 
-	telemetry_label.text = "Estado: %s\nDirección: %s\nTextura: %s\nOffset: %s\nEscala: %s\nSombra Pos: %s | Escala: %s\nCombo Stage: %d | Timer: %.2fs" % [
+	telemetry_label.text = "Estado: %s\nDirección: %s\nTextura: %s\nOffset: %s\nEscala: %s\nSombra Pos: %s | Escala: %s\nCombo Stage: %d | Timer: %.2fs\nAserciones: %d PASS | %d FAIL | %d NOT TESTED" % [
 		state_name, dir_name, tex_name,
 		str(player.sprite.offset), str(player.sprite.scale),
 		str(player.shadow.position), str(player.shadow.scale),
-		player.combo_stage, player.combo_window_timer
+		player.combo_stage, player.combo_window_timer,
+		pass_count, fail_count, not_tested_count
 	]
 
 
@@ -189,7 +190,23 @@ func _run_full_validation() -> void:
 
 	print("\n>>> EXPORTANDO INFORME Y TELEMETRÍA FINAL <<<")
 	_export_final_report()
-	status_label.text = "¡Validación Completada con Éxito!"
+
+	if fail_count > 0:
+		status_label.text = "ESTADO: CON DEFECTOS (%d FALLOS DETECTADOS)" % fail_count
+		status_label.modulate = Color(1.0, 0.25, 0.25)
+		errors_label.text = "¡FALLOS CRÍTICOS! %d FAIL | %d PASS | %d NOT TESTED" % [fail_count, pass_count, not_tested_count]
+		errors_label.modulate = Color(1.0, 0.3, 0.3)
+	elif not_tested_count > 0:
+		status_label.text = "ESTADO: APROBADO CON EXCLUSIONES JUSTIFICADAS"
+		status_label.modulate = Color(0.4, 0.85, 1.0)
+		errors_label.text = "Aprobado: %d PASS | 0 FAIL | %d NOT TESTED (Exclusiones documentadas)" % [pass_count, not_tested_count]
+		errors_label.modulate = Color(0.8, 0.9, 1.0)
+	else:
+		status_label.text = "ESTADO: APROBADO 100% (%d ASERCIONES)" % pass_count
+		status_label.modulate = Color(0.3, 1.0, 0.4)
+		errors_label.text = "Verificado completamente: %d PASS | 0 FAIL | 0 NOT TESTED" % pass_count
+		errors_label.modulate = Color(0.5, 1.0, 0.5)
+
 	_save_viewport_png("anim_captures/godot_actual_render_preview.png")
 
 	print("======================================================================")
@@ -209,9 +226,10 @@ func _run_mode_1_resource_inspection() -> void:
 	# 1. Desactivar explícitamente el procesamiento para evitar interferencias
 	player.set_physics_process(false)
 	player.set_process(false)
-	print("  [Modo 1] Procesamiento del jugador desactivado.")
+	print("  [Modo 1] Procesamiento del jugador desactivado. Validando consistencia de assets generados en disco...")
 
 	var def_offset := Vector2(0, -100)
+	var expected_img_size := Vector2i(256, 320)
 	var dirs = ["down", "up", "left", "right"]
 
 	# A) Inspección de Reposo (Idle): 4 direcciones x 8 frames = 32 comprobaciones
@@ -229,13 +247,26 @@ func _run_mode_1_resource_inspection() -> void:
 			await get_tree().process_frame
 
 			var actual_file: String = player.sprite.texture.resource_path.get_file() if player.sprite.texture else "NULO"
-			_record_assertion("RESOURCE_INSPECTION", "Idle_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
-			_record_assertion("RESOURCE_INSPECTION", "Idle_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
-			_record_assertion("RESOURCE_INSPECTION", "Idle_%s_F%d" % [dir_str, f], "sprite_scale", Vector2.ONE, player.sprite.scale, player.sprite.scale == Vector2.ONE)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Idle_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Idle_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Idle_%s_F%d" % [dir_str, f], "sprite_scale", Vector2.ONE, player.sprite.scale, player.sprite.scale == Vector2.ONE)
+
+			var img: Image = tex.get_image() if tex else null
+			var img_size := img.get_size() if img else Vector2i.ZERO
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Idle_%s_F%d" % [dir_str, f], "image_dimensions", expected_img_size, img_size, img_size == expected_img_size)
+
+			var used_rect := img.get_used_rect() if img else Rect2i()
+			var has_content := used_rect.has_area()
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Idle_%s_F%d" % [dir_str, f], "image_has_content", true, has_content, has_content)
 
 		_save_viewport_png("anim_captures/engine_idle_%s.png" % dir_str)
 
 	# B) Inspección de Marcha (Walk): 4 direcciones x 8 frames = 32 comprobaciones
+	# NOTA DE DISEÑO (J2ME -> Godot):
+	# Los 8 archivos de marcha (hero_lucian_walk_<dir>_0 a _7.png) se basan en los
+	# 4 fotogramas gráficos originales de combate de J2ME (Anim 2 en dg.java) repetidos
+	# dos veces consecutivas (f_idx = i % 4) para adaptarse a la cadencia de marcha
+	# direccional de 8 pasos del motor a 10 FPS.
 	for d in range(4):
 		var dir_str: String = dirs[d]
 		player.current_dir = d
@@ -250,8 +281,16 @@ func _run_mode_1_resource_inspection() -> void:
 			await get_tree().process_frame
 
 			var actual_file: String = player.sprite.texture.resource_path.get_file() if player.sprite.texture else "NULO"
-			_record_assertion("RESOURCE_INSPECTION", "Walk_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
-			_record_assertion("RESOURCE_INSPECTION", "Walk_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Walk_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Walk_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+
+			var img: Image = tex.get_image() if tex else null
+			var img_size := img.get_size() if img else Vector2i.ZERO
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Walk_%s_F%d" % [dir_str, f], "image_dimensions", expected_img_size, img_size, img_size == expected_img_size)
+
+			var used_rect := img.get_used_rect() if img else Rect2i()
+			var has_content := used_rect.has_area()
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Walk_%s_F%d" % [dir_str, f], "image_has_content", true, has_content, has_content)
 
 	# C) Inspección de Ataque Básico Combo 1 (Anim 6): 4 direcciones x 5 frames = 20 comprobaciones
 	for d in range(4):
@@ -269,8 +308,16 @@ func _run_mode_1_resource_inspection() -> void:
 			await get_tree().process_frame
 
 			var actual_file: String = player.sprite.texture.resource_path.get_file() if player.sprite.texture else "NULO"
-			_record_assertion("RESOURCE_INSPECTION", "Combo1_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
-			_record_assertion("RESOURCE_INSPECTION", "Combo1_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo1_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo1_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+
+			var img: Image = tex.get_image() if tex else null
+			var img_size := img.get_size() if img else Vector2i.ZERO
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo1_%s_F%d" % [dir_str, f], "image_dimensions", expected_img_size, img_size, img_size == expected_img_size)
+
+			var used_rect := img.get_used_rect() if img else Rect2i()
+			var has_content := used_rect.has_area()
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo1_%s_F%d" % [dir_str, f], "image_has_content", true, has_content, has_content)
 
 			# Guardar captura dedicada de cada fotograma (garantiza F3 != F4)
 			_save_viewport_png("anim_captures/engine_combo1_%s_f%d.png" % [dir_str, f])
@@ -291,14 +338,22 @@ func _run_mode_1_resource_inspection() -> void:
 			await get_tree().process_frame
 
 			var actual_file: String = player.sprite.texture.resource_path.get_file() if player.sprite.texture else "NULO"
-			_record_assertion("RESOURCE_INSPECTION", "Combo2_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
-			_record_assertion("RESOURCE_INSPECTION", "Combo2_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo2_%s_F%d" % [dir_str, f], "texture_exact_match", expected_file, actual_file, actual_file == expected_file)
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo2_%s_F%d" % [dir_str, f], "sprite_offset", def_offset, player.sprite.offset, player.sprite.offset == def_offset)
+
+			var img: Image = tex.get_image() if tex else null
+			var img_size := img.get_size() if img else Vector2i.ZERO
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo2_%s_F%d" % [dir_str, f], "image_dimensions", expected_img_size, img_size, img_size == expected_img_size)
+
+			var used_rect := img.get_used_rect() if img else Rect2i()
+			var has_content := used_rect.has_area()
+			_record_assertion("GENERATED_ASSET_CONSISTENCY", "Combo2_%s_F%d" % [dir_str, f], "image_has_content", true, has_content, has_content)
 
 			_save_viewport_png("anim_captures/engine_combo2_%s_f%d.png" % [dir_str, f])
 
 	# Registrar propiedades que no aplican a la inspección estática
-	_record_not_tested("RESOURCE_INSPECTION", "StaticFrames", "velocity_physics", "El procesamiento físico está desactivado deliberadamente en Modo 1")
-	_record_not_tested("RESOURCE_INSPECTION", "StaticFrames", "combo_window_timer", "La ventana de combo solo se evalúa durante la ejecución real")
+	_record_not_tested("GENERATED_ASSET_CONSISTENCY", "StaticFrames", "velocity_physics", "El procesamiento físico está desactivado deliberadamente durante la inspección de archivos generados")
+	_record_not_tested("GENERATED_ASSET_CONSISTENCY", "StaticFrames", "combo_window_timer", "La ventana de combo solo se evalúa durante la ejecución real (Modo 2)")
 
 
 # ==============================================================================
@@ -474,12 +529,21 @@ func _run_mode_2_live_execution() -> void:
 	# D) Prueba 2.4: Ataque Básico Combo 1 en Vivo (Anim 6 · 5 frames a 14 FPS)
 	print("  [Modo 2] Probando Ataque Básico Combo 1 real con registro tick-a-tick...")
 	_release_all_inputs()
+	var expected_combo1_dir: int = DIR_DOWN
+	var expected_combo1_dir_name: String = "down"
+	player.current_dir = expected_combo1_dir
+	player.current_state = STATE_IDLE
+	player._update_facing_sprite()
 	for i in range(5):
 		await get_tree().physics_frame
 
 	var atk1_trace_assertions: Array[Dictionary] = []
 	var observed_atk1_frames: Array[int] = []
 	var observed_atk1_textures: Array[String] = []
+
+	# Aserción obligatoria: Dirección real establecida coincide con la declarada
+	var a_c1_dir = _record_assertion("LIVE_EXECUTION", "Attack1_Direction", "direction_matches_declared", expected_combo1_dir, player.current_dir, player.current_dir == expected_combo1_dir)
+	atk1_trace_assertions.append(a_c1_dir)
 
 	_simulate_attack_press()
 	await get_tree().physics_frame
@@ -490,9 +554,11 @@ func _run_mode_2_live_execution() -> void:
 	var a_trig_st = _record_assertion("LIVE_EXECUTION", "Attack1_Trigger", "state_is_attack", STATE_ATTACK, player.current_state, player.current_state == STATE_ATTACK)
 	var a_trig_vel = _record_assertion("LIVE_EXECUTION", "Attack1_Trigger", "velocity_zero", Vector2.ZERO, player.velocity, player.velocity == Vector2.ZERO)
 	var a_trig_stg = _record_assertion("LIVE_EXECUTION", "Attack1_Trigger", "combo_stage_zero", 0, player.combo_stage, player.combo_stage == 0)
+	var a_trig_dir = _record_assertion("LIVE_EXECUTION", "Attack1_Trigger", "direction_maintained_during_attack", expected_combo1_dir, player.current_dir, player.current_dir == expected_combo1_dir)
 	atk1_trace_assertions.append(a_trig_st)
 	atk1_trace_assertions.append(a_trig_vel)
 	atk1_trace_assertions.append(a_trig_stg)
+	atk1_trace_assertions.append(a_trig_dir)
 
 	# Capturar durante el ataque en vivo
 	var cap_atk1_path := "anim_captures/live_attack_combo1_active.png"
@@ -512,6 +578,12 @@ func _run_mode_2_live_execution() -> void:
 		observed_atk1_frames.append(f_idx)
 		if not observed_atk1_textures.has(cur_tex):
 			observed_atk1_textures.append(cur_tex)
+
+	# Aserción obligatoria: Comprobar que cada textura observada corresponde a la dirección declarada
+	for cur_t in observed_atk1_textures:
+		var has_dir_name := ("_" + expected_combo1_dir_name + "_") in cur_t
+		var a_tex_dir = _record_assertion("LIVE_EXECUTION", "Attack1_Textures", "texture_dir_matches_" + expected_combo1_dir_name, true, has_dir_name, has_dir_name)
+		atk1_trace_assertions.append(a_tex_dir)
 
 	var unique_atk1_seq := _compress_sequence(observed_atk1_frames)
 	var is_atk1_mono := _is_strictly_monotonic(unique_atk1_seq, -1)
@@ -537,7 +609,7 @@ func _run_mode_2_live_execution() -> void:
 		"initial_state": "IDLE",
 		"final_state": "IDLE",
 		"active_state": "ATTACK",
-		"direction": "DOWN",
+		"direction": expected_combo1_dir_name.to_upper(),
 		"physics_ticks_recorded": ticks_in_attack,
 		"observed_frame_indices": observed_atk1_frames,
 		"unique_sequence": unique_atk1_seq,
@@ -551,9 +623,20 @@ func _run_mode_2_live_execution() -> void:
 
 	# E) Prueba 2.5: Remate Combo 2 en Vivo (Anim 7 · 3 frames a 14 FPS)
 	print("  [Modo 2] Probando Remate Combo 2 encadenado dentro de la ventana de combo...")
+	var expected_fin_dir: int = DIR_DOWN
+	var expected_fin_dir_name: String = "down"
+	player.current_dir = expected_fin_dir
+	player._update_facing_sprite()
+	for i in range(2):
+		await get_tree().physics_frame
+
 	var atk2_trace_assertions: Array[Dictionary] = []
 	var observed_atk2_frames: Array[int] = []
 	var observed_atk2_textures: Array[String] = []
+
+	# Aserción obligatoria: Dirección real establecida coincide con la declarada
+	var a_fin_dir = _record_assertion("LIVE_EXECUTION", "Finisher_Direction", "direction_matches_declared", expected_fin_dir, player.current_dir, player.current_dir == expected_fin_dir)
+	atk2_trace_assertions.append(a_fin_dir)
 
 	_simulate_attack_press()
 	await get_tree().physics_frame
@@ -562,8 +645,10 @@ func _run_mode_2_live_execution() -> void:
 
 	var a_fin_trig = _record_assertion("LIVE_EXECUTION", "Finisher_Trigger", "state_is_attack", STATE_ATTACK, player.current_state, player.current_state == STATE_ATTACK)
 	var a_fin_stg = _record_assertion("LIVE_EXECUTION", "Finisher_Trigger", "combo_stage_is_finisher", 1, player.combo_stage, player.combo_stage == 1)
+	var a_fin_trig_dir = _record_assertion("LIVE_EXECUTION", "Finisher_Trigger", "direction_during_finisher", expected_fin_dir, player.current_dir, player.current_dir == expected_fin_dir)
 	atk2_trace_assertions.append(a_fin_trig)
 	atk2_trace_assertions.append(a_fin_stg)
+	atk2_trace_assertions.append(a_fin_trig_dir)
 
 	var cap_atk2_path := "anim_captures/live_attack_combo2_active.png"
 	_save_viewport_png(cap_atk2_path)
@@ -581,6 +666,12 @@ func _run_mode_2_live_execution() -> void:
 		observed_atk2_frames.append(f_idx)
 		if not observed_atk2_textures.has(cur_tex):
 			observed_atk2_textures.append(cur_tex)
+
+	# Aserción obligatoria: Comprobar que cada textura observada corresponde a la dirección declarada
+	for cur_t in observed_atk2_textures:
+		var tex_has_dir := ("_" + expected_fin_dir_name + "_") in cur_t
+		var a_tex_dir = _record_assertion("LIVE_EXECUTION", "Finisher_Textures", "texture_dir_matches_" + expected_fin_dir_name, true, tex_has_dir, tex_has_dir)
+		atk2_trace_assertions.append(a_tex_dir)
 
 	var unique_atk2_seq := _compress_sequence(observed_atk2_frames)
 	var is_atk2_mono := _is_strictly_monotonic(unique_atk2_seq, -1)
@@ -604,7 +695,7 @@ func _run_mode_2_live_execution() -> void:
 		"initial_state": "IDLE (combo stage 1)",
 		"final_state": "IDLE",
 		"active_state": "ATTACK",
-		"direction": "DOWN",
+		"direction": expected_fin_dir_name.to_upper(),
 		"physics_ticks_recorded": ticks_in_finisher,
 		"observed_frame_indices": observed_atk2_frames,
 		"unique_sequence": unique_atk2_seq,
@@ -662,10 +753,17 @@ func _run_mode_2_live_execution() -> void:
 	# G) Prueba 2.7: Caducidad Autónoma de la Ventana de Combo
 	print("  [Modo 2] Probando caducidad de la ventana de combo sin entrada...")
 	_release_all_inputs()
+	var expected_exp_dir: int = DIR_DOWN
+	player.current_dir = expected_exp_dir
 	player.combo_stage = 0
 	player.combo_window_timer = 0.0
+	player._update_facing_sprite()
 	for i in range(5):
 		await get_tree().physics_frame
+
+	var expiry_assertions: Array[Dictionary] = []
+	var a_exp_dir = _record_assertion("LIVE_EXECUTION", "ComboExpiry", "direction_matches_declared", expected_exp_dir, player.current_dir, player.current_dir == expected_exp_dir)
+	expiry_assertions.append(a_exp_dir)
 
 	_simulate_attack_press()
 	await get_tree().physics_frame
@@ -679,6 +777,7 @@ func _run_mode_2_live_execution() -> void:
 			break
 
 	var a_w_open = _record_assertion("LIVE_EXECUTION", "ComboExpiry", "combo_stage_at_start", 1, player.combo_stage, player.combo_stage == 1)
+	expiry_assertions.append(a_w_open)
 
 	# Esperar 35 frames adicionales (0.58s > 0.40s ventana de combo)
 	for i in range(35):
@@ -686,27 +785,65 @@ func _run_mode_2_live_execution() -> void:
 
 	var a_w_exp = _record_assertion("LIVE_EXECUTION", "ComboExpiry", "timer_expired_to_zero", 0.0, player.combo_window_timer, player.combo_window_timer == 0.0)
 	var a_w_rst = _record_assertion("LIVE_EXECUTION", "ComboExpiry", "stage_reset_to_zero", 0, player.combo_stage, player.combo_stage == 0)
+	expiry_assertions.append(a_w_exp)
+	expiry_assertions.append(a_w_rst)
 
 	live_test_traces.append({
 		"test_name": "Live_Combo_Window_Expiry",
 		"initial_state": "IDLE (combo stage 1, ventana abierta)",
 		"final_state": "IDLE (combo stage 0)",
+		"direction": "DOWN",
 		"measured_duration_sec": 35.0 / 60.0,
 		"state_transitions": ["Combo Stage 1 -> Combo Stage 0 por caducidad de temporizador"],
-		"assertions": [a_w_open, a_w_exp, a_w_rst]
+		"assertions": expiry_assertions
 	})
 
-	# H) Prueba 2.8: Procedencia de Recursos y Paridad J2ME (Auditoría Criptográfica y Decompilada)
-	print("  [Modo 2] Validando procedencia de recursos y paridad contra JAR y clases decompiladas...")
-	_record_assertion("PROVENANCE_PARITY", "ResourceIntegrity", "cif_structure_parity", "hero/h1", "hero/h1", true)
-	_record_assertion("PROVENANCE_PARITY", "ResourceIntegrity", "layers_count_parity", 8, 8, true)
-	_record_assertion("PROVENANCE_PARITY", "ResourceIntegrity", "weapons_provenance", "hero/w/400.mpm (dual)", "hero/w/400.mpm (dual)", true)
-	_record_assertion("PROVENANCE_PARITY", "ResourceIntegrity", "vfx_provenance", "hero/4/1.mpm", "hero/4/1.mpm", true)
-	_record_assertion("PROVENANCE_PARITY", "ResourceIntegrity", "armor_light_prefix", "l00 (dq.a() == false)", "l00 (dq.a() == false)", true)
-	_record_assertion("PROVENANCE_PARITY", "DirectionMapping", "directions_parity", [1, 2, 3, 4], [1, 2, 3, 4], true)
-	_record_assertion("PROVENANCE_PARITY", "TimingParity", "attack_tick_rate_fps", 14.0, 14.0, true)
-	_record_assertion("PROVENANCE_PARITY", "TimingParity", "walk_scale_rate_fps", 10.0, 10.0, true)
-	_record_assertion("PROVENANCE_PARITY", "TimingParity", "idle_adapted_rate_fps", 6.0, 6.0, true)
+	# H) Prueba 2.8: Procedencia de Recursos y Fidelidad J2ME (Auditoría Real basada en provenance_audit.json y Configuración en Memoria)
+	print("  [Modo 2] Validando procedencia de recursos y fidelidad contra JAR y clases decompiladas...")
+	var prov_path := "res://anim_captures/provenance_audit.json"
+	var prov_exists := FileAccess.file_exists(prov_path)
+	_record_assertion("PROVENANCE_PARITY", "ReportFile", "provenance_report_exists", true, prov_exists, prov_exists)
+
+	if prov_exists:
+		var p_file := FileAccess.open(prov_path, FileAccess.READ)
+		if p_file:
+			var parsed = JSON.parse_string(p_file.get_as_text())
+			p_file.close()
+			if parsed is Dictionary:
+				var actual_status = str(parsed.get("status", ""))
+				_record_assertion("PROVENANCE_PARITY", "AuditStatus", "status_is_pass_100", "PASS_100_PERCENT", actual_status, actual_status == "PASS_100_PERCENT")
+
+				var actual_audited = int(parsed.get("total_assets_audited", 0))
+				_record_assertion("PROVENANCE_PARITY", "AuditCoverage", "total_assets_audited", 134, actual_audited, actual_audited == 134)
+
+				var actual_disc = int(parsed.get("discrepancies", -1))
+				_record_assertion("PROVENANCE_PARITY", "Discrepancies", "zero_discrepancies", 0, actual_disc, actual_disc == 0)
+
+				var actual_ratio = float(parsed.get("exact_match_ratio", 0.0))
+				_record_assertion("PROVENANCE_PARITY", "MatchRatio", "exact_match_ratio_100", 1.0, actual_ratio, actual_ratio == 1.0)
+
+				var actual_cif = str(parsed.get("cif_structure", ""))
+				_record_assertion("PROVENANCE_PARITY", "CIFStructure", "cif_structure_matches_hero_h1", "hero/h1", actual_cif, actual_cif == "hero/h1")
+
+				var layers = parsed.get("layers_verified", [])
+				_record_assertion("PROVENANCE_PARITY", "LayersCount", "layers_count_is_8", 8, layers.size(), layers.size() == 8)
+
+				if layers.size() >= 8:
+					_record_assertion("PROVENANCE_PARITY", "Layer0_Head", "layer0_path", "hero/0/00.mpm", str(layers[0].get("path", "")), str(layers[0].get("path", "")) == "hero/0/00.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer1_Torso", "layer1_light_armor", "hero/1/l00.mpm", str(layers[1].get("path", "")), str(layers[1].get("path", "")) == "hero/1/l00.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer2_Legs", "layer2_pants", "hero/2/l00.mpm", str(layers[2].get("path", "")), str(layers[2].get("path", "")) == "hero/2/l00.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer3_Boots", "layer3_boots", "hero/3/l00.mpm", str(layers[3].get("path", "")), str(layers[3].get("path", "")) == "hero/3/l00.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer4_VFX", "layer4_slash_vfx", "hero/4/1.mpm", str(layers[4].get("path", "")), str(layers[4].get("path", "")) == "hero/4/1.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer5_Face", "layer5_face", "hero/eh.mpm", str(layers[5].get("path", "")), str(layers[5].get("path", "")) == "hero/eh.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer6_WeaponMain", "layer6_dagger_main", "hero/w/400.mpm", str(layers[6].get("path", "")), str(layers[6].get("path", "")) == "hero/w/400.mpm")
+					_record_assertion("PROVENANCE_PARITY", "Layer7_WeaponOff", "layer7_dagger_off", "hero/w/400.mpm", str(layers[7].get("path", "")), str(layers[7].get("path", "")) == "hero/w/400.mpm")
+
+	# Verificación de configuración activa en memoria del jugador (Player Node)
+	_record_assertion("PROVENANCE_PARITY", "PlayerConfig", "character_class_is_asesino", "Asesino", player.character_class, player.character_class == "Asesino")
+	_record_assertion("PROVENANCE_PARITY", "PlayerConfig", "atk_frames_down_loaded", 5, player.atk_frames_down.size(), player.atk_frames_down.size() == 5)
+	_record_assertion("PROVENANCE_PARITY", "PlayerConfig", "combo_frames_down_loaded", 3, player.combo_frames_down.size(), player.combo_frames_down.size() == 3)
+	_record_assertion("PROVENANCE_PARITY", "PlayerConfig", "walk_frames_down_loaded", 8, player.walk_frames_down.size(), player.walk_frames_down.size() == 8)
+	_record_assertion("PROVENANCE_PARITY", "PlayerConfig", "idle_frames_down_loaded", 8, player.idle_frames_down.size(), player.idle_frames_down.size() == 8)
 
 	# Documentación explícita de propiedades de emulador interactivo fuera de alcance de prueba headless
 	_record_not_tested("PROVENANCE_PARITY", "J2ME_Interactive_Runtime", "emulator_audio_sync", "La sincronización de audio J2ME requiere ejecución interactiva del MIDlet con backend de sonido activo")
@@ -841,7 +978,7 @@ func _export_final_report() -> void:
 			"pass": pass_count,
 			"fail": fail_count,
 			"not_tested": not_tested_count,
-			"verdict": "APROBADO_CON_EXITO" if fail_count == 0 else "CON_DEFECTOS"
+			"verdict": "CON_DEFECTOS" if fail_count > 0 else ("APROBADO_CON_EXCLUSIONES" if not_tested_count > 0 else "APROBADO_100_PORCIENTO")
 		},
 		"provenance_audit": provenance_data,
 		"sprite_offset": str(player.sprite.offset),

@@ -179,7 +179,7 @@ def verify_all_hero_assets():
             },
             "animation_mapping": {
                 "Anim 0 (Idle)": "8 frames (Reposo con respiración)",
-                "Anim 2 (Combat Walk)": "4 frames base expandidos a 8 frames de marcha con armas listas",
+                "Anim 2 (Combat Walk)": "4 fotogramas gráficos originales repetidos dos veces consecutivas (i % 4) para formar el ciclo de 8 archivos de marcha a 10 FPS en Godot",
                 "Anim 6 (Combo 1 Attack)": "5 frames de tajo giratorio con tajos VFX en F1 y F3",
                 "Anim 7 (Combo 2 Finisher)": "3 frames de salto y estocada vertical",
                 "Anim 4 (Death)": "9 frames de caída"
